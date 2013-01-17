@@ -1,7 +1,7 @@
 Sprint Backlog: Due date on Wednesday, January 30th.
 ====================================================
 All can edit the sections as they see fit!
-===============================================================================
+------------------------------------------
 Stories: Picked from backlog for this sprint by Developers & Team Leader
 ===============================================================================
 * As a manager I want to complete the product statement document so I can turn it in on Friday
