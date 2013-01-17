@@ -20,7 +20,6 @@ Tasks: Created from stories by Developers who also chose what to be completed
 * Get an android activity of the game board with a simple background
 * Design Client/Server architecture, pick fat-server or fat-client
 * * Jim - I'm thinking fat-server is easiest as it's a long test cycle on android clients
-* Setup build environment for android client
 * Setup Unit-Test environment for android client
 * Pick language & environment for server
 * * Jim - I'm thinking Go (golang.org) for server side language, easy non-blocking I/O and built for this kind of thing
