@@ -1,0 +1,69 @@
+#!/bin/bash
+ANDROID_PATH=$( cd "$( dirname "$0" )" && pwd )
+ANDROID_TARGET="android-8"
+NAME="CAH"
+PACKAGE="com.cah"
+ACTIVITY=Cah
+
+function clean {
+	#fix for multi-user environment
+	rm -rf /tmp/android
+	ant clean
+}
+
+function build {
+	ant debug
+}
+
+function emulate {
+	if [ -z "`ls ~/.android/avd/ | grep $NAME`" ]; then
+		echo "No AVD named \`$NAME\` found"
+		echo "Use iterate \`create_avd\` to get started"
+	fi
+
+	if [ -z "`adb devices | grep -v List | grep device`" ]; then
+		echo "No devices attached, launching our cs252 device"
+		emulator -cpu-delay 0 -no-boot-anim -cache /tmp/cache -avd $NAME &
+	fi
+}
+
+function install {
+	ant debug install
+}
+
+function launch {
+	adb shell am start -n $PACKAGE/.$ACTIVITY
+}
+
+function release {
+	ant release
+}
+
+function update_project {
+	android update project \
+		--target $ANDROID_TARGET \
+		--name $NAME \
+		--path $ANDROID_PATH
+}
+
+function create_project {
+	android create project \
+		--target $ANDROID_TARGET \
+		--name $NAME \
+		--path $ANDROID_PATH \
+		--activity $ACTIVITY \
+		--package $PACKAGE
+}
+
+function create_avd {
+	android create avd \
+		--snapshot \
+		-n $NAME \
+		-t $ANDROID_TARGET
+}
+
+function run {
+	clean && build && emulate && install && launch
+}
+
+(cd "$PROJECT_PATH" && $1)
