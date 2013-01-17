@@ -14,18 +14,17 @@ Stories: Picked from backlog for this sprint by Developers & Team Leader
 
 Tasks: Created from stories by Developers who also chose what to be completed
 ===============================================================================
-Write up product statement, objectives, stakeholders and deliverables
-* Jim|May need to meet with a TA/Project Manager for this? Not sure...
-* Jim|It would be good for us to put it into project-info.txt so we can reference it 
-Get an android activity of the game board with a simple background
-Design Client/Server architecture, pick fat-server or fat-client
-* Jim|I'm thinking fat-server is easiest as it's a long test cycle on android clients
-Setup build environment for android client
-Setup Unit-Test environment for android client
-Pick language & environment for server
-	-Jim|I'm thinking Go (golang.org) for server side language, easy
-	non-blocking I/O and built for this kind of thing
-Setup Unit-Test environment for server
+* Write up product statement, objectives, stakeholders and deliverables
+* * Jim - May need to meet with a TA/Project Manager for this? Not sure...
+* * Jim - It would be good for us to put it into project-info.txt so we can reference it 
+* Get an android activity of the game board with a simple background
+* Design Client/Server architecture, pick fat-server or fat-client
+* * Jim - I'm thinking fat-server is easiest as it's a long test cycle on android clients
+* Setup build environment for android client
+* Setup Unit-Test environment for android client
+* Pick language & environment for server
+* * Jim - I'm thinking Go (golang.org) for server side language, easy non-blocking I/O and built for this kind of thing
+* Setup Unit-Test environment for server
 
 Product Backlog
 ===============
