@@ -66,4 +66,9 @@ function run {
 	clean && build && emulate && install && launch
 }
 
-(cd "$PROJECT_PATH" && $1)
+if [ "_$1" = "_" ]; then
+	echo "Please type a command."
+else
+	set -e # Tells bash to stop executing if there's an error.
+	(cd "$PROJECT_PATH" && $1)
+fi
