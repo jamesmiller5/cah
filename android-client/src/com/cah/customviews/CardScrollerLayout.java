@@ -86,7 +86,7 @@ public class CardScrollerLayout extends ViewGroup {
 				continue;
 			}
 			LayoutParams p = child.getLayoutParams();
-			child.layout(0+(i*(p.width/2)), 0, p.width+(i*(p.width/2)), p.height);
+			child.layout(0+(i*(p.width/10)), 0, p.width+(i*(p.width/10)), p.height);
 		}
 	}
 
