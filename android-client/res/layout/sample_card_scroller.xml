@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<com.cah.customviews.CardScrollerLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical" >
+
+    <com.cah.customviews.CardView
+        android:layout_width="250dp"
+        android:layout_height="300dp"
+        android:layout_gravity="top"
+        android:background="@drawable/card_background_white"
+        android:paddingBottom="40dp"
+        android:paddingLeft="20dp"
+        app:exampleDimension="24sp"
+        app:exampleString="This is a sample card. Please ignore this text." />
+
+    <com.cah.customviews.CardView
+        android:layout_width="250dp"
+        android:layout_height="300dp"
+        android:layout_gravity="right"
+        android:background="@drawable/card_background_white"
+        android:paddingBottom="40dp"
+        android:paddingLeft="20dp"
+        app:exampleDimension="24sp"
+        app:exampleString="Test, Test, Test, Test, Test, Test, Test, Test, Test!" />
+
+</com.cah.customviews.CardScrollerLayout>
