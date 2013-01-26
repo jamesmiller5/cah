@@ -8,28 +8,22 @@ import (
 
 func Serve() {
 	tcpAddr, err := net.ResolveTCPAddr("tcp", "0.0.0.0:41337")
-	checkError(err, true)
+	if err != nil {
+		log.Println("Error ", err.Error())
+	}
 
 	listener, err := net.ListenTCP("tcp", tcpAddr)
-	checkError(err, true)
+	if err != nil {
+		log.Println("Error ", err.Error())
+	}
 
 	for {
 		conn, err := listener.Accept()
 		if err != nil {
-			checkError(err, false)
+			log.Println("Fatal error ", err.Error())
+			os.Exit(1)
 			continue
 		}
 		go HandleNewClient(conn)
-	}
-}
-
-func CheckError(err error, fatal bool) {
-	if err != nil {
-		if fatal {
-			log.Println("Fatal error ", err.Error())
-			os.Exit(1)
-		} else {
-			log.Println("Error ", err.Error())
-		}
 	}
 }
