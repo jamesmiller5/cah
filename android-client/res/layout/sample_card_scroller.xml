@@ -94,4 +94,5 @@
         android:paddingLeft="20dp"
         app:exampleDimension="24sp"
         app:exampleString="how are you holding up because im a potato" />
+
 </com.cah.customviews.CardScrollerLayout>

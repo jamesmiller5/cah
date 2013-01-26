@@ -2,6 +2,7 @@ package com.cah.customviews;
 
 import android.content.Context;
 import android.util.AttributeSet;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 
@@ -9,7 +10,7 @@ public class CardScrollerLayout extends ViewGroup {
 
 	private int maxChildWidth = 0;
 	private int maxChildHeight = 0;
-	
+		
 	public CardScrollerLayout(Context context) {
 		super(context);
 		// TODO Auto-generated constructor stub
@@ -88,6 +89,34 @@ public class CardScrollerLayout extends ViewGroup {
 			LayoutParams p = child.getLayoutParams();
 			child.layout(0+(i*(p.width/10)), 0, p.width+(i*(p.width/10)), p.height);
 		}
+	}
+	
+	/**
+	 * Touch event handler
+	 * 
+	 * @param event The motion event
+	 * @return True if the event was handled, false otherwise.
+	 */
+	public boolean onTouchEvent(MotionEvent event) {
+		if(event.getActionMasked() == MotionEvent.ACTION_DOWN || event.getActionMasked() == MotionEvent.ACTION_UP){
+			return true;
+		}
+		if(event.getActionMasked() == MotionEvent.ACTION_MOVE){
+			final int childCount = getChildCount();
+			
+			for(int i = 0; i< childCount; i++) {
+				final View child = getChildAt(i);
+				if(child.getVisibility() == GONE) {
+					continue;
+				}
+				final int childLeft = child.getLeft();
+				final int childRight = child.getRight();
+				child.layout(childLeft, (int)event.getY() - (child.getHeight()/2), childRight, (int)(event.getY() + child.getHeight() - (child.getHeight()/2)));
+			}
+			
+			return true;
+		}
+		return false;
 	}
 
 }
