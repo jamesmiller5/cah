@@ -11,7 +11,8 @@ import (
 
 type Table struct {
 	id        string
-	deltaChan chan * PlayerDelta
+	game      *Game
+	deltaChan chan *PlayerDelta
 }
 
 type TableDelta struct {
@@ -21,10 +22,6 @@ type TableDelta struct {
 
 var tables = map[string]*Table{}
 var tableLock *sync.Mutex = new(sync.Mutex)
-var handlers = map[string]func(dec *json.Decoder, enc *json.Encoder, msg *TableDelta){
-	"new":  handleNewTable,
-	"join": handleJoinTable,
-}
 
 func HandleNewClient(conn net.Conn) {
 	defer conn.Close()
@@ -70,20 +67,18 @@ func handleJoinTable(dec *json.Decoder, enc *json.Encoder, msg *TableDelta) {
 		enc.Encode(&TableDelta{Command: "nope", ID: msg.ID})
 	} else {
 		enc.Encode(&TableDelta{Command: "ok", ID: msg.ID})
-	}
-
-	for {
-		var msg TableDelta
-		if err := dec.Decode(&msg); err != nil {
-			panic("Decode Error")
-		}
-
-		tab.deltaChan <- "Sup?"
+		tab.HandleNewPlayer(dec, enc)
 	}
 }
 
+//Map of handler names in messages to handler functions
+var handlers = map[string]func(dec *json.Decoder, enc *json.Encoder, msg *TableDelta){
+	"new":  handleNewTable,
+	"join": handleJoinTable,
+}
+
 func NewTable() *Table {
-	t := &Table{deltaChan: make(chan * PlayerDelta)}
+	t := &Table{deltaChan: make(chan *PlayerDelta)}
 
 	//try and add the table to the list using a random id avoiding collisions
 	for {
@@ -107,6 +102,11 @@ func NewTable() *Table {
 	return t
 }
 
+func (t *Table) PlayGame() {
+	t.game = NewGame()
+	t.game.play()
+}
+
 func LookUpTable(id string) *Table {
 	tableLock.Lock()
 	defer tableLock.Unlock()
@@ -123,10 +123,4 @@ func (t *Table) Delete() {
 	}
 
 	delete(tables, t.id)
-}
-
-func (t *Table) PlayGame() {
-	for {
-		fmt.Println("Play Game: ", <-t.deltaChan)
-	}
 }
