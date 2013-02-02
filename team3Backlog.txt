@@ -1,0 +1,45 @@
+Product Backlog		(Time estimate of tasks???)
+===============
+* Complete the product statement document: product statement, objectives, stakeholders and deliverables
+
+* Set up source control (Github) and connect group
+
+* Each developer unfamiliar with Android platform complete HelloWorld application (those familiar help).
+
+Done ./iterate run 
+* As a developer I want to 1-click build the android client so I can speed up development time
+
+* As a developer I want to design a client server architecture so I can build multiple clients (fat-server as it's a long test cycle on android clients)
+
+* Pick language & environment for server: thinking Go (golang.org) for server side language, easy non-blocking I/O and built for this kind of thing
+
+* Setup Unit-Test environment for android client
+
+* Setup Unit-Test environment for server
+
+* As a developer I want to create client & server unit-tests so I can assure my code works correctly on the phone & server. 
+
+* As a developer I want to integrate unit-tests with the build system so I can be assured my changes aren't breaking others work
+
+* Get an android activity of the game board with a simple background
+
+* As a user I want to use the android app without it crashing so I can not be disappointed 
+
+* As a user I want to play with friends next to me so I can enjoy the game true to it's original form
+
+* As a developer I want the application to handle action events: scroll over cards, select card; scroll through my cards easily so I can see what I have in my hand fast
+
+* User should be able to create a new game/table
+
+* User should be able to join an existing table
+
+* As a user I want a appealing GUI
+
+* As a developer I want to use Gestault's Principles and other human factors engineering techniques to layout/design the interface.
+
+* As a user I would like to identify who is the current Zaar of the game (user currently asking the question) via name, image, or other entity
+
+* As a developer it might be an interesting test tool to be able to play with the computer
+
+
+
