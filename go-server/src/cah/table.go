@@ -10,9 +10,8 @@ import (
 )
 
 type Table struct {
-	id        string
-	game      *Game
-	deltaChan chan *PlayerDelta
+	id   string
+	game *Game
 }
 
 type TableDelta struct {
@@ -46,18 +45,20 @@ func HandleNewClient(conn net.Conn) {
 			panic("Unknown Command: " + msg.Command)
 		}
 
-		handler(dec, enc, &msg)
+		if handler(dec, enc, &msg) {
+			break
+		}
 	}
 }
 
-func handleNewTable(dec *json.Decoder, enc *json.Encoder, msg *TableDelta) {
+func handleNewTable(dec *json.Decoder, enc *json.Encoder, msg *TableDelta) bool {
 	tab := NewTable()
 	go tab.PlayGame()
 	msg.ID = tab.id
-	handleJoinTable(dec, enc, msg)
+	return handleJoinTable(dec, enc, msg)
 }
 
-func handleJoinTable(dec *json.Decoder, enc *json.Encoder, msg *TableDelta) {
+func handleJoinTable(dec *json.Decoder, enc *json.Encoder, msg *TableDelta) bool {
 	if len(msg.ID) > 6 {
 		panic("Message ID too long")
 	}
@@ -67,18 +68,21 @@ func handleJoinTable(dec *json.Decoder, enc *json.Encoder, msg *TableDelta) {
 		enc.Encode(&TableDelta{Command: "nope", ID: msg.ID})
 	} else {
 		enc.Encode(&TableDelta{Command: "ok", ID: msg.ID})
-		tab.HandleNewPlayer(dec, enc)
+		tab.game.HandlePlayer(dec, enc)
+		return true
 	}
+
+	return false
 }
 
 //Map of handler names in messages to handler functions
-var handlers = map[string]func(dec *json.Decoder, enc *json.Encoder, msg *TableDelta){
+var handlers = map[string]func(dec *json.Decoder, enc *json.Encoder, msg *TableDelta) bool{
 	"new":  handleNewTable,
 	"join": handleJoinTable,
 }
 
 func NewTable() *Table {
-	t := &Table{deltaChan: make(chan *PlayerDelta)}
+	t := &Table{game: NewGame()}
 
 	//try and add the table to the list using a random id avoiding collisions
 	for {
@@ -104,7 +108,7 @@ func NewTable() *Table {
 
 func (t *Table) PlayGame() {
 	t.game = NewGame()
-	t.game.play()
+	t.game.Play()
 }
 
 func LookUpTable(id string) *Table {
