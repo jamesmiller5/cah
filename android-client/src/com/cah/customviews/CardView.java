@@ -3,6 +3,7 @@ package com.cah.customviews;
 import com.cah.R;
 import com.cah.R.styleable;
 
+import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.res.TypedArray;
 import android.graphics.Bitmap;
@@ -10,6 +11,7 @@ import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
+import android.graphics.Typeface;
 import android.graphics.drawable.Drawable;
 import android.text.Layout.Alignment;
 import android.text.StaticLayout;
@@ -71,6 +73,9 @@ public class CardView extends View {
 		mTextPaint = new TextPaint();
 		mTextPaint.setFlags(Paint.ANTI_ALIAS_FLAG);
 		mTextPaint.setTextAlign(Paint.Align.LEFT);
+		Typeface typeface = Typeface.createFromAsset(getContext().getAssets(), "fonts/helveticaneue.ttf");
+		mTextPaint.setTypeface(typeface);
+		mTextPaint.setTextSize((float)16.0);
 		
 		// Update TextPaint and text measurements from attributes
 		invalidateTextPaintAndMeasurements();
@@ -82,12 +87,14 @@ public class CardView extends View {
 	private void invalidateTextPaintAndMeasurements() {
 		mTextPaint.setTextSize(mExampleDimension);
 		mTextPaint.setColor(mTextColor);
+		
 		mTextWidth = mTextPaint.measureText(mCardText);
 
 		Paint.FontMetrics fontMetrics = mTextPaint.getFontMetrics();
 		mTextHeight = fontMetrics.bottom;
 	}
 
+	@SuppressLint("DrawAllocation")
 	@Override
 	protected void onDraw(Canvas canvas) {
 		super.onDraw(canvas);
@@ -102,12 +109,14 @@ public class CardView extends View {
 		int contentWidth = getWidth() - paddingLeft - paddingRight;
 		int contentHeight = getHeight() - paddingTop - paddingBottom;
 		
-		mTextLayout = new StaticLayout(mCardText, mTextPaint, contentWidth, Alignment.ALIGN_NORMAL, 1, 10, true);
+		canvas.translate((float)50, (float)35);
+		mTextLayout = new StaticLayout(mCardText, mTextPaint, contentWidth-95, Alignment.ALIGN_NORMAL, 1, 10, true);
 		mTextLayout.draw(canvas);
+		
 		// Draw the text.
 		//canvas.drawText(mCardText, paddingLeft, paddingTop + 50, mTextPaint);
-		
-		canvas.drawBitmap(mCahLogo, 30, this.getHeight()-90, null);
+		canvas.translate((float)0, (float)0);
+		canvas.drawBitmap(mCahLogo, 0, this.getHeight()-90, null);
 
 	}
 
