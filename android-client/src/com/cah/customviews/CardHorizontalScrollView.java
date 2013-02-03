@@ -9,6 +9,11 @@ import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.WindowManager;
+import android.view.animation.Animation;
+import android.view.animation.Animation.AnimationListener;
+import android.view.animation.AnimationSet;
+import android.view.animation.ScaleAnimation;
+import android.view.animation.TranslateAnimation;
 import android.widget.HorizontalScrollView;
 
 public class CardHorizontalScrollView extends HorizontalScrollView {
@@ -19,6 +24,7 @@ public class CardHorizontalScrollView extends HorizontalScrollView {
 	boolean verticalSwipePossible;
 	boolean verticalSwipeHappening = false;
 	View cardToMove;
+	View animatingCard;
 	Rect originalCardRect = new Rect();
 
 	public CardHorizontalScrollView(Context context, AttributeSet attrs) {
@@ -42,22 +48,59 @@ public class CardHorizontalScrollView extends HorizontalScrollView {
 				DisplayMetrics displayMetrics = new DisplayMetrics();
 				((WindowManager)context.getSystemService(Context.WINDOW_SERVICE)).getDefaultDisplay().getMetrics(displayMetrics);
 				int cardThresholdPosition = (displayMetrics.heightPixels / 3);
-
+				
+				animatingCard = cardToMove;
 				if(event.getRawY() < cardThresholdPosition) {
 					// Dropped on top half
-					cardToMove.setVisibility(View.GONE);
+					//cardToMove.setVisibility(View.GONE);
 					// TODO: Animate card into table.
+					ScaleAnimation scaleAnimation = new ScaleAnimation((float)1., (float)0., (float)1., (float)0., Animation.RELATIVE_TO_SELF, (float)0.5, Animation.RELATIVE_TO_SELF, (float).25);
+					AnimationSet animSet = new AnimationSet(false);
+					animSet.addAnimation(scaleAnimation);
+					animSet.setDuration(300);
+					
+					animSet.setAnimationListener(new AnimationListener() {
+
+						@Override
+						public void onAnimationEnd(Animation animation) {
+							animatingCard.setVisibility(View.GONE);
+							//TODO: Submit card choice to server.
+						}
+
+						@Override
+						public void onAnimationRepeat(Animation animation) {
+						}
+
+						@Override
+						public void onAnimationStart(Animation animation) {
+						}
+						
+					});
+					
+					startingPoint = null;
+					dxdy = null;
+					
+					cardToMove.startAnimation(animSet);
 					// TODO: Call function telling app that the user has played a card.s
 				} else {
 					// Dropped on bottom half
-					cardToMove.layout(originalCardRect.left, originalCardRect.top, originalCardRect.right, originalCardRect.bottom);
-					// TODO: Spring back
-				}
-			}
+					TranslateAnimation slideAnimation = new TranslateAnimation(0, 0, -(startingPoint.y - event.getRawY()),  0);
+					AnimationSet animSet = new AnimationSet(false);
+					animSet.addAnimation(slideAnimation);
+					animSet.setDuration(300);
+					animSet.setFillAfter(false);
 
-			startingPoint = null;
-			dxdy = null;
-			cardToMove = null;
+					cardToMove.layout(originalCardRect.left, originalCardRect.top, originalCardRect.right, originalCardRect.bottom);
+					startingPoint = null;
+					dxdy = null;
+
+					cardToMove.startAnimation(animSet);
+				}
+				cardToMove = null;
+				return true;
+			}
+			
+			return super.onTouchEvent(event);
 		}
 
 		if(verticalSwipePossible) {
