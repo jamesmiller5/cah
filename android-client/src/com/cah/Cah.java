@@ -33,6 +33,20 @@ public class Cah extends Activity
         QuickContactBadge button8 = (QuickContactBadge) this.findViewById(R.id.player8);
         QuickContactBadge button9 = (QuickContactBadge) this.findViewById(R.id.player9);
         */
-      
+    performOnBackgroundThread(new CahClient()); 
     }
+public static Thread performOnBackgroundThread(final Runnable runnable) {
+    final Thread t = new Thread() {
+        @Override
+        public void run() {
+            try {
+                runnable.run();
+            } finally {
+
+            }
+        }
+    };
+    t.start();
+    return t;
+}
 }
