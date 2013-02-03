@@ -18,92 +18,62 @@
             <com.cah.customviews.CardView
                 android:layout_width="235dp"
                 android:layout_height="300dp"
-                android:background="@drawable/card_background_white"
-                android:paddingBottom="40dp"
-                android:paddingLeft="20dp"
-                app:exampleDimension="24sp"
-                app:exampleString="Pretending to be happy." />
+                app:color="@android:color/white"
+                app:cardString="Pretending to be happy."/>
 
             <com.cah.customviews.CardView
                 android:layout_width="235dp"
                 android:layout_height="300dp"
-                android:background="@drawable/card_background_white"
-                android:paddingBottom="40dp"
-                android:paddingLeft="20dp"
-                app:exampleDimension="24sp"
-                app:exampleString="Test, Test, Test, Test, Test, Test, Test, Test, Test!" />
+                app:color="@android:color/white"
+                app:cardString="Test, Test, Test, Test, Test, Test, Test, Test, Test!" />
 
             <com.cah.customviews.CardView
                 android:layout_width="235dp"
                 android:layout_height="300dp"
-                android:background="@drawable/card_background_white"
-                android:paddingBottom="40dp"
-                android:paddingLeft="20dp"
-                app:exampleDimension="24sp"
-                app:exampleString="This card should hang off the right side of the screen!" />
+                app:color="@android:color/white"
+                app:cardString="This card should hang off the right side of the screen!" />
 
             <com.cah.customviews.CardView
                 android:layout_width="235dp"
                 android:layout_height="300dp"
-                android:background="@drawable/card_background_white"
-                android:paddingBottom="40dp"
-                android:paddingLeft="20dp"
-                app:exampleDimension="24sp"
-                app:exampleString="Bla bla bla" />
+                app:color="@android:color/white"
+                app:cardString="Bla bla bla" />
 
             <com.cah.customviews.CardView
                 android:layout_width="235dp"
                 android:layout_height="300dp"
-                android:background="@drawable/card_background_white"
-                android:paddingBottom="40dp"
-                android:paddingLeft="20dp"
-                app:exampleDimension="24sp"
-                app:exampleString="greetings cheese popsicle the number you have dialed is currently out of porkchops" />
+                app:color="@android:color/white"
+                app:cardString="greetings cheese popsicle the number you have dialed is currently out of porkchops" />
 
             <com.cah.customviews.CardView
                 android:layout_width="235dp"
                 android:layout_height="300dp"
-                android:background="@drawable/card_background_white"
-                android:paddingBottom="40dp"
-                android:paddingLeft="20dp"
-                app:exampleDimension="24sp"
-                app:exampleString="friends dont let friends let scientific progress go boink" />
+                app:color="@android:color/white"
+                app:cardString="friends dont let friends let scientific progress go boink" />
 
             <com.cah.customviews.CardView
                 android:layout_width="235dp"
                 android:layout_height="300dp"
-                android:background="@drawable/card_background_white"
-                android:paddingBottom="40dp"
-                android:paddingLeft="20dp"
-                app:exampleDimension="24sp"
-                app:exampleString="oh yeah alright were gonna shake it up with the party bear tonight" />
+                app:color="@android:color/white"
+                app:cardString="oh yeah alright were gonna shake it up with the party bear tonight" />
 
             <com.cah.customviews.CardView
                 android:layout_width="235dp"
                 android:layout_height="300dp"
-                android:background="@drawable/card_background_white"
-                android:paddingBottom="40dp"
-                android:paddingLeft="20dp"
-                app:exampleDimension="24sp"
-                app:exampleString="f of two equals f of one equals one" />
+                app:color="@android:color/white"
+                app:cardString="f of two equals f of one equals one" />
 
             <com.cah.customviews.CardView
                 android:layout_width="235dp"
                 android:layout_height="300dp"
-                android:background="@drawable/card_background_white"
-                android:paddingBottom="40dp"
-                android:paddingLeft="20dp"
-                app:exampleDimension="24sp"
-                app:exampleString="oh hai im in ur computer eating your cheezburgers and CAHing your textz" />
+                app:color="@android:color/white"
+                app:cardString="oh hai im in ur computer eating your cheezburgers and CAHing your textz" />
 
             <com.cah.customviews.CardView
                 android:layout_width="235dp"
                 android:layout_height="300dp"
-                android:background="@drawable/card_background_white"
-                android:paddingBottom="40dp"
-                android:paddingLeft="20dp"
-                app:exampleDimension="24sp"
-                app:exampleString="how are you holding up because im a potato" />
+                app:color="@android:color/white"
+                app:cardString="how are you holding up because im a potato" />
         </LinearLayout>
     </com.cah.customviews.CardHorizontalScrollView>
 
