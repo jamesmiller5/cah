@@ -47,7 +47,7 @@ public class CardHorizontalScrollView extends HorizontalScrollView {
 				// We need to figure out what to do with the card that was dropped.
 				DisplayMetrics displayMetrics = new DisplayMetrics();
 				((WindowManager)context.getSystemService(Context.WINDOW_SERVICE)).getDefaultDisplay().getMetrics(displayMetrics);
-				int cardThresholdPosition = (displayMetrics.heightPixels / 3);
+				int cardThresholdPosition = ((3*displayMetrics.heightPixels) / 6);
 				
 				animatingCard = cardToMove;
 				if(event.getRawY() < cardThresholdPosition) {
