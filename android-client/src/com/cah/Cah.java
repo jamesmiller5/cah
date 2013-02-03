@@ -10,6 +10,6 @@ public class Cah extends Activity
     public void onCreate(Bundle savedInstanceState)
     {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.main);
+        setContentView(R.layout.sample_scrollview);
     }
 }
