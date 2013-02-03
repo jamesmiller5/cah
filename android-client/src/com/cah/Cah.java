@@ -16,7 +16,7 @@ public class Cah extends Activity
     public void onCreate(Bundle savedInstanceState)
     {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.game);
+        setContentView(R.layout.main);
         /*ImageView image1 = (ImageView) this.findViewById(R.id.imageView2);
         QuickContactBadge button1 = (QuickContactBadge) this.findViewById(R.id.player1);
         QuickContactBadge button2 = (QuickContactBadge) this.findViewById(R.id.player2);
