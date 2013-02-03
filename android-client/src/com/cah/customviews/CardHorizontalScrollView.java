@@ -35,13 +35,15 @@ public class CardHorizontalScrollView extends HorizontalScrollView {
 
 	public boolean onTouchEvent(MotionEvent event) {
 		if(event.getAction() == MotionEvent.ACTION_DOWN){
+			if(verticalSwipeHappening)
+				return false;
 			startingPoint = new Point((int)event.getRawX(), (int)event.getRawY());
 			System.out.println(startingPoint.toString());
 			verticalSwipePossible = true;
 			return super.onTouchEvent(event);
 		} else if (event.getAction() == MotionEvent.ACTION_UP){
 			verticalSwipePossible = false;
-			verticalSwipeHappening = false;
+			//verticalSwipeHappening = false;
 
 			if(cardToMove != null) {
 				// We need to figure out what to do with the card that was dropped.
@@ -64,6 +66,7 @@ public class CardHorizontalScrollView extends HorizontalScrollView {
 						@Override
 						public void onAnimationEnd(Animation animation) {
 							animatingCard.setVisibility(View.GONE);
+							verticalSwipeHappening = false;
 							//TODO: Submit card choice to server.
 						}
 
@@ -89,12 +92,27 @@ public class CardHorizontalScrollView extends HorizontalScrollView {
 					animSet.addAnimation(slideAnimation);
 					animSet.setDuration(300);
 					animSet.setFillAfter(false);
+					animSet.setAnimationListener(new AnimationListener() {
+
+						@Override
+						public void onAnimationEnd(Animation animation) {
+							verticalSwipeHappening = false;
+						}
+
+						@Override
+						public void onAnimationRepeat(Animation animation) {}
+
+						@Override
+						public void onAnimationStart(Animation animation) {}
+						
+					});
 
 					cardToMove.layout(originalCardRect.left, originalCardRect.top, originalCardRect.right, originalCardRect.bottom);
 					startingPoint = null;
 					dxdy = null;
 
 					cardToMove.startAnimation(animSet);
+					
 				}
 				cardToMove = null;
 				return true;

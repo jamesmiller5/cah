@@ -16,16 +16,16 @@
             android:gravity="bottom" >
 
             <com.cah.customviews.CardView
-                android:layout_width="250dp"
+                android:layout_width="235dp"
                 android:layout_height="300dp"
                 android:background="@drawable/card_background_white"
                 android:paddingBottom="40dp"
                 android:paddingLeft="20dp"
                 app:exampleDimension="24sp"
-                app:exampleString="This is a sample card. Please ignore this text." />
+                app:exampleString="Pretending to be happy." />
 
             <com.cah.customviews.CardView
-                android:layout_width="250dp"
+                android:layout_width="235dp"
                 android:layout_height="300dp"
                 android:background="@drawable/card_background_white"
                 android:paddingBottom="40dp"
@@ -34,7 +34,7 @@
                 app:exampleString="Test, Test, Test, Test, Test, Test, Test, Test, Test!" />
 
             <com.cah.customviews.CardView
-                android:layout_width="250dp"
+                android:layout_width="235dp"
                 android:layout_height="300dp"
                 android:background="@drawable/card_background_white"
                 android:paddingBottom="40dp"
@@ -43,7 +43,7 @@
                 app:exampleString="This card should hang off the right side of the screen!" />
 
             <com.cah.customviews.CardView
-                android:layout_width="250dp"
+                android:layout_width="235dp"
                 android:layout_height="300dp"
                 android:background="@drawable/card_background_white"
                 android:paddingBottom="40dp"
@@ -52,7 +52,7 @@
                 app:exampleString="Bla bla bla" />
 
             <com.cah.customviews.CardView
-                android:layout_width="250dp"
+                android:layout_width="235dp"
                 android:layout_height="300dp"
                 android:background="@drawable/card_background_white"
                 android:paddingBottom="40dp"
@@ -61,7 +61,7 @@
                 app:exampleString="greetings cheese popsicle the number you have dialed is currently out of porkchops" />
 
             <com.cah.customviews.CardView
-                android:layout_width="250dp"
+                android:layout_width="235dp"
                 android:layout_height="300dp"
                 android:background="@drawable/card_background_white"
                 android:paddingBottom="40dp"
@@ -70,7 +70,7 @@
                 app:exampleString="friends dont let friends let scientific progress go boink" />
 
             <com.cah.customviews.CardView
-                android:layout_width="250dp"
+                android:layout_width="235dp"
                 android:layout_height="300dp"
                 android:background="@drawable/card_background_white"
                 android:paddingBottom="40dp"
@@ -79,7 +79,7 @@
                 app:exampleString="oh yeah alright were gonna shake it up with the party bear tonight" />
 
             <com.cah.customviews.CardView
-                android:layout_width="250dp"
+                android:layout_width="235dp"
                 android:layout_height="300dp"
                 android:background="@drawable/card_background_white"
                 android:paddingBottom="40dp"
@@ -88,7 +88,7 @@
                 app:exampleString="f of two equals f of one equals one" />
 
             <com.cah.customviews.CardView
-                android:layout_width="250dp"
+                android:layout_width="235dp"
                 android:layout_height="300dp"
                 android:background="@drawable/card_background_white"
                 android:paddingBottom="40dp"
@@ -97,7 +97,7 @@
                 app:exampleString="oh hai im in ur computer eating your cheezburgers and CAHing your textz" />
 
             <com.cah.customviews.CardView
-                android:layout_width="250dp"
+                android:layout_width="235dp"
                 android:layout_height="300dp"
                 android:background="@drawable/card_background_white"
                 android:paddingBottom="40dp"
