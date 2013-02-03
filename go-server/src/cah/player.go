@@ -1,8 +1,8 @@
 package cah
 
 import (
-	"encoding/json"
 	"fmt"
+	"time"
 )
 
 type PlayerDelta struct {
@@ -10,7 +10,7 @@ type PlayerDelta struct {
 	Message string
 }
 
-var playerDeltaMessages = map[string]bool{
+var playerDeltaMessages = map[string]bool {
 	"connect": true,
 	"leave":   true,
 }
@@ -34,11 +34,11 @@ type Player struct {
 	quit         chan bool
 	playerDeltas chan *PlayerDelta
 	deckDeltas   chan *DeckDelta
-	dec          *json.Decoder
-	enc          *json.Encoder
+	dec          *NetDecoder
+	enc          *NetEncoder
 }
 
-func NewPlayer(dec *json.Decoder, enc *json.Encoder, id int) *Player {
+func NewPlayer(dec *NetDecoder, enc *NetEncoder, id int) *Player {
 	return &Player{
 		Id:           id,
 		dec:          dec,
@@ -71,12 +71,13 @@ func (p *Player) DecodeMessages(playerDeltas chan *PlayerDelta, deckDeltas chan 
 			}
 
 			//decode either as a DeckDelta or PlayerDelta
+			p.dec.net.SetDeadline(time.Now().Add(30*time.Second))
 			if err := p.dec.Decode(&delta); err != nil {
 				fmt.Println("Player.DecodeMessages decode error")
 				//send a "leave" command
-				playerDeltas <- p.LeaveMessage()
 				goto exit
 			}
+			p.dec.net.SetDeadline(time.Time{})
 
 			//not zero makes this a Deck
 			if delta.Deck.Player != 0 {
@@ -84,9 +85,13 @@ func (p *Player) DecodeMessages(playerDeltas chan *PlayerDelta, deckDeltas chan 
 					fmt.Println("Deck.Player missing fields")
 					goto exit
 				}
+				if true != deckDeltaDecks[delta.Deck.DeckTo] || true != deckDeltaDecks[delta.Deck.DeckFrom] {
+					fmt.Println("Deck.DeckTo or .DeckFrom illegal")
+					goto exit
+				}
 				deckDeltas <- &delta.Deck
 			} else if delta.Player.Id != 0 {
-				if delta.Player.Id < 1 || len(delta.Player.Message) == 0 || len(delta.Player.Message) > 10 {
+				if delta.Player.Id < 1 || len(delta.Player.Message) > 10 || true != playerDeltaMessages[delta.Player.Message] {
 					fmt.Println("delta.Player data error")
 					goto exit
 				}
@@ -98,6 +103,7 @@ func (p *Player) DecodeMessages(playerDeltas chan *PlayerDelta, deckDeltas chan 
 		}
 	}
 exit:
+	playerDeltas <- p.LeaveMessage()
 }
 
 func (p *Player) EncodeMessages() {

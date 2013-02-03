@@ -7,6 +7,7 @@ import (
 	"fmt"
 	"net"
 	"sync"
+	"time"
 )
 
 type Table struct {
@@ -17,6 +18,16 @@ type Table struct {
 type TableDelta struct {
 	Command string
 	ID      string
+}
+
+type NetEncoder struct {
+	*json.Encoder
+	net net.Conn
+}
+
+type NetDecoder struct {
+	*json.Decoder
+	net net.Conn
 }
 
 var tables = map[string]*Table{}
@@ -30,14 +41,16 @@ func HandleNewClient(conn net.Conn) {
 		}
 	}()
 
-	dec := json.NewDecoder(conn)
-	enc := json.NewEncoder(conn)
+	dec := &NetDecoder{ json.Decoder: json.NewDecoder(conn), net: conn }
+	enc := &NetEncoder{ json.Encoder: json.NewEncoder(conn), net: conn }
 	for {
 		var msg TableDelta
 
+		dec.net.SetDeadline(time.Now().Add(30*time.Second))
 		if err := dec.Decode(&msg); err != nil {
 			panic("Decode Error")
 		}
+		dec.net.SetDeadline(time.Time{})
 
 		handler, exists := handlers[msg.Command]
 
@@ -51,14 +64,14 @@ func HandleNewClient(conn net.Conn) {
 	}
 }
 
-func handleNewTable(dec *json.Decoder, enc *json.Encoder, msg *TableDelta) bool {
+func handleNewTable(dec *NetDecoder, enc *NetEncoder, msg *TableDelta) bool {
 	tab := NewTable()
 	go tab.PlayGame()
 	msg.ID = tab.id
 	return handleJoinTable(dec, enc, msg)
 }
 
-func handleJoinTable(dec *json.Decoder, enc *json.Encoder, msg *TableDelta) bool {
+func handleJoinTable(dec *NetDecoder, enc *NetEncoder, msg *TableDelta) bool {
 	if len(msg.ID) > 6 {
 		panic("Message ID too long")
 	}
@@ -76,7 +89,7 @@ func handleJoinTable(dec *json.Decoder, enc *json.Encoder, msg *TableDelta) bool
 }
 
 //Map of handler names in messages to handler functions
-var handlers = map[string]func(dec *json.Decoder, enc *json.Encoder, msg *TableDelta) bool{
+var handlers = map[string]func(dec *NetDecoder, enc *NetEncoder, msg *TableDelta) bool{
 	"new":  handleNewTable,
 	"join": handleJoinTable,
 }
@@ -102,6 +115,8 @@ func NewTable() *Table {
 		}
 		tableLock.Unlock()
 	}
+
+	fmt.Printf("New Table %+v\n", t)
 
 	return t
 }
