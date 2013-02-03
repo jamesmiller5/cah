@@ -14,19 +14,15 @@ import android.widget.TextView;
 public class Cah extends Activity
 {
 
-	Queue<Delta> incoming;
-	Queue<Delta> outgoing;
 	/** Called when the activity is first created. */
 	@Override
-	public void onCreate(Bundle savedInstanceState)
-	{
+	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.main);
 
-		incoming = new LinkedList<Delta>();
-		outgoing = new LinkedList<Delta>();
-		performOnBackgroundThread(new CahClient(incoming, outgoing)); 
+		performOnBackgroundThread(new CahClient()); 
 	}
+
 	public static Thread performOnBackgroundThread(final Runnable runnable) {
 		final Thread t = new Thread() {
 			@Override
