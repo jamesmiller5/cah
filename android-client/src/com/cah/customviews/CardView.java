@@ -107,7 +107,7 @@ public class CardView extends View {
 		// Draw the text.
 		//canvas.drawText(mCardText, paddingLeft, paddingTop + 50, mTextPaint);
 		
-		canvas.drawBitmap(mCahLogo, 5, this.getBottom() - mCahLogo.getHeight() - this.getPaddingBottom(), null);
+		canvas.drawBitmap(mCahLogo, 30, this.getHeight()-90, null);
 
 	}
 
