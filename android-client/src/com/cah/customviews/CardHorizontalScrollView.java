@@ -41,9 +41,9 @@ public class CardHorizontalScrollView extends HorizontalScrollView {
 				// We need to figure out what to do with the card that was dropped.
 				DisplayMetrics displayMetrics = new DisplayMetrics();
 				((WindowManager)context.getSystemService(Context.WINDOW_SERVICE)).getDefaultDisplay().getMetrics(displayMetrics);
-				int windowHalfwayPoint = displayMetrics.heightPixels / 2;
+				int cardThresholdPosition = (displayMetrics.heightPixels / 3);
 
-				if(event.getRawY() < windowHalfwayPoint) {
+				if(event.getRawY() < cardThresholdPosition) {
 					// Dropped on top half
 					cardToMove.setVisibility(View.GONE);
 					// TODO: Animate card into table.
