@@ -3,88 +3,39 @@ package cah
 import (
 	"encoding/json"
 	"fmt"
+	"sync"
 )
 
-type PlayerDelta struct {
-	num     int
-	message string
-}
-
-type Player struct {
-	playerDeltas chan *PlayerDelta
-}
-
-func NewPlayer() *Player {
-	return &Player{playerDeltas: make(chan *PlayerDelta)}
-}
-
 type Game struct {
+	sync.Mutex
 	dealer *Player
+	playerInc int
 }
 
 func NewGame() *Game {
-	return &Game{dealer: NewPlayer()}
+	//dealer has an id of 0
+	return &Game{dealer: NewPlayer(nil, nil, 0), playerInc: 1}
 }
 
 func (game *Game) Play() {
 	for {
 		select {
 		case pd := <-game.dealer.playerDeltas:
-			fmt.Println("got a player delta", pd)
+			fmt.Println("Dealer a player delta", pd)
+		case dd := <-game.dealer.deckDeltas:
+			fmt.Println("Dealer a deck delta", dd)
 		}
 	}
 }
 
 func (game *Game) HandlePlayer(dec *json.Decoder, enc *json.Encoder) {
-	//me := NewPlayer()
-	incoming := make(chan *PlayerDelta)
-	//We want 2 slots in case both goroutines quit at the same time
-	quit := make(chan bool, 2)
-	defer func() { quit <- true }()
+	game.Lock()
+	me := NewPlayer(dec, enc, game.playerInc)
+	game.playerInc++
+	game.Unlock()
 
-	//Decode goroutine
-	go func() {
-		defer func() { quit <- true }()
-
-		for {
-			select {
-				case <-quit:
-					//Should quit
-					fmt.Println("Decode got the message to quit")
-					goto exit
-				default:
-					//dummy test message
-					var m struct {
-						Message string
-					}
-
-					if err := dec.Decode(&m); err != nil {
-						fmt.Println("HandlePlayer decode error")
-						goto exit
-					}
-
-					fmt.Println("Got a message", m)
-			}
-		}
-		exit:
-	}()
-
-	//
-	for {
-		select {
-		//pd update from dealer
-		case pd := <-game.dealer.playerDeltas:
-			fmt.Println("client got pd update from dealer", pd)
-			//encode and send
-
-			//pd update from our client
-		case pd := <-incoming:
-			game.dealer.playerDeltas <- pd
-
-		case <-quit:
-			fmt.Println("PlayerHandler got the message to quit")
-			goto exit
-		}
-	}
-exit:
+	//Decode goroutine, sends messages to dealer
+	go me.DecodeMessages(game.dealer.playerDeltas, game.dealer.deckDeltas)
+	//Encode our messages
+	me.EncodeMessages()
 }
