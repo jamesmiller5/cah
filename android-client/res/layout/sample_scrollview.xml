@@ -4,15 +4,16 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent">
 
-    <HorizontalScrollView
+    <com.cah.customviews.CardHorizontalScrollView
         android:layout_width="match_parent"
-        android:layout_height="300dp"
+        android:layout_height="match_parent"
         android:layout_alignParentBottom="true"
         android:scrollbars="none" >
 
         <LinearLayout
             android:layout_width="match_parent"
-            android:layout_height="match_parent" >
+            android:layout_height="match_parent"
+            android:gravity="bottom" >
 
             <com.cah.customviews.CardView
                 android:layout_width="250dp"
@@ -104,6 +105,6 @@
                 app:exampleDimension="24sp"
                 app:exampleString="how are you holding up because im a potato" />
         </LinearLayout>
-    </HorizontalScrollView>
+    </com.cah.customviews.CardHorizontalScrollView>
 
 </RelativeLayout>
