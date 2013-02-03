@@ -1,8 +1,5 @@
 package com.cah.customviews;
 
-import com.cah.R;
-import com.cah.R.styleable;
-
 import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.res.TypedArray;
@@ -12,12 +9,13 @@ import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.Typeface;
-import android.graphics.drawable.Drawable;
 import android.text.Layout.Alignment;
 import android.text.StaticLayout;
 import android.text.TextPaint;
 import android.util.AttributeSet;
 import android.view.View;
+
+import com.cah.R;
 
 /**
  * TODO: document your custom view class.
@@ -25,9 +23,7 @@ import android.view.View;
 public class CardView extends View {
 	private String mCardText = "Test"; // TODO: use a default from R.string...
 	private int mTextColor = Color.BLACK; // TODO: Set this based on background color
-	
-	private float mExampleDimension = 0; // TODO: use a default from R.dimen...
-	
+		
 	private Bitmap mCahLogo;
 
 	private TextPaint mTextPaint;
@@ -58,34 +54,42 @@ public class CardView extends View {
 		if(this.isInEditMode()) {
 			mCardText = "This is an example card";
 		} else {
-			mCardText = a.getString(R.styleable.CardView_exampleString);
+			mCardText = a.getString(R.styleable.CardView_cardString);
 		}
-
-		// Use getDimensionPixelSize or getDimensionPixelOffset when dealing
-		// with
-		// values that should fall on pixel boundaries.
-		mExampleDimension = a.getDimension(
-				R.styleable.CardView_exampleDimension, mExampleDimension);
-
+		
+		int backgroundColor = a.getColor(R.styleable.CardView_color, Color.WHITE);
+		if(backgroundColor == Color.WHITE){
+			mTextColor = Color.BLACK;
+			this.setBackgroundDrawable(this.getResources().getDrawable(R.drawable.card_background_white));
+			// Get bitmap image for icon
+			mCahLogo = BitmapFactory.decodeResource(this.getContext().getResources(), R.drawable.icon_w);
+		} else {
+			mTextColor = Color.WHITE;
+			this.setBackgroundDrawable(this.getResources().getDrawable(R.drawable.card_background_black));
+			// Get bitmap image for icon
+			mCahLogo = BitmapFactory.decodeResource(this.getContext().getResources(), R.drawable.icon_b);
+		}
+		
 		a.recycle();
 
 		// Set up a default TextPaint object
 		mTextPaint = new TextPaint();
 		mTextPaint.setFlags(Paint.ANTI_ALIAS_FLAG);
 		mTextPaint.setTextAlign(Paint.Align.LEFT);
-		Typeface typeface = Typeface.createFromAsset(getContext().getAssets(), "fonts/helveticaneue.ttf");
-		mTextPaint.setTypeface(typeface);
-		mTextPaint.setTextSize((float)16.0);
+		if(this.isInEditMode() == false) {
+			Typeface typeface = Typeface.createFromAsset(getContext().getAssets(), "fonts/helveticaneue.ttf");
+			mTextPaint.setTypeface(typeface);
+		}
+		mTextPaint.setTextSize((float)45);
 		
 		// Update TextPaint and text measurements from attributes
 		invalidateTextPaintAndMeasurements();
 		
-		// Get bitmap image for icon
-		mCahLogo = BitmapFactory.decodeResource(this.getContext().getResources(), R.drawable.icon_w);
+		
 	}
 
 	private void invalidateTextPaintAndMeasurements() {
-		mTextPaint.setTextSize(mExampleDimension);
+		mTextPaint.setTextSize((float)45);
 		mTextPaint.setColor(mTextColor);
 		
 		mTextWidth = mTextPaint.measureText(mCardText);
@@ -101,10 +105,10 @@ public class CardView extends View {
 		
 		// TODO: consider storing these as member variables to reduce
 		// allocations per draw cycle.
-		int paddingLeft = getPaddingLeft();
+		int paddingLeft = 20;
 		int paddingTop = getPaddingTop();
 		int paddingRight = getPaddingRight();
-		int paddingBottom = getPaddingBottom();
+		int paddingBottom = 40;
 
 		int contentWidth = getWidth() - paddingLeft - paddingRight;
 		int contentHeight = getHeight() - paddingTop - paddingBottom;
@@ -125,7 +129,7 @@ public class CardView extends View {
 	 * 
 	 * @return The example string attribute value.
 	 */
-	public String getExampleString() {
+	public String getCardString() {
 		return mCardText;
 	}
 
@@ -136,7 +140,7 @@ public class CardView extends View {
 	 * @param exampleString
 	 *            The example string attribute value to use.
 	 */
-	public void setExampleString(String exampleString) {
+	public void setCardString(String exampleString) {
 		mCardText = exampleString;
 		invalidateTextPaintAndMeasurements();
 	}
@@ -162,25 +166,5 @@ public class CardView extends View {
 		invalidateTextPaintAndMeasurements();
 	}
 
-	/**
-	 * Gets the example dimension attribute value.
-	 * 
-	 * @return The example dimension attribute value.
-	 */
-	public float getExampleDimension() {
-		return mExampleDimension;
-	}
-
-	/**
-	 * Sets the view's example dimension attribute value. In the example view,
-	 * this dimension is the font size.
-	 * 
-	 * @param exampleDimension
-	 *            The example dimension attribute value to use.
-	 */
-	public void setExampleDimension(float exampleDimension) {
-		mExampleDimension = exampleDimension;
-		invalidateTextPaintAndMeasurements();
-	}
 
 }
