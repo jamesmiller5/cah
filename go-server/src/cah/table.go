@@ -64,12 +64,6 @@ func HandleNewClient(conn net.Conn) {
 	}
 }
 
-func handleNewTable(dec *NetDecoder, enc *NetEncoder, msg *TableDelta) bool {
-	tab := NewTable()
-	go tab.PlayGame()
-	msg.ID = tab.id
-	return handleJoinTable(dec, enc, msg)
-}
 
 func handleJoinTable(dec *NetDecoder, enc *NetEncoder, msg *TableDelta) bool {
 	if len(msg.ID) > 6 {
@@ -89,9 +83,14 @@ func handleJoinTable(dec *NetDecoder, enc *NetEncoder, msg *TableDelta) bool {
 }
 
 //Map of handler names in messages to handler functions
-var handlers = map[string]func(dec *NetDecoder, enc *NetEncoder, msg *TableDelta) bool{
-	"new":  handleNewTable,
+var handlers = map[string]func(*NetDecoder, *NetEncoder, *TableDelta) bool{
 	"join": handleJoinTable,
+	"new":  func(dec *NetDecoder, enc *NetEncoder, msg *TableDelta) bool {
+		tab := NewTable()
+		go tab.PlayGame()
+		msg.ID = tab.id
+		return handleJoinTable(dec, enc, msg)
+	},
 }
 
 func NewTable() *Table {
