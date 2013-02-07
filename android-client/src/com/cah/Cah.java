@@ -2,7 +2,7 @@ package com.cah;
 
 import android.app.Activity;
 import java.util.Queue;
-import java.util.LinkedList;
+import java.util.concurrent.ArrayBlockingQueue;
 import android.widget.ImageView;
 import android.widget.QuickContactBadge;
 import android.os.Bundle;
@@ -20,7 +20,9 @@ public class Cah extends Activity
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.main);
 
-		performOnBackgroundThread(new CahClient()); 
+		Queue<Delta> in = new ArrayBlockingQueue<Delta>( 32, true );
+		Queue<Delta> out = new ArrayBlockingQueue<Delta>( 32, true );
+		performOnBackgroundThread(new CahClient(in, out));
 	}
 
 	public static Thread performOnBackgroundThread(final Runnable runnable) {
