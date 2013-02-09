@@ -28,8 +28,6 @@ public class CardView extends View {
 
 	private TextPaint mTextPaint;
 	private StaticLayout mTextLayout;
-	private float mTextWidth;
-	private float mTextHeight;
 
 	public CardView(Context context) {
 		super(context);
@@ -92,10 +90,7 @@ public class CardView extends View {
 		mTextPaint.setTextSize((float)45);
 		mTextPaint.setColor(mTextColor);
 		
-		mTextWidth = mTextPaint.measureText(mCardText);
-
 		Paint.FontMetrics fontMetrics = mTextPaint.getFontMetrics();
-		mTextHeight = fontMetrics.bottom;
 	}
 
 	@SuppressLint("DrawAllocation")
