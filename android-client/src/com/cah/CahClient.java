@@ -1,8 +1,11 @@
 package com.cah;
 
-import android.util.Log;
+import java.util.concurrent.ArrayBlockingQueue;
 import java.util.Queue;
-import java.util.LinkedList;
+import com.google.gson.*;
+import com.google.gson.stream.*;
+import java.net.*;
+import java.io.*;
 
 abstract class Delta {
 }
@@ -10,7 +13,7 @@ abstract class Delta {
 class TableDelta extends Delta{
 
 	public String Command;
-	public String Id; 
+	public String Id;
 
 }
 
@@ -39,15 +42,34 @@ class ActionDelta extends Delta {
 
 public class CahClient implements Runnable{
 
-	Queue<Delta> incoming;
-	Queue<Delta> outgoing;
-	public CahClient(Queue<Delta> x, Queue<Delta> y) {
-		incoming = x;
-		outgoing = y;
-}
+	static Queue<Delta> incoming;
+	static Queue<Delta> outgoing;
+
+	/* For Debug */
+	public static void main( String args[] ) {
+		Queue<Delta> in = (Queue<Delta>) new ArrayBlockingQueue<Delta>( 32, true );
+		Queue<Delta> out =(Queue<Delta>) new ArrayBlockingQueue<Delta>( 32, true );
+		CahClient c = new CahClient(in, out);
+		c.run();
+	}
+
+	public CahClient( Queue<Delta> in, Queue<Delta> out ) {
+		incoming = in;
+		outgoing = out;
+	}
 
 	public void run() {
-		Log.d("Cah", "schlemschlemschlem");
+
+		Socket socket = null;
+		try {
+			socket = new Socket("sslab00.cs.purdue.edu", 41337);
+			JsonWriter jw = new JsonWriter(	new OutputStreamWriter( socket.getOutputStream(), "UTF-8" ) );
+			JsonReader jr = new JsonReader(	new BufferedReader(new InputStreamReader( socket.getInputStream())));
+
+			socket.close();
+		} catch (UnknownHostException e) {
+		} catch (IOException e) {
+		}
 	}
 
 }

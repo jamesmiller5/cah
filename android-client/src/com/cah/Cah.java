@@ -2,7 +2,7 @@ package com.cah;
 
 import android.app.Activity;
 import java.util.Queue;
-import java.util.LinkedList;
+import java.util.concurrent.ArrayBlockingQueue;
 import android.widget.ImageView;
 import android.widget.QuickContactBadge;
 import android.os.Bundle;
@@ -14,19 +14,17 @@ import android.widget.TextView;
 public class Cah extends Activity
 {
 
-	Queue<Delta> incoming;
-	Queue<Delta> outgoing;
 	/** Called when the activity is first created. */
 	@Override
-	public void onCreate(Bundle savedInstanceState)
-	{
+	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.main);
 
-		incoming = new LinkedList<Delta>();
-		outgoing = new LinkedList<Delta>();
-		performOnBackgroundThread(new CahClient(incoming, outgoing)); 
+		Queue<Delta> in = new ArrayBlockingQueue<Delta>( 32, true );
+		Queue<Delta> out = new ArrayBlockingQueue<Delta>( 32, true );
+		performOnBackgroundThread(new CahClient(in, out));
 	}
+
 	public static Thread performOnBackgroundThread(final Runnable runnable) {
 		final Thread t = new Thread() {
 			@Override
