@@ -20,6 +20,8 @@ type TableDelta struct {
 	ID      string
 }
 
+const TABLE_TIMEOUT = 1 * time.Minute
+
 type NetEncoder struct {
 	*json.Encoder
 	net net.Conn
@@ -46,7 +48,7 @@ func HandleNewClient(conn net.Conn) {
 	for {
 		var msg TableDelta
 
-		dec.net.SetDeadline(time.Now().Add(30 * time.Second))
+		dec.net.SetDeadline(time.Now().Add(TABLE_TIMEOUT))
 		if err := dec.Decode(&msg); err != nil {
 			panic("Decode Error")
 		}

@@ -38,6 +38,8 @@ type Player struct {
 	enc          *NetEncoder
 }
 
+const PLAYER_TIMEOUT = 1 * time.Second
+
 func NewPlayer(dec *NetDecoder, enc *NetEncoder, id int) *Player {
 	return &Player{
 		Id:           id,
@@ -71,7 +73,7 @@ func (p *Player) DecodeMessages(playerDeltas chan *PlayerDelta, deckDeltas chan 
 			}
 
 			//decode either as a DeckDelta or PlayerDelta
-			p.dec.net.SetDeadline(time.Now().Add(30 * time.Second))
+			p.dec.net.SetDeadline(time.Now().Add(PLAYER_TIMEOUT))
 			if err := p.dec.Decode(&delta); err != nil {
 				fmt.Println("Player.DecodeMessages decode error")
 				//send a "leave" command
