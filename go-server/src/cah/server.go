@@ -3,7 +3,6 @@ package cah
 import (
 	"log"
 	"net"
-	"os"
 )
 
 func Serve() {
@@ -18,12 +17,12 @@ func Serve() {
 	}
 
 	for {
-		conn, err := listener.Accept()
+		conn, err := listener.AcceptTCP()
 		if err != nil {
 			log.Println("Fatal error ", err.Error())
-			os.Exit(1)
 			continue
 		}
+		conn.SetKeepAlive(true)
 		go HandleNewClient(conn)
 	}
 }
