@@ -41,12 +41,12 @@ func HandleNewClient(conn net.Conn) {
 		}
 	}()
 
-	dec := &NetDecoder{ json.Decoder: json.NewDecoder(conn), net: conn }
-	enc := &NetEncoder{ json.Encoder: json.NewEncoder(conn), net: conn }
+	dec := &NetDecoder{json.Decoder: json.NewDecoder(conn), net: conn}
+	enc := &NetEncoder{json.Encoder: json.NewEncoder(conn), net: conn}
 	for {
 		var msg TableDelta
 
-		dec.net.SetDeadline(time.Now().Add(30*time.Second))
+		dec.net.SetDeadline(time.Now().Add(30 * time.Second))
 		if err := dec.Decode(&msg); err != nil {
 			panic("Decode Error")
 		}
@@ -63,7 +63,6 @@ func HandleNewClient(conn net.Conn) {
 		}
 	}
 }
-
 
 func handleJoinTable(dec *NetDecoder, enc *NetEncoder, msg *TableDelta) bool {
 	if len(msg.ID) > 6 {
@@ -85,7 +84,7 @@ func handleJoinTable(dec *NetDecoder, enc *NetEncoder, msg *TableDelta) bool {
 //Map of handler names in messages to handler functions
 var handlers = map[string]func(*NetDecoder, *NetEncoder, *TableDelta) bool{
 	"join": handleJoinTable,
-	"new":  func(dec *NetDecoder, enc *NetEncoder, msg *TableDelta) bool {
+	"new": func(dec *NetDecoder, enc *NetEncoder, msg *TableDelta) bool {
 		tab := NewTable()
 		go tab.PlayGame()
 		msg.ID = tab.id

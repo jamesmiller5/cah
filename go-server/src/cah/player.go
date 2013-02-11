@@ -10,7 +10,7 @@ type PlayerDelta struct {
 	Message string
 }
 
-var playerDeltaMessages = map[string]bool {
+var playerDeltaMessages = map[string]bool{
 	"connect": true,
 	"leave":   true,
 }
@@ -23,7 +23,7 @@ type DeckDelta struct {
 }
 
 //table of available
-var deckDeltaDecks = map[string]bool {
+var deckDeltaDecks = map[string]bool{
 	"draw": true,
 	"hand": true,
 	"play": true,
@@ -71,7 +71,7 @@ func (p *Player) DecodeMessages(playerDeltas chan *PlayerDelta, deckDeltas chan 
 			}
 
 			//decode either as a DeckDelta or PlayerDelta
-			p.dec.net.SetDeadline(time.Now().Add(30*time.Second))
+			p.dec.net.SetDeadline(time.Now().Add(30 * time.Second))
 			if err := p.dec.Decode(&delta); err != nil {
 				fmt.Println("Player.DecodeMessages decode error")
 				//send a "leave" command

@@ -7,16 +7,16 @@ import (
 
 type Game struct {
 	sync.Mutex
-	dealer *Player
-	players map[int] *Player
+	dealer    *Player
+	players   map[int]*Player
 	playerInc int
 }
 
 func NewGame() *Game {
 	//dealer has an id of 0
 	return &Game{
-		dealer: NewPlayer(nil, nil, 0),
-		players: make(map[int] *Player),
+		dealer:    NewPlayer(nil, nil, 0),
+		players:   make(map[int]*Player),
 		playerInc: 1,
 	}
 }
