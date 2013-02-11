@@ -38,7 +38,7 @@ type Player struct {
 	enc          *NetEncoder
 }
 
-const PLAYER_TIMEOUT = 1 * time.Second
+const PLAYER_TIMEOUT = 30 * time.Second
 
 func NewPlayer(dec *NetDecoder, enc *NetEncoder, id int) *Player {
 	return &Player{
@@ -70,6 +70,7 @@ func (p *Player) DecodeMessages(playerDeltas chan *PlayerDelta, deckDeltas chan 
 			var delta struct {
 				Deck   DeckDelta
 				Player PlayerDelta
+				Keepalive	bool
 			}
 
 			//decode either as a DeckDelta or PlayerDelta
@@ -98,6 +99,8 @@ func (p *Player) DecodeMessages(playerDeltas chan *PlayerDelta, deckDeltas chan 
 					goto exit
 				}
 				playerDeltas <- &delta.Player
+			} else if delta.Keepalive == true {
+				//keep alive, igonre
 			} else {
 				fmt.Println("Error decoding")
 				goto exit
