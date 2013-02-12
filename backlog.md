@@ -24,6 +24,11 @@ Tasks: Created from stories by Developers who also chose what to be completed
 * Pick language & environment for server
 * * Jim - I'm thinking Go (golang.org) for server side language, easy non-blocking I/O and built for this kind of thing
 * Setup Unit-Test environment for server
+* Fix card font size DPI scaling issue.
+* Make cards re-sizable.
+* Create Android activity to show black card full-screen.
+* Clean up layout used for table and cards.
+* * Eric - I think we can make layouts more modular to reduce duplicate code. 
 
 Product Backlog
 ===============
