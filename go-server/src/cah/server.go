@@ -9,11 +9,13 @@ func Serve() {
 	tcpAddr, err := net.ResolveTCPAddr("tcp", "0.0.0.0:41337")
 	if err != nil {
 		log.Println("Error ", err.Error())
+		return
 	}
 
 	listener, err := net.ListenTCP("tcp", tcpAddr)
 	if err != nil {
 		log.Println("Error ", err.Error())
+		return
 	}
 
 	for {
