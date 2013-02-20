@@ -10,7 +10,7 @@ type PlayerDelta struct {
 	Message string
 }
 
-var playerDeltaMessages = map[string]bool {
+var playerDeltaMessages = map[string]bool{
 	"connect": true,
 	"leave":   true,
 }
@@ -23,7 +23,7 @@ type DeckDelta struct {
 }
 
 //table of available
-var deckDeltaDecks = map[string]bool {
+var deckDeltaDecks = map[string]bool{
 	"draw": true,
 	"hand": true,
 	"play": true,
@@ -37,6 +37,8 @@ type Player struct {
 	dec          *NetDecoder
 	enc          *NetEncoder
 }
+
+const PLAYER_TIMEOUT = 30 * time.Second
 
 func NewPlayer(dec *NetDecoder, enc *NetEncoder, id int) *Player {
 	return &Player{
@@ -68,10 +70,11 @@ func (p *Player) DecodeMessages(playerDeltas chan *PlayerDelta, deckDeltas chan 
 			var delta struct {
 				Deck   DeckDelta
 				Player PlayerDelta
+				Keepalive	bool
 			}
 
 			//decode either as a DeckDelta or PlayerDelta
-			p.dec.net.SetDeadline(time.Now().Add(30*time.Second))
+			p.dec.net.SetDeadline(time.Now().Add(PLAYER_TIMEOUT))
 			if err := p.dec.Decode(&delta); err != nil {
 				fmt.Println("Player.DecodeMessages decode error")
 				//send a "leave" command
@@ -96,6 +99,8 @@ func (p *Player) DecodeMessages(playerDeltas chan *PlayerDelta, deckDeltas chan 
 					goto exit
 				}
 				playerDeltas <- &delta.Player
+			} else if delta.Keepalive == true {
+				//keep alive, igonre
 			} else {
 				fmt.Println("Error decoding")
 				goto exit

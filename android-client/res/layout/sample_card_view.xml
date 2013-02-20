@@ -10,8 +10,7 @@
         android:background="@drawable/card_background_white"
         android:paddingBottom="40dp"
         android:paddingLeft="20dp"
-        app:exampleDimension="24sp"
-        app:exampleString="This is a sample card. Please ignore this text." />
+        app:cardString="This is a sample card. Please ignore this text." />
     
     <com.cah.customviews.CardView
         android:layout_width="250dp"
@@ -20,7 +19,6 @@
         android:background="@drawable/card_background_white"
         android:paddingBottom="40dp"
         android:paddingLeft="20dp"
-        app:exampleDimension="24sp"
-        app:exampleString="Test, Test, Test, Test, Test, Test, Test, Test, Test!" />
+        app:cardString="Test, Test, Test, Test, Test, Test, Test, Test, Test!" />
 
 </FrameLayout>
