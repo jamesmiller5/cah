@@ -1,0 +1,4 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+	<dimen name="card_font_size">22dp</dimen> <!-- Size should be 22.5dp, but we can't do floating point numbers in here -->
+</resources>

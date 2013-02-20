@@ -1,29 +1,29 @@
-Sprint Backlog: Due date on Wednesday, January 30th.
+Sprint Backlog: Due date on Saturday,  February 22th.
 ====================================================
 All can edit the sections as they see fit!
 ------------------------------------------
 Stories: Picked from backlog for this sprint by Developers & Team Leader
 ===============================================================================
-* As a manager I want to complete the product statement document so I can turn it in on Friday
-* As a developer I want to use source control
-* As a user I want to install the application on my android phone so I can play it
-* As a developer I want to use client server architecture so I can build multiple clients
-* As a developer I want to create client & server unit-tests so I can assure my code works correctly on the phone & server 
-* As a developer I want to 1-click build the android client so I can speed up development time
+* As a developer I want to create client & server integration-tests so I can assure my code works correctly on the phone & server 
 * As a developer I want to integrate unit-tests with the build system so I can be assured my changes aren't breaking others work
 
 Tasks: Created from stories by Developers who also chose what to be completed
 ===============================================================================
-* Write up product statement, objectives, stakeholders and deliverables
-* * Jim - May need to meet with a TA/Project Manager for this? Not sure...
-* * Jim - It would be good for us to put it into project-info.txt so we can reference it 
-* Get an android activity of the game board with a simple background
-* Design Client/Server architecture, pick fat-server or fat-client
-* * Jim - I'm thinking fat-server is easiest as it's a long test cycle on android clients
-* Setup Unit-Test environment for android client
-* Pick language & environment for server
-* * Jim - I'm thinking Go (golang.org) for server side language, easy non-blocking I/O and built for this kind of thing
-* Setup Unit-Test environment for server
+* Get Kalena's laptop working - Contact PLUG, Install  Ubuntu & Android SDK
+* Email Course Coordinator, figure out when we are meeting, Friday porbably.
+
+* Setup Integration-Test for both Server and Client
+
+* Scale card font size correctly so the text doesn't run out of the cards.
+* Scale the game board so that it doesn't get overlapped by the cards for all devices.
+* Scale CAH logo on cards correctly.
+
+* Use <include/> in game.xml to create player icons instead of repeating the <RelativeLayout/> tag.
+=== ^ Pre Hackathon | Post Hackathon  V ===
+* Make cards go into deck at bottom of screen dynamically.
+* Create Android activity to show black card full-screen.
+* * Make black card for the czar scale to full screen.
+* Send sample cards from server to client.
 
 Product Backlog
 ===============

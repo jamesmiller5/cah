@@ -23,11 +23,13 @@ import com.cah.R;
 public class CardView extends View {
 	private String mCardText = "Test"; // TODO: use a default from R.string...
 	private int mTextColor = Color.BLACK; // TODO: Set this based on background color
-		
+
 	private Bitmap mCahLogo;
 
 	private TextPaint mTextPaint;
 	private StaticLayout mTextLayout;
+
+	private final float TEXT_SIZE = this.getResources().getDimensionPixelSize(R.dimen.card_font_size);
 
 	public CardView(Context context) {
 		super(context);
@@ -54,7 +56,7 @@ public class CardView extends View {
 		} else {
 			mCardText = a.getString(R.styleable.CardView_cardString);
 		}
-		
+
 		int backgroundColor = a.getColor(R.styleable.CardView_color, Color.WHITE);
 		if(backgroundColor == Color.WHITE){
 			mTextColor = Color.BLACK;
@@ -67,7 +69,7 @@ public class CardView extends View {
 			// Get bitmap image for icon
 			mCahLogo = BitmapFactory.decodeResource(this.getContext().getResources(), R.drawable.icon_b);
 		}
-		
+
 		a.recycle();
 
 		// Set up a default TextPaint object
@@ -78,18 +80,17 @@ public class CardView extends View {
 			Typeface typeface = Typeface.createFromAsset(getContext().getAssets(), "fonts/helveticaneue.ttf");
 			mTextPaint.setTypeface(typeface);
 		}
-		mTextPaint.setTextSize((float)45);
-		
+		mTextPaint.setTextSize(this.TEXT_SIZE);
 		// Update TextPaint and text measurements from attributes
 		invalidateTextPaintAndMeasurements();
-		
-		
+
+
 	}
 
 	private void invalidateTextPaintAndMeasurements() {
-		mTextPaint.setTextSize((float)45);
+		mTextPaint.setTextSize(this.TEXT_SIZE);
 		mTextPaint.setColor(mTextColor);
-		
+
 		Paint.FontMetrics fontMetrics = mTextPaint.getFontMetrics();
 	}
 
@@ -97,7 +98,7 @@ public class CardView extends View {
 	@Override
 	protected void onDraw(Canvas canvas) {
 		super.onDraw(canvas);
-		
+
 		// TODO: consider storing these as member variables to reduce
 		// allocations per draw cycle.
 		int paddingLeft = 20;
@@ -107,11 +108,11 @@ public class CardView extends View {
 
 		int contentWidth = getWidth() - paddingLeft - paddingRight;
 		int contentHeight = getHeight() - paddingTop - paddingBottom;
-		
+
 		canvas.translate((float)50, (float)35);
 		mTextLayout = new StaticLayout(mCardText, mTextPaint, contentWidth-95, Alignment.ALIGN_NORMAL, 1, 10, true);
 		mTextLayout.draw(canvas);
-		
+
 		// Draw the text.
 		//canvas.drawText(mCardText, paddingLeft, paddingTop + 50, mTextPaint);
 		canvas.translate((float)0, (float)0);
@@ -121,7 +122,7 @@ public class CardView extends View {
 
 	/**
 	 * Gets the example string attribute value.
-	 * 
+	 *
 	 * @return The example string attribute value.
 	 */
 	public String getCardString() {
@@ -131,7 +132,7 @@ public class CardView extends View {
 	/**
 	 * Sets the view's example string attribute value. In the example view, this
 	 * string is the text to draw.
-	 * 
+	 *
 	 * @param exampleString
 	 *            The example string attribute value to use.
 	 */
@@ -142,7 +143,7 @@ public class CardView extends View {
 
 	/**
 	 * Gets the example color attribute value.
-	 * 
+	 *
 	 * @return The example color attribute value.
 	 */
 	public int getTextColor() {
@@ -152,7 +153,7 @@ public class CardView extends View {
 	/**
 	 * Sets the view's example color attribute value. In the example view, this
 	 * color is the font color.
-	 * 
+	 *
 	 * @param exampleColor
 	 *            The example color attribute value to use.
 	 */
