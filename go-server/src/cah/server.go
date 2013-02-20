@@ -17,6 +17,7 @@ func Serve() {
 		log.Println("Error ", err.Error())
 		return
 	}
+	log.Println("Listening on ", tcpAddr)
 
 	for {
 		conn, err := listener.AcceptTCP()

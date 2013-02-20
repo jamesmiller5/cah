@@ -101,6 +101,7 @@ func (p *Player) DecodeMessages(playerDeltas chan *PlayerDelta, deckDeltas chan 
 				playerDeltas <- &delta.Player
 			} else if delta.Keepalive == true {
 				//keep alive, igonre
+				fmt.Println("Keepalived")
 			} else {
 				fmt.Println("Error decoding")
 				goto exit
