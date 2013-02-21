@@ -4,6 +4,11 @@ PROJ_PATH=$( cd "$( dirname "$0" )/.." && pwd )
 function start {
 	GOPATH="$GOPATH:$PROJ_PATH/go-server"
 	go build -o server cmd
+	if [[ $? != 0 ]]; then
+		echo "Build failed, halting test"
+		exit 1
+	fi
+
 	echo "Server Built"
 	(./server 2>&1 & echo $! > pid) | while read line; do echo "[SERVER] $line"; done &
 	sleep 1
@@ -16,26 +21,31 @@ function stop {
 
 #run tests
 function run_tests {
-	setup_test
-	#for infile in client-*.json; do
-		#cat $infile > server-input
-		#echo "Diffing"
-		#diff server-output server-${infile:7}
-		#if [[ $? != 0 ]]; then 
-		#	echo "=== Diff of $infile failed! ==="
-		#	stop
-		#	exit 1
-		#fi
-	#done
-	cat client-table-new.json > server-input
-	diff server-output server-table-new.json
-	echo '{"Keepalive":true}' > server-input
-}
+	#We are testing the server, therefore read *client* input into the test buffer
+	for testset in "test*-client-player1.json"; do
+		echo "Testing ${testset:0:5}"
 
-function setup_test {
-	rm -f server-{input,output}
-	mkfifo server-{input,output}
-	nc localhost 41337 -q 10 < server-input > server-output &
+		rm -f server-{input1,input2,input3,output}
+		mkfifo server-{input1,input2,input3,output}
+
+		#read input into a buffer, skipping comments
+		cat $testset | grep -v "^//.*$" > server-input &
+
+		#connect to the server and read buffer, capturing server response
+		nc localhost 41337 --interval=2 --wait=5 < server-input1 > server-output &
+
+		#TODO: table should be random
+		head -n 1 server-output
+
+		echo "Diffing..."
+		diff server-output server-${testset:7}
+		if [[ $? != 0 ]]; then 
+			echo "=== Diff of $testset failed! ==="
+			#run stop function
+			stop
+			exit 1
+		fi
+	done
 }
 
 function clean {
