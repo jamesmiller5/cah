@@ -78,13 +78,18 @@ public class CahClient implements Runnable{
 			socket.setTcpNoDelay(true);
 			JsonWriter writer = new JsonWriter(	new OutputStreamWriter( socket.getOutputStream(), "UTF-8" ) );
 			//JsonReader reader = new JsonReader(	new BufferedReader(new InputStreamReader( socket.getInputStream())));
+			BufferedReader buffin = new BufferedReader(new InputStreamReader( socket.getInputStream()));
 
 			TableDelta td = new TableDelta();
 			td.Command = "new";
 
 			gson.toJson(td, TableDelta.class, writer);
 			writer.flush();
-			System.out.println("Written");
+
+			System.out.println("\n Written \n");
+
+			System.out.println("Reply");
+			System.out.println(buffin.readLine());
 
 		} catch (UnknownHostException e) {
 		} catch (IOException e) {
