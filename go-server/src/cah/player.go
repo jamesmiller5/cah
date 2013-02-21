@@ -120,12 +120,8 @@ func (p *Player) EncodeMessages() {
 		select {
 		//pd update from dealer
 		case pd := <-p.playerDeltas:
-			fmt.Println("client got player delta from dealer", pd)
-			//encode and send
 			p.enc.Encode(pd)
 		case dd := <-p.deckDeltas:
-			fmt.Println("client got deck delta from dealer", dd)
-			//encode and send
 			p.enc.Encode(dd)
 		case <-p.quit:
 			fmt.Println("PlayerHandler got the message to quit")
