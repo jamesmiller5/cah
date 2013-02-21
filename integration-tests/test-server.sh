@@ -1,23 +1,7 @@
 #!/bin/bash
 PROJ_PATH=$( cd "$( dirname "$0" )/.." && pwd )
 
-function start {
-	GOPATH="$GOPATH:$PROJ_PATH/go-server"
-	go build -o server cmd
-	if [[ $? != 0 ]]; then
-		echo "Build failed, halting test"
-		exit 1
-	fi
-
-	echo "Server Built"
-	(./server 2>&1 & echo $! > pid) | while read line; do echo "[SERVER] $line"; done &
-	sleep 1
-	echo "Server Running with PID $(< pid)"
-}
-
-function stop {
-	kill $(< pid)
-}
+source functions.bash
 
 #run tests
 function run_tests {
@@ -49,17 +33,18 @@ function run_tests {
 }
 
 function clean {
-	rm -f server-{input,output} server pid
+	rm -f server-{input1,input2,input3,output}
+	clean_server
 }
 
 function run {
-	start
+	start_server
 	run_tests
-	stop
+	stop_server
 	clean
 }
 
-if [ "_$1" = "_" ]; then
+if [ -z "$1" ]; then
 	run
 else
 	set -e # Tells bash to stop executing if there's an error.
