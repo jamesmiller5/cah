@@ -44,6 +44,7 @@ public class CahClient implements Runnable{
 
 	static Queue<Delta> incoming;
 	static Queue<Delta> outgoing;
+	static Gson gson = new Gson();
 
 	/* For Debug */
 	public static void main( String args[] ) {
@@ -51,6 +52,17 @@ public class CahClient implements Runnable{
 		Queue<Delta> out =(Queue<Delta>) new ArrayBlockingQueue<Delta>( 32, true );
 		CahClient c = new CahClient(in, out);
 		c.run();
+
+		//debug eat messages
+		while( true ) {
+			Delta message_in;
+
+			while( ( message_in = in.poll() ) != null ) {
+				System.out.println("Got an incoming message");
+			}
+
+			Thread.yield();
+		}
 	}
 
 	public CahClient( Queue<Delta> in, Queue<Delta> out ) {
@@ -62,13 +74,21 @@ public class CahClient implements Runnable{
 
 		Socket socket = null;
 		try {
-			socket = new Socket("sslab00.cs.purdue.edu", 41337);
-			JsonWriter jw = new JsonWriter(	new OutputStreamWriter( socket.getOutputStream(), "UTF-8" ) );
-			JsonReader jr = new JsonReader(	new BufferedReader(new InputStreamReader( socket.getInputStream())));
+			socket = new Socket("localhost", 41337);
+			socket.setTcpNoDelay(true);
+			JsonWriter writer = new JsonWriter(	new OutputStreamWriter( socket.getOutputStream(), "UTF-8" ) );
+			//JsonReader reader = new JsonReader(	new BufferedReader(new InputStreamReader( socket.getInputStream())));
 
-			socket.close();
+			TableDelta td = new TableDelta();
+			td.Command = "new";
+
+			gson.toJson(td, TableDelta.class, writer);
+			writer.flush();
+			System.out.println("Written");
+
 		} catch (UnknownHostException e) {
 		} catch (IOException e) {
+			System.out.println("IO Exception: "+e);
 		}
 	}
 
