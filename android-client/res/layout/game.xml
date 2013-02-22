@@ -193,7 +193,6 @@
                 android:adjustViewBounds="true"
                 android:gravity="left"
                 android:scaleType="fitStart"
-         
                 android:src="@drawable/newgametable" />
 
             <!-- add vertical linear layout of buttons here -->
