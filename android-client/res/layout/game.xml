@@ -331,12 +331,6 @@
                     android:scaleType="fitStart"
                     android:visibility="gone"
                     android:src="@drawable/simple_crown_md1" />
-
-            <QuickContactBadge
-                android:id="@+id/player8"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:src="@drawable/droid_small" />
             </RelativeLayout>
             
             <RelativeLayout
@@ -355,12 +349,6 @@
                     android:scaleType="fitStart"
                     android:visibility="gone"
                     android:src="@drawable/simple_crown_md1" />
-
-            <QuickContactBadge
-                android:id="@+id/player9"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:src="@drawable/droid_small" />
             </RelativeLayout>
 
             <!-- add more buttons here -->
