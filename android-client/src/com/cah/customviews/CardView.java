@@ -30,6 +30,7 @@ public class CardView extends View {
 	private StaticLayout mTextLayout;
 
 	private final float TEXT_SIZE = this.getResources().getDimensionPixelSize(R.dimen.card_font_size);
+	private final float DPI_MULTIPLIER = (float) (this.getResources().getDisplayMetrics().densityDpi/160.);
 
 	public CardView(Context context) {
 		super(context);
@@ -50,6 +51,9 @@ public class CardView extends View {
 		// Load attributes
 		final TypedArray a = getContext().obtainStyledAttributes(attrs,
 				R.styleable.CardView, defStyle, 0);
+		int[] otherAttributes = {android.R.attr.layout_width};
+		final TypedArray w = getContext().obtainStyledAttributes(attrs,
+				otherAttributes, defStyle, 0);
 
 		if(this.isInEditMode()) {
 			mCardText = "This is an example card";
@@ -67,10 +71,17 @@ public class CardView extends View {
 			mTextColor = Color.WHITE;
 			this.setBackgroundDrawable(this.getResources().getDrawable(R.drawable.card_background_black));
 			// Get bitmap image for icon
-			mCahLogo = BitmapFactory.decodeResource(this.getContext().getResources(), R.drawable.icon_b);
+			mCahLogo = BitmapFactory.decodeResource(this.getContext().getResources(), R.drawable.icon_b);			
 		}
+		
+		// mCahLogo should be 60% of the card's width
+		int goalLogoWidth = (w.getDimensionPixelSize(0, 1) / 10) * 5;
+		int goalLogoHeight = (int) (goalLogoWidth/5.8);
+		System.out.println("Card width = " + goalLogoWidth + ", height = " + goalLogoHeight);
+		mCahLogo = Bitmap.createScaledBitmap(mCahLogo, goalLogoWidth, goalLogoHeight, false);
 
 		a.recycle();
+		w.recycle();
 
 		// Set up a default TextPaint object
 		mTextPaint = new TextPaint();
@@ -93,7 +104,7 @@ public class CardView extends View {
 
 		Paint.FontMetrics fontMetrics = mTextPaint.getFontMetrics();
 	}
-
+	
 	@SuppressLint("DrawAllocation")
 	@Override
 	protected void onDraw(Canvas canvas) {
@@ -101,22 +112,22 @@ public class CardView extends View {
 
 		// TODO: consider storing these as member variables to reduce
 		// allocations per draw cycle.
-		int paddingLeft = 20;
+		int paddingLeft = (int) (10. * DPI_MULTIPLIER);
 		int paddingTop = getPaddingTop();
 		int paddingRight = getPaddingRight();
-		int paddingBottom = 40;
+		int paddingBottom = (int) (20. * DPI_MULTIPLIER);
 
 		int contentWidth = getWidth() - paddingLeft - paddingRight;
 		int contentHeight = getHeight() - paddingTop - paddingBottom;
 
-		canvas.translate((float)50, (float)35);
-		mTextLayout = new StaticLayout(mCardText, mTextPaint, contentWidth-95, Alignment.ALIGN_NORMAL, 1, 10, true);
+		canvas.translate((float)25. * DPI_MULTIPLIER, (float)17.5 * DPI_MULTIPLIER);
+		mTextLayout = new StaticLayout(mCardText, mTextPaint, (int) (contentWidth-(47.5 * DPI_MULTIPLIER)), Alignment.ALIGN_NORMAL, 1, 10, true);
 		mTextLayout.draw(canvas);
 
 		// Draw the text.
 		//canvas.drawText(mCardText, paddingLeft, paddingTop + 50, mTextPaint);
 		canvas.translate((float)0, (float)0);
-		canvas.drawBitmap(mCahLogo, 0, this.getHeight()-90, null);
+		canvas.drawBitmap(mCahLogo, 0, (float) (this.getHeight()-mCahLogo.getHeight()-(37.5 * DPI_MULTIPLIER)), null);
 
 	}
 
