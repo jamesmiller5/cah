@@ -36,7 +36,8 @@ public class CardHorizontalScrollView extends HorizontalScrollView {
 	public boolean onTouchEvent(MotionEvent event) {
 		if(event.getAction() == MotionEvent.ACTION_DOWN){
 			if(verticalSwipeHappening)
-				return false;
+				return false;	
+			
 			startingPoint = new Point((int)event.getRawX(), (int)event.getRawY());
 			System.out.println(startingPoint.toString());
 			verticalSwipePossible = true;

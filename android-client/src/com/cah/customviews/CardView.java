@@ -25,9 +25,10 @@ public class CardView extends View {
 	private int mTextColor = Color.BLACK; // TODO: Set this based on background color
 
 	private Bitmap mCahLogo;
-
 	private TextPaint mTextPaint;
 	private StaticLayout mTextLayout;
+	
+	private int mCardWidth;
 
 	private final float TEXT_SIZE = this.getResources().getDimensionPixelSize(R.dimen.card_font_size);
 	private final float DPI_MULTIPLIER = (float) (this.getResources().getDisplayMetrics().densityDpi/160.);
@@ -55,13 +56,13 @@ public class CardView extends View {
 		final TypedArray w = getContext().obtainStyledAttributes(attrs,
 				otherAttributes, defStyle, 0);
 
-		if(this.isInEditMode()) {
+		if(this.isInEditMode() || attrs == null) {
 			mCardText = "This is an example card";
 		} else {
 			mCardText = a.getString(R.styleable.CardView_cardString);
 		}
 
-		int backgroundColor = a.getColor(R.styleable.CardView_color, Color.WHITE);
+		int backgroundColor = (attrs == null) ?  Color.WHITE : a.getColor(R.styleable.CardView_color, Color.WHITE);
 		if(backgroundColor == Color.WHITE){
 			mTextColor = Color.BLACK;
 			this.setBackgroundDrawable(this.getResources().getDrawable(R.drawable.card_background_white));
@@ -74,11 +75,7 @@ public class CardView extends View {
 			mCahLogo = BitmapFactory.decodeResource(this.getContext().getResources(), R.drawable.icon_b);			
 		}
 		
-		// mCahLogo should be 60% of the card's width
-		int goalLogoWidth = (w.getDimensionPixelSize(0, 1) / 10) * 5;
-		int goalLogoHeight = (int) (goalLogoWidth/5.8);
-		System.out.println("Card width = " + goalLogoWidth + ", height = " + goalLogoHeight);
-		mCahLogo = Bitmap.createScaledBitmap(mCahLogo, goalLogoWidth, goalLogoHeight, false);
+		mCardWidth = w.getDimensionPixelSize(0,  -1);
 
 		a.recycle();
 		w.recycle();
@@ -94,8 +91,18 @@ public class CardView extends View {
 		mTextPaint.setTextSize(this.TEXT_SIZE);
 		// Update TextPaint and text measurements from attributes
 		invalidateTextPaintAndMeasurements();
+		
+		if(mCardWidth > 0)
+			invalidateSizeOfEverything();
 
-
+	}
+	
+	private void invalidateSizeOfEverything() {
+		// mCahLogo should be 60% of the card's width
+		int goalLogoWidth = (mCardWidth / 10) * 5;
+		int goalLogoHeight = (int) (goalLogoWidth/5.8);
+		System.out.println("Card width = " + goalLogoWidth + ", height = " + goalLogoHeight);
+		mCahLogo = Bitmap.createScaledBitmap(mCahLogo, goalLogoWidth, goalLogoHeight, false);
 	}
 
 	private void invalidateTextPaintAndMeasurements() {
@@ -105,10 +112,14 @@ public class CardView extends View {
 		Paint.FontMetrics fontMetrics = mTextPaint.getFontMetrics();
 	}
 	
-	@SuppressLint("DrawAllocation")
 	@Override
 	protected void onDraw(Canvas canvas) {
 		super.onDraw(canvas);
+		
+		if(mCardWidth < 0) {
+			mCardWidth = getWidth();
+			invalidateSizeOfEverything();
+		}
 
 		// TODO: consider storing these as member variables to reduce
 		// allocations per draw cycle.
@@ -121,7 +132,8 @@ public class CardView extends View {
 		int contentHeight = getHeight() - paddingTop - paddingBottom;
 
 		canvas.translate((float)25. * DPI_MULTIPLIER, (float)17.5 * DPI_MULTIPLIER);
-		mTextLayout = new StaticLayout(mCardText, mTextPaint, (int) (contentWidth-(47.5 * DPI_MULTIPLIER)), Alignment.ALIGN_NORMAL, 1, 10, true);
+		if(mTextLayout == null)
+			mTextLayout = new StaticLayout(mCardText, mTextPaint, (int) (contentWidth-(47.5 * DPI_MULTIPLIER)), Alignment.ALIGN_NORMAL, 1, 10, true);
 		mTextLayout.draw(canvas);
 
 		// Draw the text.
