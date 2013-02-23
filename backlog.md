@@ -9,9 +9,6 @@ Stories: Picked from backlog for this sprint by Developers & Team Leader
 
 Tasks: Created from stories by Developers who also chose what to be completed
 ===============================================================================
-* Get Kalena's laptop working - Contact PLUG, Install  Ubuntu & Android SDK
-* Email Course Coordinator, figure out when we are meeting, Friday porbably.
-
 * Setup Integration-Test for both Server and Client
 
 * Scale card font size correctly so the text doesn't run out of the cards.
