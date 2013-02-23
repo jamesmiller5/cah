@@ -11,7 +11,6 @@ Tasks: Created from stories by Developers who also chose what to be completed
 ===============================================================================
 * Setup Integration-Test for both Server and Client
 
-* Scale card font size correctly so the text doesn't run out of the cards.
 * Scale the game board so that it doesn't get overlapped by the cards for all devices.
 * Scale CAH logo on cards correctly.
 
