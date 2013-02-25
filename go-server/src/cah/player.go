@@ -101,6 +101,7 @@ func (p *Player) DecodeMessages(playerDeltas chan *PlayerDelta, deckDeltas chan 
 				playerDeltas <- &delta.Player
 			} else if delta.Keepalive == true {
 				//keep alive, igonre
+				fmt.Println("Keepalived")
 			} else {
 				fmt.Println("Error decoding")
 				goto exit
@@ -119,12 +120,8 @@ func (p *Player) EncodeMessages() {
 		select {
 		//pd update from dealer
 		case pd := <-p.playerDeltas:
-			fmt.Println("client got player delta from dealer", pd)
-			//encode and send
 			p.enc.Encode(pd)
 		case dd := <-p.deckDeltas:
-			fmt.Println("client got deck delta from dealer", dd)
-			//encode and send
 			p.enc.Encode(dd)
 		case <-p.quit:
 			fmt.Println("PlayerHandler got the message to quit")

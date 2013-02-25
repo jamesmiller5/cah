@@ -6,7 +6,7 @@ import (
 )
 
 type Game struct {
-	sync.Mutex
+	sync.RWMutex
 	dealer    *Player
 	players   map[int]*Player
 	playerInc int
@@ -37,11 +37,11 @@ func (game *Game) Play() {
 			game.Unlock()
 		case dd := <-game.dealer.deckDeltas:
 			fmt.Println("Dealer a deck delta", dd)
-			game.Lock()
+			game.RLock()
 			for _, p := range game.players {
 				p.deckDeltas <- dd
 			}
-			game.Unlock()
+			game.RUnlock()
 		}
 	}
 }

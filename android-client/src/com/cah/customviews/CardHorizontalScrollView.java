@@ -7,7 +7,6 @@ import android.util.AttributeSet;
 import android.util.DisplayMetrics;
 import android.view.MotionEvent;
 import android.view.View;
-import android.view.ViewConfiguration;
 import android.view.ViewGroup;
 import android.view.WindowManager;
 import android.view.animation.Animation;
@@ -37,7 +36,8 @@ public class CardHorizontalScrollView extends HorizontalScrollView {
 	public boolean onTouchEvent(MotionEvent event) {
 		if(event.getAction() == MotionEvent.ACTION_DOWN){
 			if(verticalSwipeHappening)
-				return false;
+				return false;	
+			
 			startingPoint = new Point((int)event.getRawX(), (int)event.getRawY());
 			System.out.println(startingPoint.toString());
 			verticalSwipePossible = true;
