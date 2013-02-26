@@ -4,6 +4,7 @@ PROJ_PATH=$( cd "$( dirname "$0" )/.." && pwd )
 source functions.bash
 
 function run {
+	stop_server
 	clean_server
 	start_server
 	pushd .
