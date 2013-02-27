@@ -16,7 +16,7 @@ function run {
 		echo "Build Error"
 		exit 1
 	fi
-	java -cp libs/gson-2.2.2.jar:src/ com.cah.CahClient
+	java -ea:com.cah... -cp libs/gson-2.2.2.jar:src/ com.cah.CahClient
 
 	popd
 	stop_server

@@ -9,11 +9,40 @@ import java.net.*;
 import java.io.*;
 
 abstract class Delta {
+	/* Print all fields for sub-classes */
+	public String toString() {
+		StringBuilder result = new StringBuilder();
+		String newLine = System.getProperty("line.separator");
+
+		result.append( this.getClass().getName() );
+		result.append( " Object {" );
+		result.append(newLine);
+
+		//determine fields declared in this class only (no fields of superclass)
+		java.lang.reflect.Field[] fields = this.getClass().getDeclaredFields();
+
+		//print field names paired with their values
+		for ( java.lang.reflect.Field field : fields  ) {
+			result.append("  ");
+			try {
+				result.append( field.getName() );
+				result.append(": ");
+				//requires access to private field:
+				result.append( field.get(this) );
+			} catch ( IllegalAccessException ex ) {
+				System.out.println(ex);
+			}
+			result.append(newLine);
+		}
+		result.append("}");
+
+		return result.toString();
+	}
 }
 
 class TableDelta extends Delta{
-	public String Command;
-	public String Id;
+	String Command;
+	String Id;
 }
 
 class DeckDelta extends Delta {
@@ -43,15 +72,25 @@ public class CahClient extends Thread implements JsonDeserializer<Delta> {
 
 	/* For Debug */
 	public static void main( String args[] ) {
-		BlockingQueue<Delta> in = (BlockingQueue<Delta>) new ArrayBlockingQueue<Delta>( 32, true );
-		BlockingQueue<Delta> out =(BlockingQueue<Delta>) new ArrayBlockingQueue<Delta>( 32, true );
-		(new CahClient(in, out)).start();
+		try {
+			BlockingQueue<Delta> in = (BlockingQueue<Delta>) new ArrayBlockingQueue<Delta>( 32, true );
+			BlockingQueue<Delta> out =(BlockingQueue<Delta>) new ArrayBlockingQueue<Delta>( 32, true );
+			(new CahClient(in, out)).start();
 
-		TableDelta td = new TableDelta();
-		td.Command = "new";
+			TableDelta table_new = new TableDelta();
+			table_new.Command = "new";
+			out.put(table_new);
 
-		if( !out.offer(td) ) {
-			System.out.println("NO OFFER");
+			TableDelta table_reply = (TableDelta) in.take();
+			System.out.println("Reply: "+ table_reply);
+
+			assert table_reply.Command != null;
+			assert table_reply.Command.equals("ok");
+			assert table_reply.Id != null;
+			assert table_reply.Id.length() == 6;
+
+		} catch( Exception e ) {
+			System.out.println("Debug failed: " + e);
 		}
 	}
 
@@ -94,7 +133,7 @@ public class CahClient extends Thread implements JsonDeserializer<Delta> {
 			try {
 				//block and wait for messages
 				Delta message_out = outgoing.take();
-				System.out.println("Message_out: " + message_out.getClass().getName());
+				System.out.println("Message_out: " + message_out);
 				gson.toJson(message_out, message_out.getClass(), writer);
 				writer.flush();
 			} catch (InterruptedException e ) {
