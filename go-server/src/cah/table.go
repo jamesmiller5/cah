@@ -17,7 +17,7 @@ type Table struct {
 
 type TableDelta struct {
 	Command string
-	ID      string
+	Id      string
 }
 
 const TABLE_TIMEOUT = 1 * time.Minute
