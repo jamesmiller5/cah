@@ -33,9 +33,10 @@ type NetDecoder struct {
 }
 
 var tables = map[string]*Table{}
-var tableLock *sync.Mutex = new(sync.Mutex)
+var tableLock *sync.RWMutex = new(sync.RWMutex)
 
 func HandleNewClient(conn net.Conn) {
+	fmt.Println("New Client Connection")
 	defer conn.Close()
 	defer func() {
 		if r := recover(); r != nil {
@@ -71,8 +72,8 @@ func handleJoinTable(dec *NetDecoder, enc *NetEncoder, msg *TableDelta) bool {
 		panic("Message Id too long")
 	}
 
-	tab := LookUpTable(msg.Id)
-	if tab == nil {
+	tab, exists := LookUpTable(msg.Id)
+	if exists == false || tab == nil {
 		enc.Encode(&TableDelta{Command: "nope", Id: msg.Id})
 	} else {
 		enc.Encode(&TableDelta{Command: "ok", Id: msg.Id})
@@ -87,33 +88,37 @@ func handleJoinTable(dec *NetDecoder, enc *NetEncoder, msg *TableDelta) bool {
 var handlers = map[string]func(*NetDecoder, *NetEncoder, *TableDelta) bool{
 	"join": handleJoinTable,
 	"new": func(dec *NetDecoder, enc *NetEncoder, msg *TableDelta) bool {
-		tab := NewTable()
+		tab := NewTable(nil)
 		go tab.PlayGame()
 		msg.Id = tab.id
 		return handleJoinTable(dec, enc, msg)
 	},
 }
 
-func NewTable() *Table {
+func NewTable(id *string) *Table {
 	t := &Table{game: NewGame()}
 
-	//try and add the table to the list using a random id avoiding collisions
-	for {
-		b := make([]byte, 4)
-		rand.Read(b)
-		d := make([]byte, base64.StdEncoding.EncodedLen(len(b)))
-		base64.StdEncoding.Encode(d, b)
-		id := string(d)[0:6]
-
-		//add our new table to the map in a safe manner
-		tableLock.Lock()
-		if _, exists := tables[id]; exists != true {
-			t.id = id
-			tables[id] = t
-			tableLock.Unlock()
-			break
+	//If an id is provided, try and use that
+	if id != nil {
+		t.id = *id;
+		if !t.AddToListing() {
+			panic("Couldn't add table with id:" + *id)
 		}
-		tableLock.Unlock()
+	} else {
+		//try and add the table to the list using a random id avoiding collisions
+		for {
+			b := make([]byte, 4)
+			rand.Read(b)
+			d := make([]byte, base64.StdEncoding.EncodedLen(len(b)))
+			base64.StdEncoding.Encode(d, b)
+			t.id = string(d)[0:6]
+
+			if t.AddToListing() {
+				break
+			}
+
+			fmt.Println("Had a collision of table ID's, probably not supposed to happen")
+		}
 	}
 
 	fmt.Printf("New Table %+v\n", t)
@@ -126,11 +131,24 @@ func (t *Table) PlayGame() {
 	t.game.Play()
 }
 
-func LookUpTable(id string) *Table {
+func LookUpTable(id string) (tab *Table, exists bool) {
+	tableLock.RLock()
+	defer tableLock.RUnlock()
+
+	tab, exists = tables[id];
+	return
+}
+
+func (t *Table) AddToListing() bool {
 	tableLock.Lock()
 	defer tableLock.Unlock()
 
-	return tables[id]
+	if _, exists := tables[t.id]; exists != true {
+		tables[t.id] = t
+		return true
+	}
+
+	return false
 }
 
 func (t *Table) Delete() {

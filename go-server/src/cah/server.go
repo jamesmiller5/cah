@@ -17,7 +17,7 @@ func Serve() {
 		log.Println("Error ", err.Error())
 		return
 	}
-	log.Println("Listening on ", tcpAddr)
+	log.Println("Server started with binding", tcpAddr)
 
 	for {
 		conn, err := listener.AcceptTCP()

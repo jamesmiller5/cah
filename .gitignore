@@ -26,3 +26,8 @@ proguard-project.txt
 
 # Swap files
 *.sw?
+
+#test files
+integration-tests/pid
+integration-tests/server-input*
+integration-tests/server
