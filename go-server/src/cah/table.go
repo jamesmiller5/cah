@@ -67,15 +67,15 @@ func HandleNewClient(conn net.Conn) {
 }
 
 func handleJoinTable(dec *NetDecoder, enc *NetEncoder, msg *TableDelta) bool {
-	if len(msg.ID) > 6 {
-		panic("Message ID too long")
+	if len(msg.Id) > 6 {
+		panic("Message Id too long")
 	}
 
-	tab := LookUpTable(msg.ID)
+	tab := LookUpTable(msg.Id)
 	if tab == nil {
-		enc.Encode(&TableDelta{Command: "nope", ID: msg.ID})
+		enc.Encode(&TableDelta{Command: "nope", Id: msg.Id})
 	} else {
-		enc.Encode(&TableDelta{Command: "ok", ID: msg.ID})
+		enc.Encode(&TableDelta{Command: "ok", Id: msg.Id})
 		tab.game.HandlePlayer(dec, enc)
 		return true
 	}
@@ -89,7 +89,7 @@ var handlers = map[string]func(*NetDecoder, *NetEncoder, *TableDelta) bool{
 	"new": func(dec *NetDecoder, enc *NetEncoder, msg *TableDelta) bool {
 		tab := NewTable()
 		go tab.PlayGame()
-		msg.ID = tab.id
+		msg.Id = tab.id
 		return handleJoinTable(dec, enc, msg)
 	},
 }
