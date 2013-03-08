@@ -10,13 +10,15 @@ function run {
 	pushd .
 
 	cd $PROJ_PATH/android-client/
+	export CLASSPATH="`pwd`/libs/gson-2.2.2.jar:`pwd`/src/"
 
-	javac -cp libs/gson-2.2.2.jar:src/ src/com/cah/CahClient.java
+	javac -g src/com/cah/CahClient.java
 	if [[ $? != 0 ]]; then
 		echo "Build Error"
 		exit 1
 	fi
-	java -ea:com.cah... -cp libs/gson-2.2.2.jar:src/ com.cah.CahClient
+
+	java -ea:com.cah... com.cah.CahClient
 
 	popd
 	stop_server

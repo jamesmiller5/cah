@@ -3,6 +3,7 @@ package cah
 import (
 	"fmt"
 	"time"
+	"net"
 )
 
 type PlayerDelta struct {
@@ -76,7 +77,12 @@ func (p *Player) DecodeMessages(playerDeltas chan *PlayerDelta, deckDeltas chan 
 			//decode either as a DeckDelta or PlayerDelta
 			p.dec.net.SetDeadline(time.Now().Add(PLAYER_TIMEOUT))
 			if err := p.dec.Decode(&delta); err != nil {
-				fmt.Println("Player.DecodeMessages decode error")
+				if err, ok := err.(net.Error); ok && err.Timeout() {
+					fmt.Println("Player timout")
+					goto exit
+				}
+
+				fmt.Println("Unknown Player.DecodeMessages decode error")
 				//send a "leave" command
 				goto exit
 			}
@@ -103,7 +109,7 @@ func (p *Player) DecodeMessages(playerDeltas chan *PlayerDelta, deckDeltas chan 
 				//keep alive, igonre
 				fmt.Println("Keepalived")
 			} else {
-				fmt.Println("Error decoding")
+				fmt.Println("Player.DecodeMessages: Unexpected message recieved")
 				goto exit
 			}
 		}
