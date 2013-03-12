@@ -2,6 +2,7 @@ package com.cah;
 
 import java.util.Queue;
 import java.util.concurrent.ArrayBlockingQueue;
+import java.util.concurrent.BlockingQueue;
 
 import android.app.Activity;
 import android.graphics.Color;
@@ -35,7 +36,7 @@ public class Cah extends Activity
 
 		Queue<Delta> in = new ArrayBlockingQueue<Delta>( 32, true );
 		Queue<Delta> out = new ArrayBlockingQueue<Delta>( 32, true );
-		performOnBackgroundThread(new CahClient(in, out));
+		performOnBackgroundThread(new CahClient((BlockingQueue<Delta>)in, (BlockingQueue<Delta>)out));
 	}
 
 	public static Thread performOnBackgroundThread(final Runnable runnable) {
