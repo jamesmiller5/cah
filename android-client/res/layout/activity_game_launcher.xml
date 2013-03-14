@@ -1,0 +1,35 @@
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".GameLauncher" >
+
+    <Button
+        android:id="@+id/buttonCreateNewTable"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentTop="true"
+        android:text="Create New Table" />
+
+    <Button
+        android:id="@+id/buttonJoinExistingTable"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentLeft="true"
+        android:layout_below="@+id/buttonCreateNewTable"
+        android:text="Join Existing Table" />
+
+    <EditText
+        android:id="@+id/editTextTableId"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignTop="@+id/buttonJoinExistingTable"
+        android:layout_toRightOf="@+id/buttonJoinExistingTable"
+        android:hint="Enter table ID"
+        android:ems="10" >
+
+        <requestFocus />
+    </EditText>
+
+</RelativeLayout>
