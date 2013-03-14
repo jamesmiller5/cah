@@ -85,7 +85,9 @@ public class CardHorizontalScrollView extends HorizontalScrollView {
 					dxdy = null;
 					
 					cardToMove.startAnimation(animSet);
-					// TODO: Call function telling app that the user has played a card.s
+					
+					// Card was played.
+					((CardView) cardToMove).onCardPlayed();
 				} else {
 					// Dropped on bottom half
 					TranslateAnimation slideAnimation = new TranslateAnimation(0, 0, -(startingPoint.y - event.getRawY()),  0);

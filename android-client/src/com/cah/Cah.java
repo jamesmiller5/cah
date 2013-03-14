@@ -9,6 +9,8 @@ import android.app.AlertDialog;
 import android.content.Intent;
 import android.graphics.Color;
 import android.os.Bundle;
+import android.provider.Settings;
+import android.util.Log;
 import android.widget.LinearLayout;
 import android.widget.LinearLayout.LayoutParams;
 
@@ -19,7 +21,7 @@ public class Cah extends Activity
 	
 	CahClient client;
 	Queue<Delta> in;
-	Queue<Delta> out;
+	public Queue<Delta> out;
 	
 	/** Called when the activity is first created. */
 	@Override
@@ -55,11 +57,13 @@ public class Cah extends Activity
 
 				// Get the server's reply.
 				TableDelta table_reply = (TableDelta) client.incoming.take();
-				AlertDialog.Builder alertBuilder = new AlertDialog.Builder(this);
-				alertBuilder.setTitle("New table reply");
-				alertBuilder.setMessage("Command \"" + table_reply.Command + "\", Id \"" + table_reply.Id + "\"");
-				alertBuilder.setPositiveButton("Close", null);
-				alertBuilder.show();
+				
+				if(table_reply.Command.equals("ok")) {
+					Log.d("CAH", "Settings.Secure.ANDROID_ID=" + Settings.Secure.ANDROID_ID);
+					// Create a player
+					client.outgoing.put(new PlayerDelta((int)(Math.random()*Integer.MAX_VALUE), "connect"));
+				}
+				
 			} catch (InterruptedException e) {
 				e.printStackTrace();
 			}
