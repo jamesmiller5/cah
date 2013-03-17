@@ -11,7 +11,7 @@ import java.io.*;
 //for debugging
 import java.util.Arrays;
 
-public class CahClient extends Thread implements JsonDeserializer<Delta> {
+public class CahClient extends Thread implements JsonDeserializer<Delta>, JsonSerializer<Delta> {
 	BlockingQueue<Delta> incoming;
 	BlockingQueue<Delta> outgoing;
 	Socket socket;
@@ -49,7 +49,7 @@ public class CahClient extends Thread implements JsonDeserializer<Delta> {
 			assert table_reply.Id.length() == 6;
 
 			//ask for an id player 1
-			player1.outgoing.put(new ActionDelta(new PlayerDelta(0, "my-id?"))); //TODO:make a encoding wrapper to fix this
+			player1.outgoing.put(new PlayerDelta(0, "my-id?"));
 			PlayerDelta id_reply = (PlayerDelta) player1.incoming.take();
 			assert id_reply.Id == 1;
 			assert id_reply.Message.equals("your-id");
@@ -64,7 +64,7 @@ public class CahClient extends Thread implements JsonDeserializer<Delta> {
 			assert p2_table_reply.Id.equals(table_reply.Id);
 
 			//ask for an id for player 2
-			player2.outgoing.put(new ActionDelta(new PlayerDelta(0, "my-id?"))); //TODO:make a encoding wrapper to fix this
+			player2.outgoing.put(new PlayerDelta(0, "my-id?"));
 			PlayerDelta p2_id_reply = (PlayerDelta) player2.incoming.take();
 			assert p2_id_reply.Id == 2;
 			assert p2_id_reply.Message.equals("your-id");
@@ -153,7 +153,7 @@ public class CahClient extends Thread implements JsonDeserializer<Delta> {
 			try {
 				Delta message_out = outgoing.take();
 				//System.out.println("Message_out: " + message_out);
-				gson.toJson(message_out, message_out.getClass(), writer);
+				gson.toJson(message_out, Delta.class, writer);
 				writer.flush(); //Flush writer to ensure message delivery asap
 			} catch (InterruptedException e ) {
 				//do nothing, expected exception while shutting down
@@ -175,7 +175,6 @@ public class CahClient extends Thread implements JsonDeserializer<Delta> {
 		}
 	}
 
-	@Override
 	public Delta deserialize( final JsonElement jsonRaw, final java.lang.reflect.Type type, final JsonDeserializationContext context ) throws JsonParseException {
 		//All messages are objects, get this out of the way
 		JsonObject json = jsonRaw.getAsJsonObject();
@@ -194,7 +193,16 @@ public class CahClient extends Thread implements JsonDeserializer<Delta> {
 		throw new JsonParseException("Unknown Message Delta from server");
 	}
 
-	//TODO: Make a serialize for PlayerDelta & DeckDelta, that need to be wrapped in an action delta
+	public JsonElement serialize(final Delta src, final java.lang.reflect.Type type, final JsonSerializationContext context ) throws JsonParseException {
+		//wrap some classes in an action delta if need be
+		if( src.getClass() == PlayerDelta.class ) {
+			return context.serialize(new ActionDelta((PlayerDelta)src), ActionDelta.class);
+		} else if(src.getClass() == DeckDelta.class) {
+			return context.serialize(new ActionDelta((DeckDelta)src), ActionDelta.class);
+		}else {
+			return context.serialize(src, src.getClass());
+		}
+	}
 }
 
 abstract class Delta {
