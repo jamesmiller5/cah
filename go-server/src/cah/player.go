@@ -1,9 +1,10 @@
 package cah
 
 import (
-	"fmt"
+	"log"
 	"net"
 	"time"
+	"io"
 )
 
 type Delta struct {
@@ -20,7 +21,7 @@ func (pd *PlayerDelta) isClean() bool {
 	if pd.Id < 0 ||
 		len(pd.Message) > 10 ||
 		playerDeltaMessages[pd.Message] != true {
-		fmt.Println("PlayerDelta data error")
+		log.Println("PlayerDelta is not clean")
 		return false
 	}
 
@@ -43,11 +44,11 @@ type DeckDelta struct {
 
 func (dd *DeckDelta) isClean() bool {
 	if dd.Player < 1 || dd.Amount < 1 || len(dd.DeckTo) == 0 || len(dd.DeckFrom) == 0 {
-		fmt.Println("Deck.Player missing fields")
+		log.Println("DeckDelta is not clean (missing fields)")
 		return false
 	}
 	if true != deckDeltaDecks[dd.DeckTo] || true != deckDeltaDecks[dd.DeckFrom] {
-		fmt.Println("Deck.DeckTo or .DeckFrom illegal")
+		log.Println("DeckDelta .DeckTo or .DeckFrom illegal")
 		return false
 	}
 
@@ -96,7 +97,6 @@ func (p *Player) DecodeMessages(toServerPlayerDeltas chan *PlayerDelta, toServer
 		select {
 		case <-p.quit:
 			//Should quit
-			fmt.Println("Player.DecodeMessages told to quit")
 			goto exit
 		default:
 			//Decode a delta
@@ -109,17 +109,16 @@ func (p *Player) DecodeMessages(toServerPlayerDeltas chan *PlayerDelta, toServer
 			//decode either as a DeckDelta or PlayerDelta
 			p.dec.net.SetDeadline(time.Now().Add(PLAYER_TIMEOUT))
 			if err := p.dec.Decode(&delta); err != nil {
-				if err, ok := err.(net.Error); ok && err.Timeout() {
-					fmt.Println("Player timout")
+				if err == io.EOF {
+					goto exit
+				} else if err, ok := err.(net.Error); ok && err.Timeout() {
 					goto exit
 				}
 
-				fmt.Println("Unknown Player.DecodeMessages decode error")
+				log.Println("Unknown Player.DecodeMessages decode error: " + err.Error())
 				goto exit
 			}
 			p.dec.net.SetDeadline(time.Time{})
-
-			fmt.Printf("Dec:%v\n", delta)
 
 			if delta.Deck != nil {
 				if delta.Deck.isClean() != true {
@@ -134,10 +133,9 @@ func (p *Player) DecodeMessages(toServerPlayerDeltas chan *PlayerDelta, toServer
 				delta.Player.fromPlayer = p
 				toServerPlayerDeltas <- delta.Player
 			} else if delta.Keepalive == true {
-				//keep alive, igonre
-				fmt.Println("Keepalived")
+				//keep alive, reset counter and ignore
 			} else {
-				fmt.Println("Player.DecodeMessages: Unexpected message recieved")
+				log.Println("Player.DecodeMessages: Unexpected message recieved")
 				goto exit
 			}
 		}
@@ -158,7 +156,6 @@ func (p *Player) EncodeMessages() {
 		case dd := <-p.toClientDeckDeltas:
 			p.enc.Encode(dd)
 		case <-p.quit:
-			fmt.Println("PlayerHandler got the message to quit")
 			goto exit
 		}
 	}

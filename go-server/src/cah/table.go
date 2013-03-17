@@ -4,10 +4,10 @@ import (
 	"crypto/rand"
 	"encoding/base64"
 	"encoding/json"
-	"fmt"
 	"net"
 	"sync"
 	"time"
+	"log"
 )
 
 type Table struct {
@@ -36,11 +36,10 @@ var tables = map[string]*Table{}
 var tableLock *sync.RWMutex = new(sync.RWMutex)
 
 func HandleNewClient(conn net.Conn) {
-	fmt.Println("New Client Connection")
 	defer conn.Close()
 	defer func() {
 		if r := recover(); r != nil {
-			fmt.Println("Recovered in HandleNewClients:", r)
+			log.Println("Recovered in HandleNewClients:", r)
 		}
 	}()
 
@@ -117,11 +116,9 @@ func NewTable(id *string) *Table {
 				break
 			}
 
-			fmt.Println("Had a collision of table ID's, probably not supposed to happen")
+			log.Println("Had a collision of table ID's, probably not supposed to happen")
 		}
 	}
-
-	fmt.Printf("New Table %+v\n", t)
 
 	return t
 }

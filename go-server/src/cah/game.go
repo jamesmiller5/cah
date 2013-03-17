@@ -1,7 +1,6 @@
 package cah
 
 import (
-	"fmt"
 	"sync"
 )
 
@@ -27,7 +26,6 @@ func (game *Game) Play() {
 	for {
 		select {
 		case pd := <-game.playerDeltas:
-			fmt.Println("Dealer a player delta", pd)
 			multicast := false
 			p := pd.fromPlayer
 			switch pd.Message {
@@ -54,7 +52,6 @@ func (game *Game) Play() {
 				}
 			}
 		case dd := <-game.deckDeltas:
-			fmt.Println("Dealer a deck delta", dd)
 			game.RLock()
 			for _, p := range game.players {
 				p.toClientDeckDeltas <- dd
