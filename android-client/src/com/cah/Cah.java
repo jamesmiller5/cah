@@ -15,19 +15,19 @@ import android.widget.LinearLayout.LayoutParams;
 import com.cah.customviews.CardView;
 
 public class Cah extends Activity
-{	
-	
+{
+
 	CahClient client;
-	Queue<Delta> in;
-	Queue<Delta> out;
-	
+	BlockingQueue<Delta> in;
+	BlockingQueue<Delta> out;
+
 	/** Called when the activity is first created. */
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.main);
 		Intent recievedIntent = getIntent();
-				
+
 		LinearLayout cardContainer = (LinearLayout) findViewById(R.id.cardContainer);
 		cardContainer.removeAllViews();
 
@@ -41,11 +41,8 @@ public class Cah extends Activity
 			cardContainer.addView(cv);
 		}
 
-		in = new ArrayBlockingQueue<Delta>( 32, true );
-		out = new ArrayBlockingQueue<Delta>( 32, true );
-		client = new CahClient((BlockingQueue<Delta>)in, (BlockingQueue<Delta>)out);
-		performOnBackgroundThread(client);
-		
+		performOnBackgroundThread(new CahClient());
+
 		if(recievedIntent.hasExtra("COMMAND")) {
 			try {
 				// This is probably running on the UI thread. TODO: Move this off of the UI thread if it's running there. UI will hang if there's a slow internet connection.
@@ -64,20 +61,11 @@ public class Cah extends Activity
 				e.printStackTrace();
 			}
 		}
-		
+
 	}
 
 	public static Thread performOnBackgroundThread(final Runnable runnable) {
-		final Thread t = new Thread() {
-			@Override
-			public void run() {
-				try {
-					runnable.run();
-				} finally {
-
-				}
-			}
-		};
+		Thread t = new Thread(runnable);
 		t.start();
 		return t;
 	}
