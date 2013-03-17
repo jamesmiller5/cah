@@ -23,6 +23,7 @@ import com.cah.R;
 public class CardView extends View {
 	private String mCardText = "Test"; // TODO: use a default from R.string...
 	private int mTextColor = Color.BLACK; // TODO: Set this based on background color
+	private int mCardColor = Color.WHITE;
 
 	private Bitmap mCahLogo;
 	private TextPaint mTextPaint;
@@ -65,17 +66,7 @@ public class CardView extends View {
 		}
 
 		int backgroundColor = (attrs == null) ?  Color.WHITE : a.getColor(R.styleable.CardView_color, Color.WHITE);
-		if(backgroundColor == Color.WHITE){
-			mTextColor = Color.BLACK;
-			this.setBackgroundDrawable(this.getResources().getDrawable(R.drawable.card_background_white));
-			// Get bitmap image for icon
-			mCahLogo = BitmapFactory.decodeResource(this.getContext().getResources(), R.drawable.icon_w);
-		} else {
-			mTextColor = Color.WHITE;
-			this.setBackgroundDrawable(this.getResources().getDrawable(R.drawable.card_background_black));
-			// Get bitmap image for icon
-			mCahLogo = BitmapFactory.decodeResource(this.getContext().getResources(), R.drawable.icon_b);			
-		}
+		this.setCardColor(backgroundColor);
 		
 		mCardWidth = w.getDimensionPixelSize(0,  -1);
 
@@ -192,5 +183,22 @@ public class CardView extends View {
 		invalidateTextPaintAndMeasurements();
 	}
 
+	public int getCardColor() {
+		return mCardColor;
+	}
+
+	public void setCardColor(int color) {
+		if(color == Color.WHITE){
+			mTextColor = Color.BLACK;
+			this.setBackgroundDrawable(this.getResources().getDrawable(R.drawable.card_background_white));
+			// Get bitmap image for icon
+			mCahLogo = BitmapFactory.decodeResource(this.getContext().getResources(), R.drawable.icon_w);
+		} else {
+			mTextColor = Color.WHITE;
+			this.setBackgroundDrawable(this.getResources().getDrawable(R.drawable.card_background_black));
+			// Get bitmap image for icon
+			mCahLogo = BitmapFactory.decodeResource(this.getContext().getResources(), R.drawable.icon_b);			
+		}
+	}
 
 }

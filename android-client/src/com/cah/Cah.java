@@ -7,6 +7,7 @@ import java.util.concurrent.BlockingQueue;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.Bitmap;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.provider.Settings;
@@ -20,6 +21,7 @@ import android.widget.QuickContactBadge;
 
 import com.cah.customviews.CardView;
 import com.cah.customviews.GameTable;
+import com.cah.datastructures.Card;
 
 public class Cah extends Activity
 {	
@@ -66,9 +68,40 @@ public class Cah extends Activity
 		} else {
 			this.addDummyPlayersAndCards();
 		}
+	}
+	
+	public void addPlayerToTable(Bitmap playerBitmap, boolean isCzar) {
+		GameTable table = (GameTable)this.findViewById(R.id.gameTable);
 		
+		//TODO: Decide if this inflater should be a private member variable of Cah
+		LayoutInflater inflater = (LayoutInflater)this.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
 		
-		
+		View playerCard = inflater.inflate(R.layout.player_card, null);
+		ImageView crownImageView = (ImageView)playerCard.findViewById(R.id.playerCrown);
+		if(isCzar) {
+			crownImageView.setVisibility(View.VISIBLE);
+		}
+		QuickContactBadge playerPicture = (QuickContactBadge)playerCard.findViewById(R.id.playerBadge);
+		if(playerBitmap!=null) {
+			playerPicture.setImageBitmap(playerBitmap);
+		}
+		table.addView(playerCard);
+	}
+	
+	public void addCardToHand(Card card) {
+		LinearLayout cardContainer = (LinearLayout) findViewById(R.id.cardContainer);
+		CardView cv = new CardView(getApplicationContext());
+		cv.setCardString(card.text);
+		if(card.color == Card.Color.WHITE){
+			cv.setTextColor(Color.BLACK);
+			cv.setCardColor(Color.WHITE);
+		} else {
+			cv.setTextColor(Color.WHITE);
+			cv.setCardColor(Color.BLACK);
+		}
+		LayoutParams lp = new LayoutParams((int) (235* (this.getResources().getDisplayMetrics().densityDpi/160.)), (int) (300* (this.getResources().getDisplayMetrics().densityDpi/160.)));
+		cv.setLayoutParams(lp);
+		cardContainer.addView(cv);
 	}
 	
 	private void addDummyPlayersAndCards() {
@@ -83,15 +116,8 @@ public class Cah extends Activity
 				"f of two equals f of one equals one",
 				"oh hai im in ur computer eating your cheezburgers and CAHing your textz",
 				"how are you holding up because im a potato"};
-		LinearLayout cardContainer = (LinearLayout) findViewById(R.id.cardContainer);
-		cardContainer.removeAllViews();
 		for(int i = 0; i<dummyCards.length; i++) {
-			CardView cv = new CardView(getApplicationContext());
-			cv.setCardString(dummyCards[i]);
-			cv.setTextColor(Color.BLACK);
-			LayoutParams lp = new LayoutParams((int) (235* (this.getResources().getDisplayMetrics().densityDpi/160.)), (int) (300* (this.getResources().getDisplayMetrics().densityDpi/160.)));
-			cv.setLayoutParams(lp);
-			cardContainer.addView(cv);
+			this.addCardToHand(new Card(i%2 == 0 ? Card.Color.WHITE : Card.Color.BLACK, dummyCards[i]));
 		}
 
 		// Dynamically add 10 players to the game table.
