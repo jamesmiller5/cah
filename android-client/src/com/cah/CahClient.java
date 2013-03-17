@@ -8,6 +8,195 @@ import com.google.gson.stream.*;
 import java.net.*;
 import java.io.*;
 
+//for debugging
+import java.util.Arrays;
+
+public class CahClient extends Thread implements JsonDeserializer<Delta> {
+	BlockingQueue<Delta> incoming;
+	BlockingQueue<Delta> outgoing;
+	Socket socket;
+	final Gson gson = new GsonBuilder().registerTypeAdapter(Delta.class, this).create();
+	final AtomicBoolean go = new AtomicBoolean(true);
+	Thread encoder;
+
+	public CahClient( BlockingQueue<Delta> in, BlockingQueue<Delta> out ) {
+		incoming = in;
+		outgoing = out;
+	}
+
+	public CahClient() {
+		incoming = new ArrayBlockingQueue<Delta>( 32, true );
+		outgoing = new ArrayBlockingQueue<Delta>( 32, true );
+	}
+
+	/* For Debug */
+	public static void main( String args[] ) {
+		try {
+			System.out.println("Starting Test");
+
+			CahClient player1 = new CahClient();
+			CahClient player2 = new CahClient();
+
+			//start player1 but not player2
+			player1.start();
+
+			//let player1 make the table
+			player1.outgoing.put(new TableDelta("new", null));
+			TableDelta table_reply = (TableDelta) player1.incoming.take();
+			assert table_reply.Command != null;
+			assert table_reply.Command.equals("ok");
+			assert table_reply.Id != null;
+			assert table_reply.Id.length() == 6;
+
+			//ask for an id player 1
+			player1.outgoing.put(new ActionDelta(new PlayerDelta(0, "my-id?"))); //TODO:make a encoding wrapper to fix this
+			PlayerDelta id_reply = (PlayerDelta) player1.incoming.take();
+			assert id_reply.Id == 1;
+			assert id_reply.Message.equals("your-id");
+
+			//start player 2
+			player2.start();
+
+			//have player 2 join the table
+			player2.outgoing.put(new TableDelta("join", table_reply.Id));
+			TableDelta p2_table_reply = (TableDelta) player2.incoming.take();
+			assert p2_table_reply.Command.equals("ok");
+			assert p2_table_reply.Id.equals(table_reply.Id);
+
+			//ask for an id for player 2
+			player2.outgoing.put(new ActionDelta(new PlayerDelta(0, "my-id?"))); //TODO:make a encoding wrapper to fix this
+			PlayerDelta p2_id_reply = (PlayerDelta) player2.incoming.take();
+			assert p2_id_reply.Id == 2;
+			assert p2_id_reply.Message.equals("your-id");
+
+			//have player 1 leave and see player 2's update
+			System.out.println("Player 1 is disconnecting, should show up on player 2");
+
+			//Assert that player2 saw that player1 left the game
+			player1.shutdown();
+			PlayerDelta p2_leave_reply = (PlayerDelta) player2.incoming.take();
+			assert p2_leave_reply.Id == 1;
+			assert p2_leave_reply.Message.equals("leave");
+
+			//Close player2 and exit
+			player2.shutdown();
+
+			System.out.println("Test Passed");
+		} catch( Exception e ) {
+			System.out.println("Debug failed: " + e);
+		}
+	}
+
+	public void run() {
+		//Keep track of our threads, they will need to interrupt each other in the event of errors or close()
+		encoder = (Thread) this;
+		Thread decoder = new Thread(new DecodeThread());
+		try {
+			socket = new Socket();
+			socket.setTcpNoDelay(true);
+			socket.setReuseAddress(true);
+
+			//look for a localhost connection first
+			try {
+				socket.connect(new InetSocketAddress("localhost", 41337), 1000);
+			} catch ( IOException e ) {
+				//if that fails attempt to connect to the local android network
+				socket.connect(new InetSocketAddress("10.0.2.2", 41337), 5000);
+			}
+
+			decoder.start();
+			encode();
+		} catch (Exception e ){
+			System.out.println("Unexpected Exception in CahClient.run(): " + e + "\n" + Arrays.toString(e.getStackTrace()) );
+		}
+	}
+
+	//Helper thread to decode json in a blocking fashion
+	private class DecodeThread implements Runnable {
+		public void run() {
+			try {
+				decode();
+			} catch( JsonSyntaxException e ) {
+				//Json library throws this when connection is closed
+			} catch( Exception e ) {
+				System.out.println("Unexpected Decode Thread Exception: " + e + "\n" + Arrays.toString(e.getStackTrace()) );
+			} finally {
+				//Shutdown thread pair in case this thread encountered an error
+				shutdown();
+			}
+		}
+	}
+
+	public void shutdown() {
+		//Shutdown only once
+		if( go.get() ) {
+			go.set(false);
+
+			//interrupt the encoder as it's probably waiting for a message on the incoming queue
+			if( encoder != null ) {
+				encoder.interrupt();
+			}
+
+			//decoder thread gets an exception from socket and will exit gracefully
+			try {
+				if( socket != null && !socket.isClosed() )
+					socket.close();
+			} catch( IOException e ) {
+				//socket is already closed, continue with shutdown
+			}
+		}
+	}
+
+	public void encode() throws IOException {
+		JsonWriter writer = new JsonWriter(	new OutputStreamWriter( socket.getOutputStream(), "UTF-8" ) );
+		while( go.get() ) {
+			try {
+				Delta message_out = outgoing.take();
+				//System.out.println("Message_out: " + message_out);
+				gson.toJson(message_out, message_out.getClass(), writer);
+				writer.flush(); //Flush writer to ensure message delivery asap
+			} catch (InterruptedException e ) {
+				//do nothing, expected exception while shutting down
+			}
+		}
+	}
+
+	public void decode() throws IOException {
+		JsonReader reader = new JsonReader(new BufferedReader(new InputStreamReader( socket.getInputStream())));
+		while( go.get() ) {
+			//block and wait for messages from Socket
+			Delta message_in = gson.fromJson(reader, Delta.class);
+			//System.out.println("Message_in: " + message_in);
+			try {
+				incoming.put( message_in );
+			} catch (InterruptedException e ) {
+				//do nothing, thread is shutting down
+			}
+		}
+	}
+
+	@Override
+	public Delta deserialize( final JsonElement jsonRaw, final java.lang.reflect.Type type, final JsonDeserializationContext context ) throws JsonParseException {
+		//All messages are objects, get this out of the way
+		JsonObject json = jsonRaw.getAsJsonObject();
+
+		//Guess message type based on fields
+		if( json.has("Command") ) {
+			return context.deserialize(json, TableDelta.class );
+		} else if( json.has("DeckTo") ) {
+			return context.deserialize(json, DeckDelta.class );
+		} else if( json.has("Id") ) {
+			return context.deserialize(json, PlayerDelta.class );
+		} else if( json.has("Deck") ) {
+			return context.deserialize(json, ActionDelta.class );
+		}
+
+		throw new JsonParseException("Unknown Message Delta from server");
+	}
+
+	//TODO: Make a serialize for PlayerDelta & DeckDelta, that need to be wrapped in an action delta
+}
+
 abstract class Delta {
 	/* Print all fields for sub-classes */
 	public String toString() {
@@ -84,179 +273,5 @@ class ActionDelta extends Delta {
 	}
 	public ActionDelta(PlayerDelta p) {
 		Player = p;
-	}
-}
-
-public class CahClient extends Thread implements JsonDeserializer<Delta> {
-	BlockingQueue<Delta> incoming;
-	BlockingQueue<Delta> outgoing;
-	Socket socket;
-	final Gson gson = new GsonBuilder().registerTypeAdapter(Delta.class, this).create();
-	final AtomicBoolean go = new AtomicBoolean(true);
-	Thread encoder, decoder;
-
-	/* For Debug */
-	public static void main( String args[] ) {
-		try {
-			System.out.println("Starting Test");
-			CahClient player1 = new CahClient();
-			CahClient player2 = new CahClient();
-
-			//Make Player1 the host
-			player1.start();
-
-			player1.outgoing.put(new TableDelta("new", null));
-
-			TableDelta table_reply = (TableDelta) player1.incoming.take();
-			System.out.println("Reply: "+ table_reply);
-
-			assert table_reply.Command != null;
-			assert table_reply.Command.equals("ok");
-			assert table_reply.Id != null;
-			assert table_reply.Id.length() == 6;
-
-			//ask for an id player 1
-			player1.outgoing.put(new ActionDelta(new PlayerDelta(0, "my-id?"))); //TODO:make a encoding wrapper to fix this
-			System.out.println("PlayerDelta (player1): "+ player1.incoming.take());
-
-			System.out.println("Starting player 2");
-			player2.start();
-			player2.outgoing.put(new TableDelta("join", table_reply.Id));
-			System.out.println("Reply (player2): "+ player2.incoming.take());
-			//ask for an id for player 2
-			player2.outgoing.put(new ActionDelta(new PlayerDelta(0, "my-id?"))); //TODO:make a encoding wrapper to fix this
-			System.out.println("PlayerDelta (player2): "+ player2.incoming.take());
-
-			//have player 1 leave and see player 2's update
-			System.out.println("Player 1 is disconnecting, should show up on player 2");
-
-			//see each other
-			player1.cleanup();
-			System.out.println("PlayerDelta (player2): "+ player2.incoming.take());
-
-		} catch( Exception e ) {
-			System.out.println("Debug failed: " + e);
-		}
-	}
-
-	public CahClient( BlockingQueue<Delta> in, BlockingQueue<Delta> out ) {
-		incoming = in;
-		outgoing = out;
-	}
-
-	public CahClient() {
-		incoming = new ArrayBlockingQueue<Delta>( 32, true );
-		outgoing = new ArrayBlockingQueue<Delta>( 32, true );
-	}
-
-	public void cleanup() {
-		//cleanup threads
-		go.set(false);
-		encoder.isInterrupted();
-		decoder.isInterrupted();
-	}
-
-	public void run() {
-		try {
-			//Keep track of our threads, they will need to interrupt each other
-			encoder = (Thread) this;
-			decoder = new Thread(new DecodeThread());
-
-			socket = new Socket();
-			socket.setTcpNoDelay(true);
-			socket.setReuseAddress(true);
-
-			//look for a localhost connection first
-			try {
-				socket.connect(new InetSocketAddress("localhost", 41337), 1000);
-			} catch ( IOException e ) {
-				//if that fails connect to the local android network
-				socket.connect(new InetSocketAddress("10.0.2.2", 41337), 5000);
-			}
-
-			decoder.start();
-			this.encode();
-		} catch (UnknownHostException e) {
-			System.out.println("Unknown Host: "+e);
-		} catch (IOException e) {
-			System.out.println("IO Exception: "+e);
-		} catch (Exception e ) {
-			System.out.println("Unexpected Exception: " + e);
-		} finally {
-			cleanup();
-		}
-	}
-
-	public void encode() throws IOException {
-		JsonWriter writer = new JsonWriter(	new OutputStreamWriter( socket.getOutputStream(), "UTF-8" ) );
-
-		//encode and send messages until go is false
-		while( go.get() ) {
-			try {
-				//block and wait for messages from Message-Queue
-				Delta message_out = outgoing.take();
-
-				System.out.println("Message_out: " + message_out);
-
-				gson.toJson(message_out, message_out.getClass(), writer);
-				writer.flush(); //Flush writer to ensure message delivery asap
-			} catch (InterruptedException e ) {
-				System.out.println("InterruptedException: " + e);
-			}
-		}
-	}
-
-	public void decode() throws IOException {
-		JsonReader reader = new JsonReader(new BufferedReader(new InputStreamReader( socket.getInputStream())));
-
-		try {
-			//recieve and decode messages until go is false
-			while( go.get() ) {
-				try {
-					//block and wait for messages from Socket
-					Delta message_in = gson.fromJson(reader, Delta.class);
-
-					System.out.println("Message_in: " + message_in);
-
-					incoming.put( message_in );
-				} catch (InterruptedException e ) {
-					System.out.println("InterruptedException: " + e);
-				}
-			}
-		} catch (JsonParseException e) {
-			System.out.println("JsonParseException: " + e);
-			cleanup();
-		}
-	}
-
-	//Helper thread to decode json in a blocking fashion
-	private class DecodeThread implements Runnable {
-		public void run() {
-			try {
-				decode();
-			} catch( Exception e ) {
-				System.out.println("Deocde Thread Exception: " + e );
-				cleanup();
-			}
-		}
-	}
-
-	@Override
-	public Delta deserialize( final JsonElement jsonRaw, final java.lang.reflect.Type type, final JsonDeserializationContext context ) throws JsonParseException {
-		//All messages are objects, get this out of the way
-		JsonObject json = jsonRaw.getAsJsonObject();
-
-		//Guess message type based on fields
-		if( json.has("Command") ) {
-			return context.deserialize(json, TableDelta.class );
-		} else if( json.has("DeckTo") ) {
-			return context.deserialize(json, DeckDelta.class );
-		} else if( json.has("Id") ) {
-			return context.deserialize(json, PlayerDelta.class );
-		} else if( json.has("Deck") ) {
-			return context.deserialize(json, ActionDelta.class );
-		}
-
-		throw new JsonParseException("Unknown Message Delta from server");
 	}
 }
