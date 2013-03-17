@@ -1,6 +1,5 @@
 package com.cah.customviews;
 
-import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.res.TypedArray;
 import android.graphics.Bitmap;
@@ -15,6 +14,7 @@ import android.text.TextPaint;
 import android.util.AttributeSet;
 import android.view.View;
 
+import com.cah.Cah;
 import com.cah.R;
 
 /**
@@ -23,6 +23,7 @@ import com.cah.R;
 public class CardView extends View {
 	private String mCardText = "Test"; // TODO: use a default from R.string...
 	private int mTextColor = Color.BLACK; // TODO: Set this based on background color
+	private int mCardColor = Color.WHITE;
 
 	private Bitmap mCahLogo;
 	private TextPaint mTextPaint;
@@ -32,6 +33,8 @@ public class CardView extends View {
 
 	private final float TEXT_SIZE = this.getResources().getDimensionPixelSize(R.dimen.card_font_size);
 	private final float DPI_MULTIPLIER = (float) (this.getResources().getDisplayMetrics().densityDpi/160.);
+	
+	private Cah gameActivity;
 
 	public CardView(Context context) {
 		super(context);
@@ -63,17 +66,7 @@ public class CardView extends View {
 		}
 
 		int backgroundColor = (attrs == null) ?  Color.WHITE : a.getColor(R.styleable.CardView_color, Color.WHITE);
-		if(backgroundColor == Color.WHITE){
-			mTextColor = Color.BLACK;
-			this.setBackgroundDrawable(this.getResources().getDrawable(R.drawable.card_background_white));
-			// Get bitmap image for icon
-			mCahLogo = BitmapFactory.decodeResource(this.getContext().getResources(), R.drawable.icon_w);
-		} else {
-			mTextColor = Color.WHITE;
-			this.setBackgroundDrawable(this.getResources().getDrawable(R.drawable.card_background_black));
-			// Get bitmap image for icon
-			mCahLogo = BitmapFactory.decodeResource(this.getContext().getResources(), R.drawable.icon_b);			
-		}
+		this.setCardColor(backgroundColor);
 		
 		mCardWidth = w.getDimensionPixelSize(0,  -1);
 
@@ -142,6 +135,11 @@ public class CardView extends View {
 		canvas.drawBitmap(mCahLogo, 0, (float) (this.getHeight()-mCahLogo.getHeight()-(37.5 * DPI_MULTIPLIER)), null);
 
 	}
+	
+	protected void onCardPlayed() {
+		//TODO: Send card to server.
+		//gameActivity.out.add(new DeckDelta());
+	}
 
 	/**
 	 * Gets the example string attribute value.
@@ -185,5 +183,22 @@ public class CardView extends View {
 		invalidateTextPaintAndMeasurements();
 	}
 
+	public int getCardColor() {
+		return mCardColor;
+	}
+
+	public void setCardColor(int color) {
+		if(color == Color.WHITE){
+			mTextColor = Color.BLACK;
+			this.setBackgroundDrawable(this.getResources().getDrawable(R.drawable.card_background_white));
+			// Get bitmap image for icon
+			mCahLogo = BitmapFactory.decodeResource(this.getContext().getResources(), R.drawable.icon_w);
+		} else {
+			mTextColor = Color.WHITE;
+			this.setBackgroundDrawable(this.getResources().getDrawable(R.drawable.card_background_black));
+			// Get bitmap image for icon
+			mCahLogo = BitmapFactory.decodeResource(this.getContext().getResources(), R.drawable.icon_b);			
+		}
+	}
 
 }

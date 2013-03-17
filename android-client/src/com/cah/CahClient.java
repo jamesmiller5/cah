@@ -55,6 +55,13 @@ class DeckDelta extends Delta {
 	String DeckTo;
 	String DeckFrom;
 	int Amount; //TODO: This should be an array if card indicators
+
+	public DeckDelta( int Player, String DeckTo, String DeckFrom, int Amount ) {
+		this.Player = Player;
+		this.DeckTo = DeckTo;
+		this.DeckFrom = DeckFrom;
+		this.Amount = Amount;
+	}
 }
 
 class PlayerDelta extends Delta{
@@ -154,7 +161,7 @@ public class CahClient extends Thread implements JsonDeserializer<Delta> {
 			encoder = (Thread) this;
 			decoder = new Thread(new DecodeThread());
 
-			socket = new Socket("localhost", 41337);
+			socket = new Socket("10.0.2.2", 41337);
 			socket.setTcpNoDelay(true);
 			socket.setReuseAddress(true);
 
