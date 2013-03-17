@@ -12,11 +12,11 @@ import java.io.*;
 import java.util.Arrays;
 
 public class CahClient extends Thread implements JsonDeserializer<Delta>, JsonSerializer<Delta> {
+	final Gson gson = new GsonBuilder().registerTypeAdapter(Delta.class, this).create();
+	final AtomicBoolean go = new AtomicBoolean(true);
 	BlockingQueue<Delta> incoming;
 	BlockingQueue<Delta> outgoing;
 	Socket socket;
-	final Gson gson = new GsonBuilder().registerTypeAdapter(Delta.class, this).create();
-	final AtomicBoolean go = new AtomicBoolean(true);
 	Thread encoder;
 
 	public CahClient( BlockingQueue<Delta> in, BlockingQueue<Delta> out ) {
@@ -193,13 +193,16 @@ public class CahClient extends Thread implements JsonDeserializer<Delta>, JsonSe
 		throw new JsonParseException("Unknown Message Delta from server");
 	}
 
-	public JsonElement serialize(final Delta src, final java.lang.reflect.Type type, final JsonSerializationContext context ) throws JsonParseException {
+	public JsonElement serialize(final Delta src, final java.lang.reflect.Type type, final JsonSerializationContext context ) {
 		//wrap some classes in an action delta if need be
 		if( src.getClass() == PlayerDelta.class ) {
 			return context.serialize(new ActionDelta((PlayerDelta)src), ActionDelta.class);
-		} else if(src.getClass() == DeckDelta.class) {
+		} else if( src.getClass() == DeckDelta.class ) {
 			return context.serialize(new ActionDelta((DeckDelta)src), ActionDelta.class);
-		}else {
+		} else if( src.getClass() == ActionDelta.class ) {
+			//makes no sense, action delta's are a wrapper and shouldn't be used manually
+			throw new IllegalStateException("Unable to encode ActionDelta, should be done automatically");
+		} else {
 			return context.serialize(src, src.getClass());
 		}
 	}
