@@ -7,6 +7,13 @@ function run {
 	stop_server
 	clean_server
 	start_server
+
+	client_only
+
+	stop_server
+}
+
+function client_only {
 	pushd .
 
 	cd $PROJ_PATH/android-client/
@@ -21,12 +28,11 @@ function run {
 	java -ea:com.cah... com.cah.CahClient
 
 	popd
-	stop_server
 }
 
 if [ -z "$1" ]; then
 	run
 else
-	set -e # Tells bash to stop executing if there's an error.
+	set -e #Tells bash to stop executing if there's an error.
 	$1
 fi

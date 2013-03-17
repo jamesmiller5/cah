@@ -98,6 +98,7 @@ public class CahClient extends Thread implements JsonDeserializer<Delta> {
 	/* For Debug */
 	public static void main( String args[] ) {
 		try {
+			System.out.println("Starting Test");
 			CahClient player1 = new CahClient();
 			CahClient player2 = new CahClient();
 
@@ -161,9 +162,17 @@ public class CahClient extends Thread implements JsonDeserializer<Delta> {
 			encoder = (Thread) this;
 			decoder = new Thread(new DecodeThread());
 
-			socket = new Socket("10.0.2.2", 41337);
+			socket = new Socket();
 			socket.setTcpNoDelay(true);
 			socket.setReuseAddress(true);
+
+			//look for a localhost connection first
+			try {
+				socket.connect(new InetSocketAddress("localhost", 41337), 1000);
+			} catch ( IOException e ) {
+				//if that fails connect to the local android network
+				socket.connect(new InetSocketAddress("10.0.2.2", 41337), 5000);
+			}
 
 			decoder.start();
 			this.encode();
