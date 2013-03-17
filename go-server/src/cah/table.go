@@ -100,7 +100,7 @@ func NewTable(id *string) *Table {
 
 	//If an id is provided, try and use that
 	if id != nil {
-		t.id = *id;
+		t.id = *id
 		if !t.AddToListing() {
 			panic("Couldn't add table with id:" + *id)
 		}
@@ -135,7 +135,7 @@ func LookUpTable(id string) (tab *Table, exists bool) {
 	tableLock.RLock()
 	defer tableLock.RUnlock()
 
-	tab, exists = tables[id];
+	tab, exists = tables[id]
 	return
 }
 

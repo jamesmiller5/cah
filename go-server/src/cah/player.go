@@ -2,18 +2,35 @@ package cah
 
 import (
 	"fmt"
-	"time"
 	"net"
+	"time"
 )
+
+type Delta struct {
+	fromPlayer *Player `json:"-"` //Don't let json parse this field
+}
 
 type PlayerDelta struct {
 	Id      int
 	Message string
+	Delta
+}
+
+func (pd *PlayerDelta) isClean() bool {
+	if pd.Id < 0 ||
+		len(pd.Message) > 10 ||
+		playerDeltaMessages[pd.Message] != true {
+		fmt.Println("PlayerDelta data error")
+		return false
+	}
+
+	return true
 }
 
 var playerDeltaMessages = map[string]bool{
-	"connect": true,
-	"leave":   true,
+	"join":   true,
+	"leave":  true,
+	"my-id?": true,
 }
 
 type DeckDelta struct {
@@ -21,6 +38,20 @@ type DeckDelta struct {
 	DeckTo   string
 	DeckFrom string
 	Amount   int
+	Delta
+}
+
+func (dd *DeckDelta) isClean() bool {
+	if dd.Player < 1 || dd.Amount < 1 || len(dd.DeckTo) == 0 || len(dd.DeckFrom) == 0 {
+		fmt.Println("Deck.Player missing fields")
+		return false
+	}
+	if true != deckDeltaDecks[dd.DeckTo] || true != deckDeltaDecks[dd.DeckFrom] {
+		fmt.Println("Deck.DeckTo or .DeckFrom illegal")
+		return false
+	}
+
+	return true
 }
 
 //table of available
@@ -31,23 +62,23 @@ var deckDeltaDecks = map[string]bool{
 }
 
 type Player struct {
-	Id           int
-	quit         chan bool
-	playerDeltas chan *PlayerDelta
-	deckDeltas   chan *DeckDelta
-	dec          *NetDecoder
-	enc          *NetEncoder
+	Id                   int
+	quit                 chan bool
+	toClientPlayerDeltas chan *PlayerDelta
+	toClientDeckDeltas   chan *DeckDelta
+	dec                  *NetDecoder
+	enc                  *NetEncoder
 }
 
 const PLAYER_TIMEOUT = 30 * time.Second
 
 func NewPlayer(dec *NetDecoder, enc *NetEncoder, id int) *Player {
 	return &Player{
-		Id:           id,
-		dec:          dec,
-		enc:          enc,
-		playerDeltas: make(chan *PlayerDelta),
-		deckDeltas:   make(chan *DeckDelta),
+		Id:                   id,
+		dec:                  dec,
+		enc:                  enc,
+		toClientPlayerDeltas: make(chan *PlayerDelta),
+		toClientDeckDeltas:   make(chan *DeckDelta),
 		//We want 2 slots in case both goroutines quit at the same time
 		quit: make(chan bool, 2),
 	}
@@ -58,7 +89,7 @@ func (p *Player) LeaveMessage() *PlayerDelta {
 }
 
 //Send decoded messages to arguments
-func (p *Player) DecodeMessages(playerDeltas chan *PlayerDelta, deckDeltas chan *DeckDelta) {
+func (p *Player) DecodeMessages(toServerPlayerDeltas chan *PlayerDelta, toServerDeckDeltas chan *DeckDelta) {
 	defer func() { p.quit <- true }()
 
 	for {
@@ -70,9 +101,9 @@ func (p *Player) DecodeMessages(playerDeltas chan *PlayerDelta, deckDeltas chan 
 		default:
 			//Decode a delta
 			var delta struct {
-				Deck   DeckDelta
-				Player PlayerDelta
-				Keepalive	bool
+				Deck      *DeckDelta
+				Player    *PlayerDelta
+				Keepalive bool
 			}
 
 			//decode either as a DeckDelta or PlayerDelta
@@ -84,28 +115,24 @@ func (p *Player) DecodeMessages(playerDeltas chan *PlayerDelta, deckDeltas chan 
 				}
 
 				fmt.Println("Unknown Player.DecodeMessages decode error")
-				//send a "leave" command
 				goto exit
 			}
 			p.dec.net.SetDeadline(time.Time{})
 
-			//not zero makes this a Deck
-			if delta.Deck.Player != 0 {
-				if delta.Deck.Player < 1 || delta.Deck.Amount < 1 || len(delta.Deck.DeckTo) == 0 || len(delta.Deck.DeckFrom) == 0 {
-					fmt.Println("Deck.Player missing fields")
+			fmt.Printf("Dec:%v\n", delta)
+
+			if delta.Deck != nil {
+				if delta.Deck.isClean() != true {
 					goto exit
 				}
-				if true != deckDeltaDecks[delta.Deck.DeckTo] || true != deckDeltaDecks[delta.Deck.DeckFrom] {
-					fmt.Println("Deck.DeckTo or .DeckFrom illegal")
+				delta.Deck.fromPlayer = p
+				toServerDeckDeltas <- delta.Deck
+			} else if delta.Player != nil {
+				if delta.Player.isClean() != true {
 					goto exit
 				}
-				deckDeltas <- &delta.Deck
-			} else if delta.Player.Id != 0 {
-				if delta.Player.Id < 1 || len(delta.Player.Message) > 10 || true != playerDeltaMessages[delta.Player.Message] {
-					fmt.Println("delta.Player data error")
-					goto exit
-				}
-				playerDeltas <- &delta.Player
+				delta.Player.fromPlayer = p
+				toServerPlayerDeltas <- delta.Player
 			} else if delta.Keepalive == true {
 				//keep alive, igonre
 				fmt.Println("Keepalived")
@@ -116,7 +143,7 @@ func (p *Player) DecodeMessages(playerDeltas chan *PlayerDelta, deckDeltas chan 
 		}
 	}
 exit:
-	playerDeltas <- p.LeaveMessage()
+	toServerPlayerDeltas <- p.LeaveMessage()
 }
 
 func (p *Player) EncodeMessages() {
@@ -126,9 +153,9 @@ func (p *Player) EncodeMessages() {
 	for {
 		select {
 		//pd update from dealer
-		case pd := <-p.playerDeltas:
+		case pd := <-p.toClientPlayerDeltas:
 			p.enc.Encode(pd)
-		case dd := <-p.deckDeltas:
+		case dd := <-p.toClientDeckDeltas:
 			p.enc.Encode(dd)
 		case <-p.quit:
 			fmt.Println("PlayerHandler got the message to quit")

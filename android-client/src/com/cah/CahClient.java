@@ -60,11 +60,24 @@ class DeckDelta extends Delta {
 class PlayerDelta extends Delta{
 	int Id;
 	String Message;
+
+	public PlayerDelta( int id, String message ) {
+		Id = id;
+		Message = message;
+	}
 }
 
 class ActionDelta extends Delta {
 	DeckDelta Deck;
 	PlayerDelta Player;
+	boolean Keepalive = true;
+
+	public ActionDelta(DeckDelta d) {
+		Deck = d;
+	}
+	public ActionDelta(PlayerDelta p) {
+		Player = p;
+	}
 }
 
 public class CahClient extends Thread implements JsonDeserializer<Delta> {
@@ -94,16 +107,23 @@ public class CahClient extends Thread implements JsonDeserializer<Delta> {
 			assert table_reply.Id != null;
 			assert table_reply.Id.length() == 6;
 
+			//ask for an id player 1
+			player1.outgoing.put(new ActionDelta(new PlayerDelta(0, "my-id?"))); //TODO:make a encoding wrapper to fix this
 			System.out.println("PlayerDelta (player1): "+ player1.incoming.take());
 
 			System.out.println("Starting player 2");
 			player2.start();
 			player2.outgoing.put(new TableDelta("join", table_reply.Id));
 			System.out.println("Reply (player2): "+ player2.incoming.take());
+			//ask for an id for player 2
+			player2.outgoing.put(new ActionDelta(new PlayerDelta(0, "my-id?"))); //TODO:make a encoding wrapper to fix this
 			System.out.println("PlayerDelta (player2): "+ player2.incoming.take());
 
+			//have player 1 leave and see player 2's update
+			System.out.println("Player 1 is disconnecting, should show up on player 2");
+
 			//see each other
-			System.out.println("PlayerDelta (player1): "+ player1.incoming.take());
+			player1.cleanup();
 			System.out.println("PlayerDelta (player2): "+ player2.incoming.take());
 
 		} catch( Exception e ) {
@@ -160,7 +180,7 @@ public class CahClient extends Thread implements JsonDeserializer<Delta> {
 				//block and wait for messages from Message-Queue
 				Delta message_out = outgoing.take();
 
-				//System.out.println("Message_out: " + message_out);
+				System.out.println("Message_out: " + message_out);
 
 				gson.toJson(message_out, message_out.getClass(), writer);
 				writer.flush(); //Flush writer to ensure message delivery asap
@@ -180,7 +200,7 @@ public class CahClient extends Thread implements JsonDeserializer<Delta> {
 					//block and wait for messages from Socket
 					Delta message_in = gson.fromJson(reader, Delta.class);
 
-					//System.out.println("Message_in: " + message_in);
+					System.out.println("Message_in: " + message_in);
 
 					incoming.put( message_in );
 				} catch (InterruptedException e ) {
