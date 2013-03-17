@@ -1,6 +1,5 @@
 package com.cah.customviews;
 
-import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.res.TypedArray;
 import android.graphics.Bitmap;
@@ -15,6 +14,7 @@ import android.text.TextPaint;
 import android.util.AttributeSet;
 import android.view.View;
 
+import com.cah.Cah;
 import com.cah.R;
 
 /**
@@ -32,6 +32,8 @@ public class CardView extends View {
 
 	private final float TEXT_SIZE = this.getResources().getDimensionPixelSize(R.dimen.card_font_size);
 	private final float DPI_MULTIPLIER = (float) (this.getResources().getDisplayMetrics().densityDpi/160.);
+	
+	private Cah gameActivity;
 
 	public CardView(Context context) {
 		super(context);
@@ -141,6 +143,11 @@ public class CardView extends View {
 		canvas.translate((float)0, (float)0);
 		canvas.drawBitmap(mCahLogo, 0, (float) (this.getHeight()-mCahLogo.getHeight()-(37.5 * DPI_MULTIPLIER)), null);
 
+	}
+	
+	protected void onCardPlayed() {
+		//TODO: Send card to server.
+		//gameActivity.out.add(new DeckDelta());
 	}
 
 	/**
