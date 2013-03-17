@@ -5,6 +5,7 @@ import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.BlockingQueue;
 
 import android.app.Activity;
+import android.app.AlertDialog;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
@@ -43,6 +44,7 @@ public class Cah extends Activity
 		performOnBackgroundThread(client);
 		
 		if(recievedIntent.hasExtra("COMMAND")) {
+			//TODO: Move the following code to CahClient
 			Runnable joinGame = new Runnable() {
 				@Override
 				public void run() {
@@ -53,10 +55,30 @@ public class Cah extends Activity
 						// Get the server's reply.
 						TableDelta table_reply = (TableDelta) client.incoming.take();
 
+						// Client should send a player delta with a 0 Id and message "join". 
+						// Server should send a reply delta with next Id and message "you" 
+						// followed by zero or more player deltas that are the other people
 						if(table_reply.Command.equals("ok")) {
 							Log.d("CAH", "Settings.Secure.ANDROID_ID=" + Settings.Secure.ANDROID_ID);
-							// Create a player
-							client.outgoing.put(new PlayerDelta((int)(Math.random()*Integer.MAX_VALUE), "connect"));
+							client.outgoing.put(new PlayerDelta(0, "join"));
+
+							PlayerDelta player = (PlayerDelta) client.incoming.take();
+							if(player.Message.equals("you") == false) {
+								// ERROR!!!
+								final String badMessage = player.Message;
+								runOnUiThread(new Runnable() {
+									@Override
+									public void run() {
+										AlertDialog.Builder alertBuilder = new AlertDialog.Builder(getApplicationContext());
+										alertBuilder.setTitle("Unexpected response from server!");
+										alertBuilder.setMessage("Recieved \"" + badMessage + "\" from server. Expected \"you\"");
+									}
+								});
+							}
+							while(player != null) {
+								//TODO: Do something with player
+								player = (PlayerDelta) client.incoming.take();
+							}
 						}
 					} catch (InterruptedException ex) {
 						ex.printStackTrace();
@@ -69,13 +91,13 @@ public class Cah extends Activity
 			this.addDummyPlayersAndCards();
 		}
 	}
-	
+
 	public void addPlayerToTable(Bitmap playerBitmap, boolean isCzar) {
 		GameTable table = (GameTable)this.findViewById(R.id.gameTable);
-		
+
 		//TODO: Decide if this inflater should be a private member variable of Cah
 		LayoutInflater inflater = (LayoutInflater)this.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-		
+
 		View playerCard = inflater.inflate(R.layout.player_card, null);
 		ImageView crownImageView = (ImageView)playerCard.findViewById(R.id.playerCrown);
 		if(isCzar) {
