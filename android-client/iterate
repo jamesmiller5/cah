@@ -19,10 +19,11 @@ function emulate {
 	if [ -z "`ls ~/.android/avd/ | grep $NAME`" ]; then
 		echo "No AVD named \`$NAME\` found"
 		echo "Use iterate \`create_avd\` to get started"
+		exit 1
 	fi
 
 	if [ -z "`adb devices | grep -v List | grep device`" ]; then
-		echo "No devices attached, launching our cs252 device"
+		echo "No devices attached, launching our emulator"
 		emulator -cpu-delay 0 -no-boot-anim -cache /tmp/cache -avd $NAME &
 	fi
 }
