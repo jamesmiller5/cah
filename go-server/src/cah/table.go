@@ -24,12 +24,12 @@ const TABLE_TIMEOUT = 1 * time.Minute
 
 type NetEncoder struct {
 	*json.Encoder
-	net net.Conn
+	net.Conn
 }
 
 type NetDecoder struct {
 	*json.Decoder
-	net net.Conn
+	net.Conn
 }
 
 var tables = map[string]*Table{}
@@ -43,23 +43,21 @@ func HandleNewClient(conn net.Conn) {
 		}
 	}()
 
-	dec := &NetDecoder{json.Decoder: json.NewDecoder(conn), net: conn}
-	enc := &NetEncoder{json.Encoder: json.NewEncoder(conn), net: conn}
+	dec := &NetDecoder{json.Decoder: json.NewDecoder(conn), net.Conn: conn}
+	enc := &NetEncoder{json.Encoder: json.NewEncoder(conn), net.Conn: conn}
 	for {
 		var msg TableDelta
 
-		dec.net.SetDeadline(time.Now().Add(TABLE_TIMEOUT))
+		dec.SetDeadline(time.Now().Add(TABLE_TIMEOUT))
 		if err := dec.Decode(&msg); err != nil {
 			panic("Decode Error")
 		}
-		dec.net.SetDeadline(time.Time{})
+		dec.SetDeadline(time.Time{})
 
 		handler, exists := handlers[msg.Command]
-
 		if !exists {
 			panic("Unknown Command: " + msg.Command)
 		}
-
 		if handler(dec, enc, &msg) {
 			break
 		}

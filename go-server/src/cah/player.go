@@ -107,7 +107,7 @@ func (p *Player) DecodeMessages(toServerPlayerDeltas chan *PlayerDelta, toServer
 			}
 
 			//decode either as a DeckDelta or PlayerDelta
-			p.dec.net.SetDeadline(time.Now().Add(PLAYER_TIMEOUT))
+			p.dec.SetDeadline(time.Now().Add(PLAYER_TIMEOUT))
 			if err := p.dec.Decode(&delta); err != nil {
 				if err == io.EOF {
 					goto exit
@@ -118,7 +118,7 @@ func (p *Player) DecodeMessages(toServerPlayerDeltas chan *PlayerDelta, toServer
 				log.Println("Unknown Player.DecodeMessages decode error: " + err.Error())
 				goto exit
 			}
-			p.dec.net.SetDeadline(time.Time{})
+			p.dec.SetDeadline(time.Time{})
 
 			if delta.Deck != nil {
 				if delta.Deck.isClean() != true {
