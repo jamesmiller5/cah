@@ -5,16 +5,21 @@ import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.BlockingQueue;
 
 import android.app.Activity;
-import android.app.AlertDialog;
+import android.content.Context;
 import android.content.Intent;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.provider.Settings;
 import android.util.Log;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.LinearLayout.LayoutParams;
+import android.widget.QuickContactBadge;
 
 import com.cah.customviews.CardView;
+import com.cah.customviews.GameTable;
 
 public class Cah extends Activity
 {	
@@ -67,6 +72,18 @@ public class Cah extends Activity
 			} catch (InterruptedException e) {
 				e.printStackTrace();
 			}
+		}
+		
+		// Dynamically add 10 players to the game table.
+		for(int i = 0; i<10; i++) {
+			GameTable table = (GameTable)this.findViewById(R.id.gameTable);
+			LayoutInflater inflater = (LayoutInflater)this.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+			View playerCard = inflater.inflate(R.layout.player_card, null);
+			ImageView crownImageView = (ImageView)playerCard.findViewById(R.id.playerCrown);
+			if(i == 7)
+				crownImageView.setVisibility(View.VISIBLE);
+			QuickContactBadge playerPicture = (QuickContactBadge)playerCard.findViewById(R.id.playerBadge);
+			table.addView(playerCard);
 		}
 		
 	}
