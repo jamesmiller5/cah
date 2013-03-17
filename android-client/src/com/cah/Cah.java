@@ -33,20 +33,7 @@ public class Cah extends Activity
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.main);
-		Intent recievedIntent = getIntent();
-				
-		LinearLayout cardContainer = (LinearLayout) findViewById(R.id.cardContainer);
-		cardContainer.removeAllViews();
-
-		for(int i = 0; i<10; i++) {
-			CardView cv = new CardView(getApplicationContext());
-			cv.setCardString("Dynamic card! Number = " + i + ".");
-			cv.setTextColor(Color.BLACK);
-			LayoutParams lp = new LayoutParams((int) (235* (this.getResources().getDisplayMetrics().densityDpi/160.)), (int) (300* (this.getResources().getDisplayMetrics().densityDpi/160.)));
-			cv.setLayoutParams(lp);
-
-			cardContainer.addView(cv);
-		}
+		final Intent recievedIntent = getIntent();
 
 		in = new ArrayBlockingQueue<Delta>( 32, true );
 		out = new ArrayBlockingQueue<Delta>( 32, true );
@@ -54,26 +41,59 @@ public class Cah extends Activity
 		performOnBackgroundThread(client);
 		
 		if(recievedIntent.hasExtra("COMMAND")) {
-			try {
-				// This is probably running on the UI thread. TODO: Move this off of the UI thread if it's running there. UI will hang if there's a slow internet connection.
+			Runnable joinGame = new Runnable() {
+				@Override
+				public void run() {
+					try {
+						// Make/Join new table
+						client.outgoing.put(new TableDelta(recievedIntent.getStringExtra("COMMAND"), recievedIntent.getStringExtra("TABLE_ID")));
 
-				// Make/Join new table
-				client.outgoing.put(new TableDelta(recievedIntent.getStringExtra("COMMAND"), recievedIntent.getStringExtra("TABLE_ID")));
+						// Get the server's reply.
+						TableDelta table_reply = (TableDelta) client.incoming.take();
 
-				// Get the server's reply.
-				TableDelta table_reply = (TableDelta) client.incoming.take();
-				
-				if(table_reply.Command.equals("ok")) {
-					Log.d("CAH", "Settings.Secure.ANDROID_ID=" + Settings.Secure.ANDROID_ID);
-					// Create a player
-					client.outgoing.put(new PlayerDelta((int)(Math.random()*Integer.MAX_VALUE), "connect"));
+						if(table_reply.Command.equals("ok")) {
+							Log.d("CAH", "Settings.Secure.ANDROID_ID=" + Settings.Secure.ANDROID_ID);
+							// Create a player
+							client.outgoing.put(new PlayerDelta((int)(Math.random()*Integer.MAX_VALUE), "connect"));
+						}
+					} catch (InterruptedException ex) {
+						ex.printStackTrace();
+					}
 				}
-				
-			} catch (InterruptedException e) {
-				e.printStackTrace();
-			}
+			};
+			performOnBackgroundThread(joinGame);
+
+		} else {
+			this.addDummyPlayersAndCards();
 		}
 		
+		
+		
+	}
+	
+	private void addDummyPlayersAndCards() {
+		// Dynamically add 10 cards to the game.
+		String dummyCards[] = {"Pretending to be happy",
+				"Test, Test, Test, Test, Test, Test, Test, Test, Test!",
+				"This card should hang off the right side of the screen!",
+				"Bla bla bla",
+				"greetings cheese popsicle the number you have dialed is currently out of porkchops",
+				"friends dont let friends let scientific progress go boink",
+				"oh yeah alright were gonna shake it up with the party bear tonight",
+				"f of two equals f of one equals one",
+				"oh hai im in ur computer eating your cheezburgers and CAHing your textz",
+				"how are you holding up because im a potato"};
+		LinearLayout cardContainer = (LinearLayout) findViewById(R.id.cardContainer);
+		cardContainer.removeAllViews();
+		for(int i = 0; i<dummyCards.length; i++) {
+			CardView cv = new CardView(getApplicationContext());
+			cv.setCardString(dummyCards[i]);
+			cv.setTextColor(Color.BLACK);
+			LayoutParams lp = new LayoutParams((int) (235* (this.getResources().getDisplayMetrics().densityDpi/160.)), (int) (300* (this.getResources().getDisplayMetrics().densityDpi/160.)));
+			cv.setLayoutParams(lp);
+			cardContainer.addView(cv);
+		}
+
 		// Dynamically add 10 players to the game table.
 		for(int i = 0; i<10; i++) {
 			GameTable table = (GameTable)this.findViewById(R.id.gameTable);
@@ -85,7 +105,6 @@ public class Cah extends Activity
 			QuickContactBadge playerPicture = (QuickContactBadge)playerCard.findViewById(R.id.playerBadge);
 			table.addView(playerCard);
 		}
-		
 	}
 
 	public static Thread performOnBackgroundThread(final Runnable runnable) {
