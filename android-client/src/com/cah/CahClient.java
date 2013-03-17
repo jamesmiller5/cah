@@ -94,12 +94,17 @@ public class CahClient extends Thread implements JsonDeserializer<Delta> {
 			assert table_reply.Id != null;
 			assert table_reply.Id.length() == 6;
 
+			System.out.println("PlayerDelta (player1): "+ player1.incoming.take());
+
 			System.out.println("Starting player 2");
 			player2.start();
 			player2.outgoing.put(new TableDelta("join", table_reply.Id));
+			System.out.println("Reply (player2): "+ player2.incoming.take());
+			System.out.println("PlayerDelta (player2): "+ player2.incoming.take());
 
-			System.out.println("Player1 : " + player1.incoming.take());
-			System.out.println("Player2 : " + player2.incoming.take());
+			//see each other
+			System.out.println("PlayerDelta (player1): "+ player1.incoming.take());
+			System.out.println("PlayerDelta (player2): "+ player2.incoming.take());
 
 		} catch( Exception e ) {
 			System.out.println("Debug failed: " + e);
@@ -112,8 +117,8 @@ public class CahClient extends Thread implements JsonDeserializer<Delta> {
 	}
 
 	public CahClient() {
-		incoming = (BlockingQueue<Delta>) new ArrayBlockingQueue<Delta>( 32, true );
-		outgoing = (BlockingQueue<Delta>) new ArrayBlockingQueue<Delta>( 32, true );
+		incoming = new ArrayBlockingQueue<Delta>( 32, true );
+		outgoing = new ArrayBlockingQueue<Delta>( 32, true );
 	}
 
 	public void cleanup() {
@@ -132,8 +137,6 @@ public class CahClient extends Thread implements JsonDeserializer<Delta> {
 			socket = new Socket("localhost", 41337);
 			socket.setTcpNoDelay(true);
 			socket.setReuseAddress(true);
-
-			Thread.sleep(3000);
 
 			decoder.start();
 			this.encode();
@@ -156,7 +159,9 @@ public class CahClient extends Thread implements JsonDeserializer<Delta> {
 			try {
 				//block and wait for messages from Message-Queue
 				Delta message_out = outgoing.take();
-				System.out.println("Message_out: " + message_out);
+
+				//System.out.println("Message_out: " + message_out);
+
 				gson.toJson(message_out, message_out.getClass(), writer);
 				writer.flush(); //Flush writer to ensure message delivery asap
 			} catch (InterruptedException e ) {
@@ -174,8 +179,10 @@ public class CahClient extends Thread implements JsonDeserializer<Delta> {
 				try {
 					//block and wait for messages from Socket
 					Delta message_in = gson.fromJson(reader, Delta.class);
+
+					//System.out.println("Message_in: " + message_in);
+
 					incoming.put( message_in );
-					System.out.println("Message_in: " + message_in);
 				} catch (InterruptedException e ) {
 					System.out.println("InterruptedException: " + e);
 				}
