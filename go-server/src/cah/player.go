@@ -57,6 +57,7 @@ func (p *Player) LeaveMessage() *PlayerDelta {
 	return &PlayerDelta{Id: p.Id, Message: "leave"}
 }
 
+//Send decoded messages to arguments
 func (p *Player) DecodeMessages(playerDeltas chan *PlayerDelta, deckDeltas chan *DeckDelta) {
 	defer func() { p.quit <- true }()
 
