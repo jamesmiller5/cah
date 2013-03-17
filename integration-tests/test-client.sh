@@ -14,7 +14,7 @@ function run {
 }
 
 function client_only {
-	pushd .
+	pushd . > /dev/null
 
 	cd $PROJ_PATH/android-client/
 	export CLASSPATH="`pwd`/libs/gson-2.2.2.jar:`pwd`/src/"
@@ -25,9 +25,9 @@ function client_only {
 		exit 1
 	fi
 
-	java -ea:com.cah... com.cah.CahClient
+	java -ea:com.cah... com.cah.CahClient | while read line; do echo "[CLIENT] $line"; done
 
-	popd
+	popd > /dev/null
 }
 
 if [ -z "$1" ]; then
