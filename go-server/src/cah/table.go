@@ -86,6 +86,8 @@ func init() {
 			return false
 		},
 		"new": func(dec *NetDecoder, enc *NetEncoder, msg *TableDelta) bool {
+			log.Println("New table created")
+
 			tab := NewTable(nil)
 			go tab.PlayGame()
 			msg.Id = tab.id
