@@ -100,7 +100,7 @@ public class CahClient extends Thread implements JsonDeserializer<Delta>, JsonSe
 			try {
 				socket.connect(new InetSocketAddress("localhost", 41337), 1000);
 			} catch ( IOException e ) {
-				//if that fails attempt to connect to the local android network
+				//if that fails attempt to connect to the emulator host's loopback
 				socket.connect(new InetSocketAddress("10.0.2.2", 41337), 5000);
 			}
 
