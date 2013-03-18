@@ -64,32 +64,34 @@ func HandleNewClient(conn net.Conn) {
 	}
 }
 
-func handleJoinTable(dec *NetDecoder, enc *NetEncoder, msg *TableDelta) bool {
-	if len(msg.Id) > 6 {
-		panic("Message Id too long")
-	}
-
-	tab, exists := LookUpTable(msg.Id)
-	if exists == false || tab == nil {
-		enc.Encode(&TableDelta{Command: "nope", Id: msg.Id})
-	} else {
-		enc.Encode(&TableDelta{Command: "ok", Id: msg.Id})
-		tab.game.HandlePlayer(dec, enc)
-		return true
-	}
-
-	return false
-}
-
 //Map of handler names in messages to handler functions
-var handlers = map[string]func(*NetDecoder, *NetEncoder, *TableDelta) bool{
-	"join": handleJoinTable,
-	"new": func(dec *NetDecoder, enc *NetEncoder, msg *TableDelta) bool {
-		tab := NewTable(nil)
-		go tab.PlayGame()
-		msg.Id = tab.id
-		return handleJoinTable(dec, enc, msg)
-	},
+var handlers map[string]func(*NetDecoder, *NetEncoder, *TableDelta) bool
+
+func init() {
+	handlers = map[string]func(*NetDecoder, *NetEncoder, *TableDelta) bool {
+		"join": func (dec *NetDecoder, enc *NetEncoder, msg *TableDelta) bool {
+			if len(msg.Id) > 6 {
+				panic("Message Id too long")
+			}
+
+			tab, exists := LookUpTable(msg.Id)
+			if exists == false || tab == nil {
+				enc.Encode(&TableDelta{Command: "nope", Id: msg.Id})
+			} else {
+				enc.Encode(&TableDelta{Command: "ok", Id: msg.Id})
+				tab.game.HandlePlayer(dec, enc)
+				return true
+			}
+
+			return false
+		},
+		"new": func(dec *NetDecoder, enc *NetEncoder, msg *TableDelta) bool {
+			tab := NewTable(nil)
+			go tab.PlayGame()
+			msg.Id = tab.id
+			return handlers["join"](dec, enc, msg)
+		},
+	}
 }
 
 func NewTable(id *string) *Table {
