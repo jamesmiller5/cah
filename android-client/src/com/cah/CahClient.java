@@ -1,15 +1,31 @@
 package com.cah;
 
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.io.OutputStreamWriter;
+import java.net.InetSocketAddress;
+import java.net.Socket;
+import java.util.Arrays;
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.atomic.AtomicBoolean;
-import com.google.gson.*;
-import com.google.gson.stream.*;
-import java.net.*;
-import java.io.*;
 
+import android.util.Log;
+
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+import com.google.gson.JsonDeserializationContext;
+import com.google.gson.JsonDeserializer;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParseException;
+import com.google.gson.JsonSerializationContext;
+import com.google.gson.JsonSerializer;
+import com.google.gson.JsonSyntaxException;
+import com.google.gson.stream.JsonReader;
+import com.google.gson.stream.JsonWriter;
 //for debugging
-import java.util.Arrays;
 
 public class CahClient extends Thread implements JsonDeserializer<Delta>, JsonSerializer<Delta> {
 	final Gson gson = new GsonBuilder().registerTypeAdapter(Delta.class, this).create();
@@ -96,12 +112,23 @@ public class CahClient extends Thread implements JsonDeserializer<Delta>, JsonSe
 			socket.setTcpNoDelay(true);
 			socket.setReuseAddress(true);
 
-			//look for a localhost connection first
-			try {
-				socket.connect(new InetSocketAddress("localhost", 41337), 1000);
-			} catch ( IOException e ) {
-				//if that fails attempt to connect to the emulator host's loopback
-				socket.connect(new InetSocketAddress("10.0.2.2", 41337), 5000);
+			String hosts[] = {
+					"localhost", // Look for localhost connection first.
+					"10.0.2.2"}; //if that fails attempt to connect to the emulator host's loopback
+			boolean connectedToServer = false;
+			for(int i = 0; i<hosts.length && connectedToServer == false; i++) {
+				try {
+					socket.connect(new InetSocketAddress(hosts[i], 41337), 1000);
+					// If we get below this line, we've successfully connected.
+					connectedToServer = true;
+					Log.d("CAH CONNECTED", hosts[i]);
+				} catch ( IOException e ) {
+					// Connection failed. Fail silently and try next host.
+				}
+			}
+			if(connectedToServer == false) {
+				Log.e("CAH", "SOCKET COULDN'T CONNECT!");
+				return;
 			}
 
 			decoder.start();
