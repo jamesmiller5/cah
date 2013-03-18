@@ -41,15 +41,6 @@ public class Cah extends Activity
 		LinearLayout cardContainer = (LinearLayout) findViewById(R.id.cardContainer);
 		cardContainer.removeAllViews();
 
-		for(int i = 0; i<10; i++) {
-			CardView cv = new CardView(getApplicationContext());
-			cv.setCardString("Dynamic card! Number = " + i + ".");
-			cv.setTextColor(Color.BLACK);
-			LayoutParams lp = new LayoutParams((int) (235* (this.getResources().getDisplayMetrics().densityDpi/160.)), (int) (300* (this.getResources().getDisplayMetrics().densityDpi/160.)));
-			cv.setLayoutParams(lp);
-
-			cardContainer.addView(cv);
-		}
 
 		performOnBackgroundThread(new CahClient());
 
