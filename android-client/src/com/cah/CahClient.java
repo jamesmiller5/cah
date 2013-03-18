@@ -11,8 +11,6 @@ import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.atomic.AtomicBoolean;
 
-import android.util.Log;
-
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonDeserializationContext;
@@ -25,7 +23,6 @@ import com.google.gson.JsonSerializer;
 import com.google.gson.JsonSyntaxException;
 import com.google.gson.stream.JsonReader;
 import com.google.gson.stream.JsonWriter;
-//for debugging
 
 public class CahClient extends Thread implements JsonDeserializer<Delta>, JsonSerializer<Delta> {
 	final Gson gson = new GsonBuilder().registerTypeAdapter(Delta.class, this).create();
@@ -107,27 +104,32 @@ public class CahClient extends Thread implements JsonDeserializer<Delta>, JsonSe
 		//Keep track of our threads, they will need to interrupt each other in the event of errors or close()
 		encoder = (Thread) this;
 		Thread decoder = new Thread(new DecodeThread());
-		try {
-			socket = new Socket();
-			socket.setTcpNoDelay(true);
-			socket.setReuseAddress(true);
+		String hosts[] = {
+			"localhost", // Look for localhost connection first.
+			"10.0.2.2"   // If that fails attempt to connect to the emulator host's loopback.
+		};
 
-			String hosts[] = {
-					"localhost", // Look for localhost connection first.
-					"10.0.2.2"}; //if that fails attempt to connect to the emulator host's loopback
+		try {
 			boolean connectedToServer = false;
-			for(int i = 0; i<hosts.length && connectedToServer == false; i++) {
+
+			for( String host : hosts ) {
+				socket = new Socket();
+				socket.setTcpNoDelay(true);
+				socket.setReuseAddress(true);
+
 				try {
-					socket.connect(new InetSocketAddress(hosts[i], 41337), 1000);
-					// If we get below this line, we've successfully connected.
+					socket.connect(new InetSocketAddress(host, 41337), 1000);
 					connectedToServer = true;
-					Log.d("CAH CONNECTED", hosts[i]);
+					System.out.println("Connected to server at " + host);
+					break;
+
 				} catch ( IOException e ) {
-					// Connection failed. Fail silently and try next host.
+					//can't connect
 				}
 			}
-			if(connectedToServer == false) {
-				Log.e("CAH", "SOCKET COULDN'T CONNECT!");
+
+			if( connectedToServer == false ) {
+				System.out.println("Can't connect to server");
 				return;
 			}
 

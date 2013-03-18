@@ -41,8 +41,9 @@ public class Cah extends Activity
 		LinearLayout cardContainer = (LinearLayout) findViewById(R.id.cardContainer);
 		cardContainer.removeAllViews();
 
-
-		performOnBackgroundThread(new CahClient());
+		//spawn a new client to the server
+		client = new CahClient();
+		performOnBackgroundThread(client);
 
 		if(recievedIntent.hasExtra("COMMAND")) {
 			//TODO: Move the following code to CahClient
