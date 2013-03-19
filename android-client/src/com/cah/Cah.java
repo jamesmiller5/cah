@@ -28,8 +28,6 @@ public class Cah extends Activity
 {
 
 	CahClient client;
-	BlockingQueue<Delta> in;
-	BlockingQueue<Delta> out;
 
 	/** Called when the activity is first created. */
 	@Override
