@@ -46,47 +46,6 @@ public class Cah extends Activity
 
 		if(recievedIntent.hasExtra("COMMAND")) {
 			player = new CahPlayer(this, client, recievedIntent.getStringExtra("TABLE_ID"));
-			
-			//TODO: Move the following code to CahClient
-			Runnable joinGame = new Runnable() {
-				@Override
-				public void run() {
-					try {
-						// Get the server's reply.
-						TableDelta table_reply = (TableDelta) client.incoming.take();
-
-						// Client should send a player delta with a 0 Id and message "join".
-						// Server should send a reply delta with next Id and message "you"
-						// followed by zero or more player deltas that are the other people
-						if(table_reply.Command.equals("ok")) {
-							Log.d("CAH", "Settings.Secure.ANDROID_ID=" + Settings.Secure.ANDROID_ID);
-							client.outgoing.put(new PlayerDelta(0, "join"));
-
-							PlayerDelta player = (PlayerDelta) client.incoming.take();
-							if(player.Message.equals("you") == false) {
-								// ERROR!!!
-								final String badMessage = player.Message;
-								runOnUiThread(new Runnable() {
-									@Override
-									public void run() {
-										AlertDialog.Builder alertBuilder = new AlertDialog.Builder(getApplicationContext());
-										alertBuilder.setTitle("Unexpected response from server!");
-										alertBuilder.setMessage("Recieved \"" + badMessage + "\" from server. Expected \"you\"");
-									}
-								});
-							}
-							while(player != null) {
-								//TODO: Do something with player
-								player = (PlayerDelta) client.incoming.take();
-							}
-						}
-					} catch (InterruptedException ex) {
-						ex.printStackTrace();
-					}
-				}
-			};
-			performOnBackgroundThread(joinGame);
-
 		} else {
 			this.addDummyPlayersAndCards();
 		}
