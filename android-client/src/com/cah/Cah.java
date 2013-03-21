@@ -28,6 +28,7 @@ public class Cah extends Activity
 {
 
 	CahClient client;
+	CahPlayer player;
 
 	/** Called when the activity is first created. */
 	@Override
@@ -44,14 +45,13 @@ public class Cah extends Activity
 		performOnBackgroundThread(client);
 
 		if(recievedIntent.hasExtra("COMMAND")) {
+			player = new CahPlayer(this, client, recievedIntent.getStringExtra("TABLE_ID"));
+			
 			//TODO: Move the following code to CahClient
 			Runnable joinGame = new Runnable() {
 				@Override
 				public void run() {
 					try {
-						// Make/Join new table
-						client.outgoing.put(new TableDelta(recievedIntent.getStringExtra("COMMAND"), recievedIntent.getStringExtra("TABLE_ID")));
-
 						// Get the server's reply.
 						TableDelta table_reply = (TableDelta) client.incoming.take();
 
