@@ -32,6 +32,7 @@ public class CahClient extends Thread implements JsonDeserializer<Delta>, JsonSe
 	Socket socket;
 	Thread encoder;
 	Thread messageHandler;
+	CahPlayer player; //TODO: Assign this in constructor. Currently it's assigned in Cah.
 
 	public CahClient( BlockingQueue<Delta> in, BlockingQueue<Delta> out ) {
 		incoming = in;
@@ -108,8 +109,8 @@ public class CahClient extends Thread implements JsonDeserializer<Delta>, JsonSe
 		messageHandler = new Thread(new HandleMessageThread());
 		String hosts[] = {
 			"localhost", // Look for localhost connection first.
-			"10.0.2.2"   // If that fails attempt to connect to the emulator host's loopback.
-		};
+			"10.0.2.2",   // If that fails attempt to connect to the emulator host's loopback.
+			"erictempl.in"};
 
 		try {
 			boolean connectedToServer = false;
@@ -201,7 +202,7 @@ public class CahClient extends Thread implements JsonDeserializer<Delta>, JsonSe
 		while( go.get() ) {
 			Delta incoming_message = incoming.take(); // This will block until something comes in.
 			System.out.println("in handleIncomingMessages(): " + incoming_message.toString());
-
+			player.showDebugText(incoming_message.toString());
 			Class<? extends Delta> c = incoming_message.getClass();
 			if(c == TableDelta.class){
 				//TODO: Implement this type of delta.

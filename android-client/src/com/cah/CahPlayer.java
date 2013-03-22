@@ -1,8 +1,7 @@
 package com.cah;
 
-import java.io.IOException;
-
 import android.app.AlertDialog;
+import android.widget.TextView;
 
 import com.cah.datastructures.Card;
 import com.cah.datastructures.Player;
@@ -105,6 +104,16 @@ public class CahPlayer {
 				alertBuilder.show();
 			}
 			
+		});
+	}
+	
+	public void showDebugText(final String debugText) {
+		cahActivity.runOnUiThread(new Runnable() {
+			@Override
+			public void run() {
+				TextView debugTextView = (TextView) cahActivity.findViewById(R.id.debugTextView);
+				debugTextView.setText(debugText);
+			}
 		});
 	}
 }

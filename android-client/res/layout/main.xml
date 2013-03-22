@@ -10,4 +10,12 @@
     <include layout="@layout/sample_scrollview">
     </include>
 
+    <TextView
+        android:id="@+id/debugTextView"
+        android:textSize="10dp"
+        android:layout_height="wrap_content"
+        android:layout_width="wrap_content"
+        android:textColor="@android:color/white"
+        />
+    
 </FrameLayout>
