@@ -206,10 +206,21 @@ public class CahClient extends Thread implements JsonDeserializer<Delta>, JsonSe
 			Class<? extends Delta> c = incoming_message.getClass();
 			if(c == TableDelta.class){
 				//TODO: Implement this type of delta.
+				TableDelta delta = (TableDelta) incoming_message;
+				if(delta.Command.equals("ok")) {
+					player.tableID = delta.Id;
+					//ask for an id
+					outgoing.put(new PlayerDelta(0, "my-id?"));
+				}
 			} else if (c == DeckDelta.class){
 				//TODO: Implement this type of delta.
 			} else if (c == PlayerDelta.class) {
 				//TODO: Implement this type of delta.
+				PlayerDelta delta = (PlayerDelta) incoming_message;
+				if(delta.Message.equals("your-id")) {
+					player.playerId = delta.Id;
+					outgoing.put(new PlayerDelta(player.playerId, "join"));
+				}
 				// When joining table, client should send a player delta with a 0 Id and message "join".
 				// Server should send a reply delta with next Id and message "you"
 				// followed by zero or more player deltas that are the other people

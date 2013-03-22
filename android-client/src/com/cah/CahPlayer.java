@@ -14,7 +14,8 @@ public class CahPlayer {
 	
 	final Cah cahActivity;
 	final CahClient client;
-	final String tableID;
+	String tableID;
+	int playerId;
 
 	/**
 	 * 
@@ -112,7 +113,7 @@ public class CahPlayer {
 			@Override
 			public void run() {
 				TextView debugTextView = (TextView) cahActivity.findViewById(R.id.debugTextView);
-				debugTextView.setText(debugText);
+				debugTextView.setText("Table ID: " + CahPlayer.this.tableID + "\n" + debugText);
 			}
 		});
 	}
