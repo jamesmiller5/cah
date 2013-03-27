@@ -40,16 +40,24 @@ public class Cah extends Activity
 		LinearLayout cardContainer = (LinearLayout) findViewById(R.id.cardContainer);
 		cardContainer.removeAllViews();
 
-		//spawn a new client to the server
-		client = new CahClient();
-		performOnBackgroundThread(client);
-
 		if(recievedIntent.hasExtra("COMMAND")) {
+			//spawn a new client to the server
+			client = new CahClient();
+			performOnBackgroundThread(client);
+			
 			player = new CahPlayer(this, client, recievedIntent.getStringExtra("TABLE_ID"));
 			client.player = player; //TODO: DON'T DO THIS HERE. CahClient could crash as soon as it receives a message.
 		} else {
 			this.addDummyPlayersAndCards();
 		}
+	}
+	
+	@Override
+	public void onStop() {
+		if(client != null)
+			client.shutdown();
+		
+		super.onStop(); // Required!
 	}
 
 	public void addPlayerToTable(Bitmap playerBitmap, boolean isCzar) {
