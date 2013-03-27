@@ -1,10 +1,10 @@
 package cah
 
 import (
+	"io"
 	"log"
 	"net"
 	"time"
-	"io"
 )
 
 type Delta struct {
