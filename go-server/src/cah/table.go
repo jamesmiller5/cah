@@ -4,10 +4,11 @@ import (
 	"crypto/rand"
 	"encoding/base64"
 	"encoding/json"
+	"errors"
+	"log"
 	"net"
 	"sync"
 	"time"
-	"log"
 )
 
 type Table struct {
@@ -49,8 +50,11 @@ func HandleNewClient(conn net.Conn) {
 		var msg TableDelta
 
 		dec.SetDeadline(time.Now().Add(TABLE_TIMEOUT))
-		if err := dec.Decode(&msg); err != nil {
+		if err := dec.Decode(&msg); err != nil && err != errors.New("EOF") {
 			panic("Decode Error")
+		} else if err == errors.New("EOF") {
+			log.Println("Client disconnected before joining a table.")
+			break
 		}
 		dec.SetDeadline(time.Time{})
 
