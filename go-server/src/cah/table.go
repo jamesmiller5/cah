@@ -72,8 +72,8 @@ func HandleNewClient(conn net.Conn) {
 var handlers map[string]func(*NetDecoder, *NetEncoder, *TableDelta) bool
 
 func init() {
-	handlers = map[string]func(*NetDecoder, *NetEncoder, *TableDelta) bool {
-		"join": func (dec *NetDecoder, enc *NetEncoder, msg *TableDelta) bool {
+	handlers = map[string]func(*NetDecoder, *NetEncoder, *TableDelta) bool{
+		"join": func(dec *NetDecoder, enc *NetEncoder, msg *TableDelta) bool {
 			if len(msg.Id) > 6 {
 				panic("Message Id too long")
 			}
