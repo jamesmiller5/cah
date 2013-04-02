@@ -20,6 +20,7 @@ Tasks: Created from stories by Developers who also chose what to be completed
 * Create Android activity to show black card full-screen.
 * * Make black card for the czar scale to full screen.
 * Send sample cards from server to client.
+* Make text on cards smaller
 
 Product Backlog
 ===============
