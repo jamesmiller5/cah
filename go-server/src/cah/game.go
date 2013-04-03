@@ -34,7 +34,13 @@ func (game *Game) Play() {
 				p.toClientPlayerDeltas <- &PlayerDelta{Id: p.Id, Message: "your-id"}
 			case "join":
 				//let this client join the game
-				//if they already existed, send them their cards
+				//TODO: if they already existed, send them their cards
+
+				// Give the new player a new hand of 7 cards
+				for i:= 0; i < 7; i++ {
+					cardText := GetNewWhiteCard()
+					p.toClientDeckDeltas <- &DeckDelta{Player: p.Id, DeckTo: "hand", DeckFrom: "draw", Amount: 1, Cards: []string{cardText}}
+				}
 			case "leave":
 				//remove from player list and reflect to others
 				game.Lock()

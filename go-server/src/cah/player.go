@@ -39,6 +39,7 @@ type DeckDelta struct {
 	DeckTo   string
 	DeckFrom string
 	Amount   int
+	Cards    []string
 	Delta
 }
 
