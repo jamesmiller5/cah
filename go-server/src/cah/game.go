@@ -38,10 +38,10 @@ func (game *Game) Play() {
 
 				// Give the new player a new hand of 7 cards
 				cards := []string{}
-				for i:= 0; i < 7; i++ {
-					cards = append(cards,GetNewWhiteCard())
+				for i := 0; i < 7; i++ {
+					cards = append(cards, GetNewWhiteCard())
 				}
-					p.toClientDeckDeltas <- &DeckDelta{Player: p.Id, DeckTo: "hand", DeckFrom: "draw", Amount: 7, Cards: cards}
+				p.toClientDeckDeltas <- &DeckDelta{Player: p.Id, DeckTo: "hand", DeckFrom: "draw", Amount: 7, Cards: cards}
 			case "leave":
 				//remove from player list and reflect to others
 				game.Lock()
