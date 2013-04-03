@@ -311,7 +311,11 @@ abstract class Delta {
 				result.append( field.getName() );
 				result.append(": ");
 				//requires access to private field:
-				result.append( field.get(this) );
+				if(field.get(this).getClass() == String[].class) {
+					result.append(Arrays.toString((String[]) field.get(this)));
+				} else {
+					result.append( field.get(this) );
+				}
 			} catch ( IllegalAccessException ex ) {
 				System.out.println(ex);
 			}
@@ -338,12 +342,14 @@ class DeckDelta extends Delta {
 	String DeckTo;
 	String DeckFrom;
 	int Amount; //TODO: This should be an array if card indicators
+	String[] Cards;
 
-	public DeckDelta( int Player, String DeckTo, String DeckFrom, int Amount ) {
+	public DeckDelta( int Player, String DeckTo, String DeckFrom, int Amount, String[] Cards ) {
 		this.Player = Player;
 		this.DeckTo = DeckTo;
 		this.DeckFrom = DeckFrom;
 		this.Amount = Amount;
+		this.Cards = Cards;
 	}
 }
 
