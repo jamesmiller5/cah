@@ -31,6 +31,8 @@ public class CahClient extends Thread implements JsonDeserializer<Delta>, JsonSe
 	BlockingQueue<Delta> outgoing;
 	Socket socket;
 	Thread encoder;
+	Thread messageHandler;
+	CahPlayer player; //TODO: Assign this in constructor. Currently it's assigned in Cah.
 
 	public CahClient( BlockingQueue<Delta> in, BlockingQueue<Delta> out ) {
 		incoming = in;
@@ -104,10 +106,11 @@ public class CahClient extends Thread implements JsonDeserializer<Delta>, JsonSe
 		//Keep track of our threads, they will need to interrupt each other in the event of errors or close()
 		encoder = (Thread) this;
 		Thread decoder = new Thread(new DecodeThread());
+		messageHandler = new Thread(new HandleMessageThread());
 		String hosts[] = {
 			"localhost", // Look for localhost connection first.
-			"10.0.2.2"   // If that fails attempt to connect to the emulator host's loopback.
-		};
+			"10.0.2.2",   // If that fails attempt to connect to the emulator host's loopback.
+			"erictempl.in"};
 
 		try {
 			boolean connectedToServer = false;
@@ -134,6 +137,7 @@ public class CahClient extends Thread implements JsonDeserializer<Delta>, JsonSe
 			}
 
 			decoder.start();
+			messageHandler.start();
 			encode();
 		} catch (Exception e ){
 			System.out.println("Unexpected Exception in CahClient.run(): " + e + "\n" + Arrays.toString(e.getStackTrace()) );
@@ -155,6 +159,20 @@ public class CahClient extends Thread implements JsonDeserializer<Delta>, JsonSe
 			}
 		}
 	}
+	
+	//Helper thread to handle incoming messages in a blocking fashion
+	private class HandleMessageThread implements Runnable {
+		public void run() {
+			try {
+				handleIncomingMessages();
+			} catch (Exception e) {
+				System.err.println("Unexpected Incoming Message Handler Thread Exception: " + e + "\n" + Arrays.toString(e.getStackTrace()) );
+			} finally {
+				//Shutdown threads in case this thread encountered an error
+				shutdown();
+			}
+		}
+	}
 
 	public void shutdown() {
 		//Shutdown only once
@@ -165,6 +183,10 @@ public class CahClient extends Thread implements JsonDeserializer<Delta>, JsonSe
 			if( encoder != null ) {
 				encoder.interrupt();
 			}
+			
+			if(messageHandler != null ) {
+				messageHandler.interrupt();
+			}
 
 			//decoder thread gets an exception from socket and will exit gracefully
 			try {
@@ -172,6 +194,38 @@ public class CahClient extends Thread implements JsonDeserializer<Delta>, JsonSe
 					socket.close();
 			} catch( IOException e ) {
 				//socket is already closed, continue with shutdown
+			}
+		}
+	}
+	
+	public void handleIncomingMessages() throws InterruptedException {
+		while( go.get() ) {
+			Delta incoming_message = incoming.take(); // This will block until something comes in.
+			System.out.println("in handleIncomingMessages(): " + incoming_message.toString());
+			player.showDebugText(incoming_message.toString());
+			Class<? extends Delta> c = incoming_message.getClass();
+			if(c == TableDelta.class){
+				//TODO: Implement this type of delta.
+				TableDelta delta = (TableDelta) incoming_message;
+				if(delta.Command.equals("ok")) {
+					player.tableID = delta.Id;
+					//ask for an id
+					outgoing.put(new PlayerDelta(0, "my-id?"));
+				}
+			} else if (c == DeckDelta.class){
+				//TODO: Implement this type of delta.
+			} else if (c == PlayerDelta.class) {
+				//TODO: Implement this type of delta.
+				PlayerDelta delta = (PlayerDelta) incoming_message;
+				if(delta.Message.equals("your-id")) {
+					player.playerId = delta.Id;
+					outgoing.put(new PlayerDelta(player.playerId, "join"));
+				}
+				// When joining table, client should send a player delta with a 0 Id and message "join".
+				// Server should send a reply delta with next Id and message "you"
+				// followed by zero or more player deltas that are the other people
+			} else if (c == ActionDelta.class) {
+				//TODO: Implement this type of delta.
 			}
 		}
 	}

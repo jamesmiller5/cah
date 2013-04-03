@@ -1,10 +1,10 @@
 package cah
 
 import (
+	"io"
 	"log"
 	"net"
 	"time"
-	"io"
 )
 
 type Delta struct {
@@ -71,7 +71,7 @@ type Player struct {
 	enc                  *NetEncoder
 }
 
-const PLAYER_TIMEOUT = 30 * time.Second
+const PLAYER_TIMEOUT = 10 * time.Minute
 
 func NewPlayer(dec *NetDecoder, enc *NetEncoder, id int) *Player {
 	return &Player{

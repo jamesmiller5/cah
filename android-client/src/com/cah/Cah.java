@@ -28,8 +28,7 @@ public class Cah extends Activity
 {
 
 	CahClient client;
-	BlockingQueue<Delta> in;
-	BlockingQueue<Delta> out;
+	CahPlayer player;
 
 	/** Called when the activity is first created. */
 	@Override
@@ -41,57 +40,24 @@ public class Cah extends Activity
 		LinearLayout cardContainer = (LinearLayout) findViewById(R.id.cardContainer);
 		cardContainer.removeAllViews();
 
-		//spawn a new client to the server
-		client = new CahClient();
-		performOnBackgroundThread(client);
-
 		if(recievedIntent.hasExtra("COMMAND")) {
-			//TODO: Move the following code to CahClient
-			Runnable joinGame = new Runnable() {
-				@Override
-				public void run() {
-					try {
-						// Make/Join new table
-						client.outgoing.put(new TableDelta(recievedIntent.getStringExtra("COMMAND"), recievedIntent.getStringExtra("TABLE_ID")));
-
-						// Get the server's reply.
-						TableDelta table_reply = (TableDelta) client.incoming.take();
-
-						// Client should send a player delta with a 0 Id and message "join".
-						// Server should send a reply delta with next Id and message "you"
-						// followed by zero or more player deltas that are the other people
-						if(table_reply.Command.equals("ok")) {
-							Log.d("CAH", "Settings.Secure.ANDROID_ID=" + Settings.Secure.ANDROID_ID);
-							client.outgoing.put(new PlayerDelta(0, "join"));
-
-							PlayerDelta player = (PlayerDelta) client.incoming.take();
-							if(player.Message.equals("you") == false) {
-								// ERROR!!!
-								final String badMessage = player.Message;
-								runOnUiThread(new Runnable() {
-									@Override
-									public void run() {
-										AlertDialog.Builder alertBuilder = new AlertDialog.Builder(getApplicationContext());
-										alertBuilder.setTitle("Unexpected response from server!");
-										alertBuilder.setMessage("Recieved \"" + badMessage + "\" from server. Expected \"you\"");
-									}
-								});
-							}
-							while(player != null) {
-								//TODO: Do something with player
-								player = (PlayerDelta) client.incoming.take();
-							}
-						}
-					} catch (InterruptedException ex) {
-						ex.printStackTrace();
-					}
-				}
-			};
-			performOnBackgroundThread(joinGame);
-
+			//spawn a new client to the server
+			client = new CahClient();
+			performOnBackgroundThread(client);
+			
+			player = new CahPlayer(this, client, recievedIntent.getStringExtra("TABLE_ID"));
+			client.player = player; //TODO: DON'T DO THIS HERE. CahClient could crash as soon as it receives a message.
 		} else {
 			this.addDummyPlayersAndCards();
 		}
+	}
+	
+	@Override
+	public void onStop() {
+		if(client != null)
+			client.shutdown();
+		
+		super.onStop(); // Required!
 	}
 
 	public void addPlayerToTable(Bitmap playerBitmap, boolean isCzar) {
