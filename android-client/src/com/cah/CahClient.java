@@ -289,14 +289,12 @@ class DeckDelta extends Delta {
 	int Player;
 	String DeckTo;
 	String DeckFrom;
-	int Amount; //TODO: This should be an array if card indicators
 	String[] Cards;
 
-	public DeckDelta( int Player, String DeckTo, String DeckFrom, int Amount, String[] Cards ) {
+	public DeckDelta( int Player, String DeckTo, String DeckFrom, String[] Cards ) {
 		this.Player = Player;
 		this.DeckTo = DeckTo;
 		this.DeckFrom = DeckFrom;
-		this.Amount = Amount;
 		this.Cards = Cards;
 	}
 }
