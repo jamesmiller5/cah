@@ -17,7 +17,6 @@ import android.view.animation.TranslateAnimation;
 import android.widget.HorizontalScrollView;
 
 import com.cah.Cah;
-import com.cah.CahPlayer;
 import com.cah.datastructures.Card;
 
 public class CardHorizontalScrollView extends HorizontalScrollView {

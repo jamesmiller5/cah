@@ -11,6 +11,7 @@
     
     <ImageView
         android:id="@+id/playerCrown"
+        android:contentDescription="Player's Photo"
         android:layout_width="50dip"
         android:layout_height="50dip"
         android:layout_alignParentLeft="true"
