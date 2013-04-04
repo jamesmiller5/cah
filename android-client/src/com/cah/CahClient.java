@@ -149,6 +149,7 @@ public class CahClient extends Thread implements JsonDeserializer<Delta>, JsonSe
 				decode();
 			} catch( JsonSyntaxException e ) {
 				//Json library throws this when connection is closed
+				System.out.println("SOCKET CLOSED!");
 			} catch( Exception e ) {
 				System.out.println("Unexpected Decode Thread Exception: " + e + "\n" + Arrays.toString(e.getStackTrace()) );
 			} finally {

@@ -90,7 +90,7 @@ public class CahPlayer {
 					this.playerId = delta.Id;
 					outgoing.put(new PlayerDelta(this.playerId, "join"));
 				} else if (delta.Id != this.playerId){
-					//TODO: Unlock the player's hand when the server tells us that the round has started.
+					//TODO: Unlock the player's hand when the server tells us that the round has started, instead of just when another player joins.
 					cahActivity.runOnUiThread(new Runnable() {
 						@Override
 						public void run() {
@@ -138,6 +138,21 @@ public class CahPlayer {
 			@Override
 			public void run() {
 				cahActivity.addCardToHand(card);
+			}
+		});
+		
+	}
+	
+	public void playCard(final Card card) {
+		Cah.performOnBackgroundThread(new Runnable() {
+			@Override
+			public void run() {
+				try {
+					client.outgoing.put(new DeckDelta(playerId, "play", "hand", new String[] {card.text}));
+				} catch (InterruptedException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
 			}
 		});
 		

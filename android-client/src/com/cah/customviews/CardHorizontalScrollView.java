@@ -16,6 +16,10 @@ import android.view.animation.ScaleAnimation;
 import android.view.animation.TranslateAnimation;
 import android.widget.HorizontalScrollView;
 
+import com.cah.Cah;
+import com.cah.CahPlayer;
+import com.cah.datastructures.Card;
+
 public class CardHorizontalScrollView extends HorizontalScrollView {
 	
 	Context context;
@@ -70,6 +74,7 @@ public class CardHorizontalScrollView extends HorizontalScrollView {
 							animatingCard.setVisibility(View.GONE);
 							verticalSwipeHappening = false;
 							//TODO: Submit card choice to server.
+							Cah.player.playCard(new Card(Card.Color.WHITE, ((CardView)animatingCard).getCardString()));
 						}
 
 						@Override
