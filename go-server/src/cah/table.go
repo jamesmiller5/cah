@@ -4,7 +4,7 @@ import (
 	"crypto/rand"
 	"encoding/base64"
 	"encoding/json"
-	"errors"
+	"io"
 	"log"
 	"net"
 	"sync"
@@ -50,9 +50,9 @@ func HandleNewClient(conn net.Conn) {
 		var msg TableDelta
 
 		dec.SetDeadline(time.Now().Add(TABLE_TIMEOUT))
-		if err := dec.Decode(&msg); err != nil && err != errors.New("EOF") {
+		if err := dec.Decode(&msg); err != nil && err != io.EOF {
 			panic("Decode Error")
-		} else if err == errors.New("EOF") {
+		} else if err == io.EOF {
 			log.Println("Client disconnected before joining a table.")
 			break
 		}
