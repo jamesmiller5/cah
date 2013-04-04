@@ -10,9 +10,14 @@ import android.view.ViewGroup;
 
 public class GameTable extends ViewGroup {
 
+	Paint paint;
+	
 	public GameTable(Context context, AttributeSet attrs) {
 		super(context, attrs);
 		this.setWillNotDraw(false);
+		paint = new Paint();
+		paint.setColor(Color.WHITE);
+		paint.setStrokeWidth(1);
 	}
 
 	@Override
@@ -57,10 +62,7 @@ public class GameTable extends ViewGroup {
 	
 	@Override
 	protected void onDraw(Canvas canvas) {
-		Paint p = new Paint();
-		p.setColor(Color.WHITE);
-		p.setStrokeWidth(1);
-		canvas.drawCircle(this.getLeft()+(this.getWidth()/2), this.getTop()+(this.getHeight()/2), (this.getWidth()<this.getHeight()) ? this.getWidth()/3 : this.getHeight()/3, p);
+		canvas.drawCircle(this.getLeft()+(this.getWidth()/2), this.getTop()+(this.getHeight()/2), (this.getWidth()<this.getHeight()) ? this.getWidth()/3 : this.getHeight()/3, paint);
 	}
 
 }

@@ -16,6 +16,9 @@ import android.view.animation.ScaleAnimation;
 import android.view.animation.TranslateAnimation;
 import android.widget.HorizontalScrollView;
 
+import com.cah.Cah;
+import com.cah.datastructures.Card;
+
 public class CardHorizontalScrollView extends HorizontalScrollView {
 	
 	Context context;
@@ -23,6 +26,7 @@ public class CardHorizontalScrollView extends HorizontalScrollView {
 	Point dxdy;
 	boolean verticalSwipePossible;
 	boolean verticalSwipeHappening = false;
+	public boolean handLocked = true;
 	View cardToMove;
 	View animatingCard;
 	Rect originalCardRect = new Rect();
@@ -69,6 +73,7 @@ public class CardHorizontalScrollView extends HorizontalScrollView {
 							animatingCard.setVisibility(View.GONE);
 							verticalSwipeHappening = false;
 							//TODO: Submit card choice to server.
+							Cah.player.playCard(new Card(Card.Color.WHITE, ((CardView)animatingCard).getCardString()));
 						}
 
 						@Override
@@ -124,7 +129,7 @@ public class CardHorizontalScrollView extends HorizontalScrollView {
 			return super.onTouchEvent(event);
 		}
 
-		if(verticalSwipePossible) {
+		if(verticalSwipePossible && handLocked == false) {
 			dxdy = new Point((int)event.getX()-startingPoint.x, (int)event.getY()-startingPoint.y);
 			if(Math.abs(dxdy.x)> 15) {
 				// We can no longer try to swipe up.

@@ -32,18 +32,19 @@ var playerDeltaMessages = map[string]bool{
 	"join":   true,
 	"leave":  true,
 	"my-id?": true,
+	"is-czar": true,
 }
 
 type DeckDelta struct {
 	Player   int
 	DeckTo   string
 	DeckFrom string
-	Amount   int
+	Cards    []string
 	Delta
 }
 
 func (dd *DeckDelta) isClean() bool {
-	if dd.Player < 1 || dd.Amount < 1 || len(dd.DeckTo) == 0 || len(dd.DeckFrom) == 0 {
+	if dd.Player < 1 || len(dd.DeckTo) == 0 || len(dd.DeckFrom) == 0 || len(dd.Cards) == 0 {
 		log.Println("DeckDelta is not clean (missing fields)")
 		return false
 	}
@@ -69,6 +70,7 @@ type Player struct {
 	toClientDeckDeltas   chan *DeckDelta
 	dec                  *NetDecoder
 	enc                  *NetEncoder
+	//TODO: add hand of cards
 }
 
 const PLAYER_TIMEOUT = 10 * time.Minute
