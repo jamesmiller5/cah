@@ -22,49 +22,63 @@ func NewGame() *Game {
 	}
 }
 
+func (game *Game) playRound() {
+
+	//pick czar
+	//pick black card
+	//wait for player input
+	//wait for czar input
+	//win?
+	//deal up to x cards
+
+	select {
+	case pd := <-game.playerDeltas:
+		multicast := false
+		p := pd.fromPlayer
+		switch pd.Message {
+		case "my-id?":
+			//let this client know their id so they can join
+			p.toClientPlayerDeltas <- &PlayerDelta{Id: p.Id, Message: "your-id"}
+		case "join":
+			//let this client join the game
+			//TODO: if they already existed, send them their cards
+
+			// Give the new player a new hand of 7 cards
+			cards := []string{}
+			for i := 0; i < 7; i++ {
+				cards = append(cards, GetNewWhiteCard())
+			}
+			p.toClientDeckDeltas <- &DeckDelta{Player: p.Id, DeckTo: "hand", DeckFrom: "draw", Cards: cards}
+
+			multicast = true
+		case "leave":
+			//remove from player list and reflect to others
+			game.Lock()
+			delete(game.players, pd.Id)
+			game.Unlock()
+			multicast = true
+		default:
+			//error, should have been something above
+		}
+
+		//If we should reflect this message to all players
+		if multicast {
+			for _, p := range game.players {
+				p.toClientPlayerDeltas <- pd
+			}
+		}
+	case dd := <-game.deckDeltas:
+		game.RLock()
+		for _, p := range game.players {
+			p.toClientDeckDeltas <- dd
+		}
+		game.RUnlock()
+	}
+}
+
 func (game *Game) Play() {
 	for {
-		select {
-		case pd := <-game.playerDeltas:
-			multicast := false
-			p := pd.fromPlayer
-			switch pd.Message {
-			case "my-id?":
-				//let this client know their id so they can join
-				p.toClientPlayerDeltas <- &PlayerDelta{Id: p.Id, Message: "your-id"}
-			case "join":
-				//let this client join the game
-				//TODO: if they already existed, send them their cards
-
-				// Give the new player a new hand of 7 cards
-				cards := []string{}
-				for i := 0; i < 7; i++ {
-					cards = append(cards, GetNewWhiteCard())
-				}
-				p.toClientDeckDeltas <- &DeckDelta{Player: p.Id, DeckTo: "hand", DeckFrom: "draw", Amount: 7, Cards: cards}
-			case "leave":
-				//remove from player list and reflect to others
-				game.Lock()
-				delete(game.players, pd.Id)
-				game.Unlock()
-				multicast = true
-			default:
-				//error, should have been something above
-			}
-
-			//If we should reflect this message to all players
-			if multicast {
-				for _, p := range game.players {
-					p.toClientPlayerDeltas <- pd
-				}
-			}
-		case dd := <-game.deckDeltas:
-			game.RLock()
-			for _, p := range game.players {
-				p.toClientDeckDeltas <- dd
-			}
-			game.RUnlock()
-		}
+		game.playRound();
 	}
 }
 
