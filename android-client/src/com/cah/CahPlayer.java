@@ -76,6 +76,13 @@ public class CahPlayer {
 				}
 			} else if (c == DeckDelta.class){
 				//TODO: Implement this type of delta.
+				DeckDelta delta = (DeckDelta) incoming_message;
+				if(delta.DeckTo.equals("hand")) {
+					// Add the card to our hand
+					for(String cardText : delta.Cards) {
+						addCardToHand(new Card(Card.Color.WHITE, cardText));
+					}
+				}
 			} else if (c == PlayerDelta.class) {
 				//TODO: Implement this type of delta.
 				PlayerDelta delta = (PlayerDelta) incoming_message;
@@ -118,8 +125,14 @@ public class CahPlayer {
 	 * 
 	 * @param card Card to be added to hand
 	 */
-	public void addCardToHand(Card card) {
-		//TODO: Implement this function.
+	public void addCardToHand(final Card card) {
+		cahActivity.runOnUiThread(new Runnable() {
+			@Override
+			public void run() {
+				cahActivity.addCardToHand(card);
+			}
+		});
+		
 	}
 	
 	/**
