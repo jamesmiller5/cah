@@ -1,5 +1,9 @@
 package com.cah;
 
+import java.util.Arrays;
+import java.util.concurrent.BlockingQueue;
+import java.util.concurrent.atomic.AtomicBoolean;
+
 import android.app.AlertDialog;
 import android.widget.TextView;
 
@@ -12,10 +16,12 @@ import com.cah.datastructures.Player;
  */
 public class CahPlayer {
 	
+	final AtomicBoolean go = new AtomicBoolean(true);
 	final Cah cahActivity;
 	final CahClient client;
 	String tableID;
 	int playerId;
+	Thread messageHandler;
 
 	/**
 	 * 
@@ -33,6 +39,9 @@ public class CahPlayer {
 			@Override
 			public void run() {
 				try {
+					messageHandler = new Thread(new HandleMessageThread());
+					messageHandler.start();
+					
 					// Go ahead and join/create table at this point.
 					if(CahPlayer.this.tableID != null) {
 						// Join table
@@ -50,6 +59,58 @@ public class CahPlayer {
 		}); // End performOnBackgroundThread
 
 	}
+	
+	public void handleIncomingMessages(BlockingQueue<Delta> incoming, BlockingQueue<Delta> outgoing) throws InterruptedException {
+		while( go.get() ) {
+			Delta incoming_message = incoming.take(); // This will block until something comes in.
+			System.out.println("in handleIncomingMessages(): " + incoming_message.toString());
+			this.showDebugText(incoming_message.toString());
+			Class<? extends Delta> c = incoming_message.getClass();
+			if(c == TableDelta.class){
+				//TODO: Implement this type of delta.
+				TableDelta delta = (TableDelta) incoming_message;
+				if(delta.Command.equals("ok")) {
+					this.tableID = delta.Id;
+					//ask for an id
+					outgoing.put(new PlayerDelta(0, "my-id?"));
+				}
+			} else if (c == DeckDelta.class){
+				//TODO: Implement this type of delta.
+			} else if (c == PlayerDelta.class) {
+				//TODO: Implement this type of delta.
+				PlayerDelta delta = (PlayerDelta) incoming_message;
+				if(delta.Message.equals("your-id")) {
+					this.playerId = delta.Id;
+					outgoing.put(new PlayerDelta(this.playerId, "join"));
+				}
+				// When joining table, client should send a player delta with a 0 Id and message "join".
+				// Server should send a reply delta with next Id and message "you"
+				// followed by zero or more player deltas that are the other people
+			} else if (c == ActionDelta.class) {
+				//TODO: Implement this type of delta.
+			}
+		}
+	}
+	//Helper thread to handle incoming messages in a blocking fashion
+	private class HandleMessageThread implements Runnable {
+		public void run() {
+			try {
+				handleIncomingMessages(client.incoming, client.outgoing);
+			} catch (Exception e) {
+				System.err.println("Unexpected Incoming Message Handler Thread Exception: " + e + "\n" + Arrays.toString(e.getStackTrace()) );
+			} finally {
+				//Shutdown threads in case this thread encountered an error
+				shutdown();
+			}
+		}
+	}
+	
+	public void shutdown() {
+		go.set(false);
+		messageHandler.interrupt();
+		client.shutdown();
+	}
+
 	
 	/**
 	 * This function is called by CahClient when the server

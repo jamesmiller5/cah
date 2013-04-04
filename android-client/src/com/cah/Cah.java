@@ -46,7 +46,6 @@ public class Cah extends Activity
 			performOnBackgroundThread(client);
 			
 			player = new CahPlayer(this, client, recievedIntent.getStringExtra("TABLE_ID"));
-			client.player = player; //TODO: DON'T DO THIS HERE. CahClient could crash as soon as it receives a message.
 		} else {
 			this.addDummyPlayersAndCards();
 		}
