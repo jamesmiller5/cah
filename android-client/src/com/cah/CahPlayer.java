@@ -77,7 +77,7 @@ public class CahPlayer {
 			} else if (c == DeckDelta.class){
 				//TODO: Implement this type of delta.
 				DeckDelta delta = (DeckDelta) incoming_message;
-				if(delta.DeckTo.equals("hand")) {
+				if(delta.DeckTo.equals("hand") && delta.DeckFrom.equals("draw")) {
 					// Add the card to our hand
 					for(String cardText : delta.Cards) {
 						addCardToHand(new Card(Card.Color.WHITE, cardText));
@@ -89,6 +89,14 @@ public class CahPlayer {
 				if(delta.Message.equals("your-id")) {
 					this.playerId = delta.Id;
 					outgoing.put(new PlayerDelta(this.playerId, "join"));
+				} else if (delta.Id != this.playerId){
+					//TODO: Unlock the player's hand when the server tells us that the round has started.
+					cahActivity.runOnUiThread(new Runnable() {
+						@Override
+						public void run() {
+							cahActivity.playerCanPlayCard(true);
+						}
+					});
 				}
 				// When joining table, client should send a player delta with a 0 Id and message "join".
 				// Server should send a reply delta with next Id and message "you"

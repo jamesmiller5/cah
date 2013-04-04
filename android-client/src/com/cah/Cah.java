@@ -1,18 +1,11 @@
 package com.cah;
 
-import java.util.Queue;
-import java.util.concurrent.ArrayBlockingQueue;
-import java.util.concurrent.BlockingQueue;
-
 import android.app.Activity;
-import android.app.AlertDialog;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.Color;
 import android.os.Bundle;
-import android.provider.Settings;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.ImageView;
@@ -20,6 +13,7 @@ import android.widget.LinearLayout;
 import android.widget.LinearLayout.LayoutParams;
 import android.widget.QuickContactBadge;
 
+import com.cah.customviews.CardHorizontalScrollView;
 import com.cah.customviews.CardView;
 import com.cah.customviews.GameTable;
 import com.cah.datastructures.Card;
@@ -91,6 +85,11 @@ public class Cah extends Activity
 		LayoutParams lp = new LayoutParams((int) (235* (this.getResources().getDisplayMetrics().densityDpi/160.)), (int) (300* (this.getResources().getDisplayMetrics().densityDpi/160.)));
 		cv.setLayoutParams(lp);
 		cardContainer.addView(cv);
+	}
+	
+	public void playerCanPlayCard(boolean status) {
+		CardHorizontalScrollView handScrollView = (CardHorizontalScrollView) findViewById(R.id.handScrollView);
+		handScrollView.handLocked = !status;
 	}
 
 	private void addDummyPlayersAndCards() {

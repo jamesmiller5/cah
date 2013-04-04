@@ -23,6 +23,7 @@ public class CardHorizontalScrollView extends HorizontalScrollView {
 	Point dxdy;
 	boolean verticalSwipePossible;
 	boolean verticalSwipeHappening = false;
+	public boolean handLocked = true;
 	View cardToMove;
 	View animatingCard;
 	Rect originalCardRect = new Rect();
@@ -124,7 +125,7 @@ public class CardHorizontalScrollView extends HorizontalScrollView {
 			return super.onTouchEvent(event);
 		}
 
-		if(verticalSwipePossible) {
+		if(verticalSwipePossible && handLocked == false) {
 			dxdy = new Point((int)event.getX()-startingPoint.x, (int)event.getY()-startingPoint.y);
 			if(Math.abs(dxdy.x)> 15) {
 				// We can no longer try to swipe up.
