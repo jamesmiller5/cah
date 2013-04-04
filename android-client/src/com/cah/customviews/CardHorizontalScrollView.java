@@ -1,6 +1,7 @@
 package com.cah.customviews;
 
 import android.content.Context;
+import android.graphics.Color;
 import android.graphics.Point;
 import android.graphics.Rect;
 import android.util.AttributeSet;
@@ -51,77 +52,81 @@ public class CardHorizontalScrollView extends HorizontalScrollView {
 			//verticalSwipeHappening = false;
 
 			if(cardToMove != null) {
-				// We need to figure out what to do with the card that was dropped.
-				DisplayMetrics displayMetrics = new DisplayMetrics();
-				((WindowManager)context.getSystemService(Context.WINDOW_SERVICE)).getDefaultDisplay().getMetrics(displayMetrics);
-				int cardThresholdPosition = ((3*displayMetrics.heightPixels) / 6);
-				
-				animatingCard = cardToMove;
-				if(event.getRawY() < cardThresholdPosition) {
-					// Dropped on top half
-					//cardToMove.setVisibility(View.GONE);
-					// TODO: Animate card into table.
-					ScaleAnimation scaleAnimation = new ScaleAnimation((float)1., (float)0., (float)1., (float)0., Animation.RELATIVE_TO_SELF, (float)0.5, Animation.RELATIVE_TO_SELF, (float).25);
-					AnimationSet animSet = new AnimationSet(false);
-					animSet.addAnimation(scaleAnimation);
-					animSet.setDuration(300);
-					
-					animSet.setAnimationListener(new AnimationListener() {
+				if(handLocked == false) {
+					// We need to figure out what to do with the card that was dropped.
+					DisplayMetrics displayMetrics = new DisplayMetrics();
+					((WindowManager)context.getSystemService(Context.WINDOW_SERVICE)).getDefaultDisplay().getMetrics(displayMetrics);
+					int cardThresholdPosition = ((3*displayMetrics.heightPixels) / 6);
 
-						@Override
-						public void onAnimationEnd(Animation animation) {
-							animatingCard.setVisibility(View.GONE);
-							verticalSwipeHappening = false;
-							//TODO: Submit card choice to server.
-							Cah.player.playCard(new Card(Card.Color.WHITE, ((CardView)animatingCard).getCardString()));
-						}
+					animatingCard = cardToMove;
+					if(event.getRawY() < cardThresholdPosition) {
+						// Dropped on top half
+						//cardToMove.setVisibility(View.GONE);
+						// TODO: Animate card into table.
+						ScaleAnimation scaleAnimation = new ScaleAnimation((float)1., (float)0., (float)1., (float)0., Animation.RELATIVE_TO_SELF, (float)0.5, Animation.RELATIVE_TO_SELF, (float).25);
+						AnimationSet animSet = new AnimationSet(false);
+						animSet.addAnimation(scaleAnimation);
+						animSet.setDuration(300);
 
-						@Override
-						public void onAnimationRepeat(Animation animation) {
-						}
+						animSet.setAnimationListener(new AnimationListener() {
 
-						@Override
-						public void onAnimationStart(Animation animation) {
-						}
-						
-					});
-					
-					startingPoint = null;
-					dxdy = null;
-					
-					cardToMove.startAnimation(animSet);
-					
-					// Card was played.
-					((CardView) cardToMove).onCardPlayed();
-				} else {
-					// Dropped on bottom half
-					TranslateAnimation slideAnimation = new TranslateAnimation(0, 0, -(startingPoint.y - event.getRawY()),  0);
-					AnimationSet animSet = new AnimationSet(false);
-					animSet.addAnimation(slideAnimation);
-					animSet.setDuration(300);
-					animSet.setFillAfter(false);
-					animSet.setAnimationListener(new AnimationListener() {
+							@Override
+							public void onAnimationEnd(Animation animation) {
+								animatingCard.setVisibility(View.GONE);
+								verticalSwipeHappening = false;
+								//TODO: Submit card choice to server.
+								Cah.player.playCard(new Card(Card.Color.WHITE, ((CardView)animatingCard).getCardString()));
+							}
 
-						@Override
-						public void onAnimationEnd(Animation animation) {
-							verticalSwipeHappening = false;
-						}
+							@Override
+							public void onAnimationRepeat(Animation animation) {
+							}
 
-						@Override
-						public void onAnimationRepeat(Animation animation) {}
+							@Override
+							public void onAnimationStart(Animation animation) {
+							}
 
-						@Override
-						public void onAnimationStart(Animation animation) {}
-						
-					});
+						});
 
-					cardToMove.layout(originalCardRect.left, originalCardRect.top, originalCardRect.right, originalCardRect.bottom);
-					startingPoint = null;
-					dxdy = null;
+						cardToMove.startAnimation(animSet);
 
-					cardToMove.startAnimation(animSet);
-					
+						// Card was played.
+						((CardView) cardToMove).onCardPlayed();
+					} else {
+						// Dropped on bottom half
+						TranslateAnimation slideAnimation = new TranslateAnimation(0, 0, -(startingPoint.y - event.getRawY()),  0);
+						AnimationSet animSet = new AnimationSet(false);
+						animSet.addAnimation(slideAnimation);
+						animSet.setDuration(300);
+						animSet.setFillAfter(false);
+						animSet.setAnimationListener(new AnimationListener() {
+
+							@Override
+							public void onAnimationEnd(Animation animation) {
+								verticalSwipeHappening = false;
+							}
+
+							@Override
+							public void onAnimationRepeat(Animation animation) {}
+
+							@Override
+							public void onAnimationStart(Animation animation) {}
+
+						});
+
+						cardToMove.layout(originalCardRect.left, originalCardRect.top, originalCardRect.right, originalCardRect.bottom);
+
+						cardToMove.startAnimation(animSet);
+
+					}
+				}// end handLocked == false
+				else {
+					// Hand is locked. Reset background color of card.
+					((CardView)cardToMove).setCardColor(Color.WHITE);
+					verticalSwipeHappening = false;
 				}
+				startingPoint = null;
+				dxdy = null;
 				cardToMove = null;
 				return true;
 			}
@@ -129,7 +134,7 @@ public class CardHorizontalScrollView extends HorizontalScrollView {
 			return super.onTouchEvent(event);
 		}
 
-		if(verticalSwipePossible && handLocked == false) {
+		if(verticalSwipePossible) {
 			dxdy = new Point((int)event.getX()-startingPoint.x, (int)event.getY()-startingPoint.y);
 			if(Math.abs(dxdy.x)> 15) {
 				// We can no longer try to swipe up.
@@ -163,11 +168,22 @@ public class CardHorizontalScrollView extends HorizontalScrollView {
 				//Toast.makeText(getContext(), "Vertical swipe happening", Toast.LENGTH_SHORT).show();
 			}
 		}
-		if(verticalSwipeHappening && event.getAction() == MotionEvent.ACTION_MOVE) {
-			dxdy = new Point((int)event.getRawX(), (int)event.getRawY());
-			System.out.println("dx=" + dxdy.x + " dy=" + dxdy.y);
-			cardToMove.layout(cardToMove.getLeft(), (dxdy.y) - (startingPoint.y - originalCardRect.top), cardToMove.getRight(), (dxdy.y) -(startingPoint.y - originalCardRect.top) + cardToMove.getMeasuredHeight());
-			return true;
+		if(event.getAction() == MotionEvent.ACTION_MOVE && verticalSwipeHappening) {
+			if(handLocked == false) {
+				//  Hand is unlocked, move the card upwards.
+				dxdy = new Point((int)event.getRawX(), (int)event.getRawY());
+				System.out.println("dx=" + dxdy.x + " dy=" + dxdy.y);
+				cardToMove.layout(cardToMove.getLeft(), (dxdy.y) - (startingPoint.y - originalCardRect.top), cardToMove.getRight(), (dxdy.y) -(startingPoint.y - originalCardRect.top) + cardToMove.getMeasuredHeight());
+				return true;
+			} else {
+				// Hand is locked. Give visual feedback as the user tries to push the card up.
+				
+				DisplayMetrics displayMetrics = new DisplayMetrics();
+				((WindowManager)context.getSystemService(Context.WINDOW_SERVICE)).getDefaultDisplay().getMetrics(displayMetrics);
+				float percentageOfScreenMoved = -((event.getRawY() - startingPoint.y)/displayMetrics.heightPixels) * 100;
+				System.out.println("percentageOfScreenMoved = "+ percentageOfScreenMoved);
+				((CardView)cardToMove).setRedFadePercent((int)percentageOfScreenMoved);
+			}
 		}
 		return super.onTouchEvent(event);
 	}
