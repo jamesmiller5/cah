@@ -135,7 +135,7 @@ public class CahClient extends Thread implements JsonDeserializer<Delta>, JsonSe
 			}
 
 			decoder.start();
-			
+
 			encode();
 		} catch (Exception e ){
 			System.out.println("Unexpected Exception in CahClient.run(): " + e + "\n" + Arrays.toString(e.getStackTrace()) );
@@ -157,8 +157,6 @@ public class CahClient extends Thread implements JsonDeserializer<Delta>, JsonSe
 			}
 		}
 	}
-	
-	
 
 	public void shutdown() {
 		//Shutdown only once
@@ -179,8 +177,7 @@ public class CahClient extends Thread implements JsonDeserializer<Delta>, JsonSe
 			}
 		}
 	}
-	
-	
+
 	public void encode() throws IOException {
 		JsonWriter writer = new JsonWriter(	new OutputStreamWriter( socket.getOutputStream(), "UTF-8" ) );
 		while( go.get() ) {
