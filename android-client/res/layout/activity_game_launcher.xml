@@ -32,4 +32,21 @@
         <requestFocus />
     </EditText>
 
+    <Button
+        android:id="@+id/buttonShowCzarCard"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentLeft="true"
+        android:layout_below="@+id/buttonJoinExistingTable"
+        android:text="Show Demo Czar View" />
+
+    <EditText
+        android:id="@+id/czarCardText"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentLeft="true"
+        android:layout_below="@+id/buttonShowCzarCard"
+        android:hint="Enter text to appear on Czar card."
+        android:ems="10" />
+
 </RelativeLayout>

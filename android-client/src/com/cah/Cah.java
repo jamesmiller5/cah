@@ -22,7 +22,7 @@ public class Cah extends Activity
 {
 
 	CahClient client;
-	CahPlayer player;
+	public static CahPlayer player;
 
 	/** Called when the activity is first created. */
 	@Override

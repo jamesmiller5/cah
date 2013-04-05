@@ -63,8 +63,11 @@ public class CahPlayer {
 	public void handleIncomingMessages(BlockingQueue<Delta> incoming, BlockingQueue<Delta> outgoing) throws InterruptedException {
 		while( go.get() ) {
 			Delta incoming_message = incoming.take(); // This will block until something comes in.
+			// Print out debug information
 			System.out.println("in handleIncomingMessages(): " + incoming_message.toString());
 			this.showDebugText(incoming_message.toString());
+			
+			
 			Class<? extends Delta> c = incoming_message.getClass();
 			if(c == TableDelta.class){
 				//TODO: Implement this type of delta.
@@ -90,7 +93,7 @@ public class CahPlayer {
 					this.playerId = delta.Id;
 					outgoing.put(new PlayerDelta(this.playerId, "join"));
 				} else if (delta.Id != this.playerId){
-					//TODO: Unlock the player's hand when the server tells us that the round has started.
+					//TODO: Unlock the player's hand when the server tells us that the round has started, instead of just when another player joins.
 					cahActivity.runOnUiThread(new Runnable() {
 						@Override
 						public void run() {
@@ -138,6 +141,21 @@ public class CahPlayer {
 			@Override
 			public void run() {
 				cahActivity.addCardToHand(card);
+			}
+		});
+		
+	}
+	
+	public void playCard(final Card card) {
+		Cah.performOnBackgroundThread(new Runnable() {
+			@Override
+			public void run() {
+				try {
+					client.outgoing.put(new DeckDelta(playerId, "play", "hand", new String[] {card.text}));
+				} catch (InterruptedException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
 			}
 		});
 		

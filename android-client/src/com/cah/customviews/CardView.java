@@ -6,6 +6,8 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
 import android.graphics.Color;
+import android.graphics.ColorMatrix;
+import android.graphics.ColorMatrixColorFilter;
 import android.graphics.Paint;
 import android.graphics.Typeface;
 import android.text.Layout.Alignment;
@@ -199,6 +201,17 @@ public class CardView extends View {
 			// Get bitmap image for icon
 			mCahLogo = BitmapFactory.decodeResource(this.getContext().getResources(), R.drawable.icon_b);			
 		}
+	}
+	
+	/**
+	 * Makes the card fade red when the hand is locked.
+	 * 
+	 * @param percentageRed value from 0-100 that determines how strong the red color is on the card.
+	 */
+	public void setRedFadePercent(int percentageRed) {
+		int redValue = (int) ((((float)percentageRed)/100f) * 255f);
+		this.setBackgroundColor(Color.argb(255, (255-redValue)+redValue, 255-redValue, 255-redValue));
+
 	}
 
 }
