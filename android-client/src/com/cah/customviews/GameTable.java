@@ -16,14 +16,14 @@ public class GameTable extends ViewGroup {
 		super(context, attrs);
 		this.setWillNotDraw(false);
 		paint = new Paint();
-		paint.setColor(Color.WHITE);
+		paint.setColor(Color.LTGRAY);
 		paint.setStrokeWidth(1);
 	}
 
 	@Override
 	protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec){
 		int mMaxChildWidth = 0;
-       int  mMaxChildHeight = 0;
+        int mMaxChildHeight = 0;
  
         final int childWidthMeasureSpec = MeasureSpec.makeMeasureSpec(
                 MeasureSpec.getSize(widthMeasureSpec), MeasureSpec.AT_MOST);
