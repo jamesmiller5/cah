@@ -5,6 +5,8 @@ import android.graphics.Color;
 import android.os.Bundle;
 import android.text.SpannableString;
 import android.view.Menu;
+import android.view.View;
+import android.view.View.OnClickListener;
 import android.widget.FrameLayout;
 import android.widget.LinearLayout.LayoutParams;
 
@@ -12,6 +14,8 @@ import com.cah.customviews.CardView;
 
 public class CzarActivity extends Activity {
 
+	CardView card;
+	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
@@ -19,7 +23,7 @@ public class CzarActivity extends Activity {
 		
 		FrameLayout cardContainer = (FrameLayout) findViewById(R.id.czarCardViewContainer);
 		
-		CardView card = new CardView(this);
+		card = new CardView(this);
 		card.setCardColor(Color.BLACK);
 		card.setCardString(((SpannableString)this.getIntent().getExtras().get("CARD_TEXT")).toString());
 		
@@ -27,6 +31,7 @@ public class CzarActivity extends Activity {
 		card.setLayoutParams(lp);
 		
 		cardContainer.addView(card);
+		
 	}
 
 	@Override
