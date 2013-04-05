@@ -10,6 +10,7 @@ type Game struct {
 	playerInc    int
 	playerDeltas chan *PlayerDelta
 	deckDeltas   chan *DeckDelta
+	czar *Player
 }
 
 func NewGame() *Game {
@@ -24,21 +25,22 @@ func NewGame() *Game {
 
 func (game *Game) playRound() {
 
-	//pick czar
-	//pick black card
-	//wait for player input
-	//wait for czar input
+	//pick czar : Emit PlayerDelta{ "is-czar" }
+	//pick black card : Emit DeckDelta{ }
+	//wait for player input : foreach player-czar { get DeckDelta }
+	//wait for czar input : czar { get DeckDelta }
+	//send czar's choice : Emit DeckDelta { }
 	//win?
 	//deal up to x cards
 
 	select {
 	case pd := <-game.playerDeltas:
 		multicast := false
-		p := pd.fromPlayer
+		player := pd.fromPlayer
 		switch pd.Message {
 		case "my-id?":
 			//let this client know their id so they can join
-			p.toClientPlayerDeltas <- &PlayerDelta{Id: p.Id, Message: "your-id"}
+			player.outgoingPlayerDeltas <- &PlayerDelta{Id: player.Id, Message: "your-id"}
 		case "join":
 			//let this client join the game
 			//TODO: if they already existed, send them their cards
@@ -48,14 +50,17 @@ func (game *Game) playRound() {
 			for i := 0; i < 7; i++ {
 				cards = append(cards, GetNewWhiteCard())
 			}
-			p.toClientDeckDeltas <- &DeckDelta{Player: p.Id, DeckTo: "hand", DeckFrom: "draw", Cards: cards}
+			player.outgoingDeckDeltas <- &DeckDelta{Player: player.Id, DeckTo: "hand", DeckFrom: "draw", Cards: cards}
 
 			multicast = true
 		case "leave":
 			//remove from player list and reflect to others
+			/*
 			game.Lock()
 			delete(game.players, pd.Id)
 			game.Unlock()
+			*/
+			player.Shutdown();
 			multicast = true
 		default:
 			//error, should have been something above
@@ -64,13 +69,13 @@ func (game *Game) playRound() {
 		//If we should reflect this message to all players
 		if multicast {
 			for _, p := range game.players {
-				p.toClientPlayerDeltas <- pd
+				p.outgoingPlayerDeltas <- pd
 			}
 		}
 	case dd := <-game.deckDeltas:
 		game.RLock()
 		for _, p := range game.players {
-			p.toClientDeckDeltas <- dd
+			p.outgoingDeckDeltas <- dd
 		}
 		game.RUnlock()
 	}
@@ -90,7 +95,7 @@ func (game *Game) HandlePlayer(dec *NetDecoder, enc *NetEncoder) {
 	game.Unlock()
 
 	//Decode goroutine, sends messages to dealer
-	go me.DecodeMessages(game.playerDeltas, game.deckDeltas)
+	go me.DecodeDeltas(game.playerDeltas, game.deckDeltas)
 	//Encode our messages
-	me.EncodeMessages()
+	me.EncodeDeltas()
 }

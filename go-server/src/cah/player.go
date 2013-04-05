@@ -18,9 +18,7 @@ type PlayerDelta struct {
 }
 
 func (pd *PlayerDelta) isClean() bool {
-	if pd.Id < 0 ||
-		len(pd.Message) > 10 ||
-		playerDeltaMessages[pd.Message] != true {
+	if pd.Id < 0 || len(pd.Message) > 10 || playerDeltaMessages[pd.Message] != true {
 		log.Println("PlayerDelta is not clean")
 		return false
 	}
@@ -66,8 +64,8 @@ var deckDeltaDecks = map[string]bool{
 type Player struct {
 	Id                   int
 	quit                 chan bool
-	toClientPlayerDeltas chan *PlayerDelta
-	toClientDeckDeltas   chan *DeckDelta
+	outgoingPlayerDeltas chan *PlayerDelta
+	outgoingDeckDeltas   chan *DeckDelta
 	dec                  *NetDecoder
 	enc                  *NetEncoder
 	//TODO: add hand of cards
@@ -80,19 +78,23 @@ func NewPlayer(dec *NetDecoder, enc *NetEncoder, id int) *Player {
 		Id:                   id,
 		dec:                  dec,
 		enc:                  enc,
-		toClientPlayerDeltas: make(chan *PlayerDelta),
-		toClientDeckDeltas:   make(chan *DeckDelta),
+		outgoingPlayerDeltas: make(chan *PlayerDelta),
+		outgoingDeckDeltas:   make(chan *DeckDelta),
 		//We want 2 slots in case both goroutines quit at the same time
 		quit: make(chan bool, 2),
 	}
 }
 
-func (p *Player) LeaveMessage() *PlayerDelta {
-	return &PlayerDelta{Id: p.Id, Message: "leave"}
+func (p *Player) Shutdown() {
+	p.quit <- true;
+}
+
+func (p *Player) Leave() *PlayerDelta {
+	return &PlayerDelta{ Id: p.Id, Message: "leave", Delta:Delta{ fromPlayer: p }}
 }
 
 //Send decoded messages to arguments
-func (p *Player) DecodeMessages(toServerPlayerDeltas chan *PlayerDelta, toServerDeckDeltas chan *DeckDelta) {
+func (p *Player) DecodeDeltas(incomingPlayerDeltas chan *PlayerDelta, incomingDeckDeltas chan *DeckDelta) {
 	defer func() { p.quit <- true }()
 
 	for {
@@ -117,7 +119,7 @@ func (p *Player) DecodeMessages(toServerPlayerDeltas chan *PlayerDelta, toServer
 					goto exit
 				}
 
-				log.Println("Unknown Player.DecodeMessages decode error: " + err.Error())
+				log.Println("Unknown Player.DecodeCommands decode error: " + err.Error())
 				goto exit
 			}
 			p.dec.SetDeadline(time.Time{})
@@ -127,35 +129,34 @@ func (p *Player) DecodeMessages(toServerPlayerDeltas chan *PlayerDelta, toServer
 					goto exit
 				}
 				delta.Deck.fromPlayer = p
-				toServerDeckDeltas <- delta.Deck
+				incomingDeckDeltas <- delta.Deck
 			} else if delta.Player != nil {
 				if delta.Player.isClean() != true {
 					goto exit
 				}
 				delta.Player.fromPlayer = p
-				toServerPlayerDeltas <- delta.Player
+				incomingPlayerDeltas <- delta.Player
 			} else if delta.Keepalive == true {
 				//keep alive, reset counter and ignore
 			} else {
-				log.Println("Player.DecodeMessages: Unexpected message recieved")
+				log.Println("Player.DecodeCommands: Unexpected delta recieved")
 				goto exit
 			}
 		}
 	}
 exit:
-	toServerPlayerDeltas <- p.LeaveMessage()
+	incomingPlayerDeltas <- p.Leave()
 }
 
-func (p *Player) EncodeMessages() {
+func (p *Player) EncodeDeltas() {
 	defer func() { p.quit <- true }()
 
-	//message pump for this player
 	for {
 		select {
 		//pd update from dealer
-		case pd := <-p.toClientPlayerDeltas:
+		case pd := <-p.outgoingPlayerDeltas:
 			p.enc.Encode(pd)
-		case dd := <-p.toClientDeckDeltas:
+		case dd := <-p.outgoingDeckDeltas:
 			p.enc.Encode(dd)
 		case <-p.quit:
 			goto exit
