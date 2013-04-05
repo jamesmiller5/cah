@@ -63,8 +63,11 @@ public class CahPlayer {
 	public void handleIncomingMessages(BlockingQueue<Delta> incoming, BlockingQueue<Delta> outgoing) throws InterruptedException {
 		while( go.get() ) {
 			Delta incoming_message = incoming.take(); // This will block until something comes in.
+			// Print out debug information
 			System.out.println("in handleIncomingMessages(): " + incoming_message.toString());
 			this.showDebugText(incoming_message.toString());
+			
+			
 			Class<? extends Delta> c = incoming_message.getClass();
 			if(c == TableDelta.class){
 				//TODO: Implement this type of delta.

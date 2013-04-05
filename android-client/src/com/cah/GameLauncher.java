@@ -17,8 +17,12 @@ public class GameLauncher extends Activity {
 		setContentView(R.layout.activity_game_launcher);
 		
 		final Button createNewTableButton = (Button) findViewById(R.id.buttonCreateNewTable);
+		
 		final Button joinExistingTableButton = (Button) findViewById(R.id.buttonJoinExistingTable);
 		final EditText tableIdEditText = (EditText) findViewById(R.id.editTextTableId);
+		
+		final Button showCzarCardButton = (Button) findViewById(R.id.buttonShowCzarCard);
+		final EditText czarCardText = (EditText) findViewById(R.id.czarCardText);
 		
 		createNewTableButton.setOnClickListener(new OnClickListener() {
 			@Override
@@ -35,6 +39,15 @@ public class GameLauncher extends Activity {
 				Intent intent = new Intent(v.getContext(), Cah.class);
 				intent.putExtra("COMMAND", "join");
 				intent.putExtra("TABLE_ID", tableIdEditText.getText().toString());
+				startActivity(intent);
+			}
+		});
+		
+		showCzarCardButton.setOnClickListener(new OnClickListener() {
+			@Override
+			public void onClick(View v) {
+				Intent intent = new Intent(v.getContext(), CzarActivity.class);
+				intent.putExtra("CARD_TEXT", czarCardText.getText());
 				startActivity(intent);
 			}
 		});
