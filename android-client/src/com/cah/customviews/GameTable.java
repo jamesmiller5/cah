@@ -4,6 +4,9 @@ import android.content.Context;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
+import android.graphics.RadialGradient;
+import android.graphics.Shader;
+import android.graphics.SweepGradient;
 import android.util.AttributeSet;
 import android.view.View;
 import android.view.ViewGroup;
@@ -18,6 +21,8 @@ public class GameTable extends ViewGroup {
 		paint = new Paint();
 		paint.setColor(Color.LTGRAY);
 		paint.setStrokeWidth(1);
+		
+	//	paint.setShader(new RadialGradient(10f,100f,100f,Color.LTGRAY,Color.GRAY, Shader.TileMode.MIRROR));
 	}
 
 	@Override
@@ -56,12 +61,14 @@ public class GameTable extends ViewGroup {
 			int x =(int) (Math.cos(((2.0*Math.PI)/ (float)numberOfChildren)*(float)i)*(float)radius + this.getLeft()+(this.getWidth()/2));
 			int y = (int) (Math.sin(((2.0*Math.PI)/(float)numberOfChildren)*(float)i)*(float)radius + this.getTop()+(this.getHeight()/2));
 			toPosition.layout(x-(toPosition.getMeasuredWidth()/2), y-(toPosition.getMeasuredHeight()/2), x+(toPosition.getMeasuredWidth()/2), y+(toPosition.getMeasuredHeight()/2));
-		}
-		
+		}		
 	}
 	
-	@Override
 	protected void onDraw(Canvas canvas) {
+		
+		//Set shading for table
+		paint.setShader(new RadialGradient(this.getLeft()+(this.getWidth()/2), this.getTop()+(this.getHeight()/2), (this.getWidth()<this.getHeight()) ? this.getWidth()/3 : this.getHeight()/3, Color.LTGRAY,Color.GRAY, Shader.TileMode.MIRROR));
+
 		canvas.drawCircle(this.getLeft()+(this.getWidth()/2), this.getTop()+(this.getHeight()/2), (this.getWidth()<this.getHeight()) ? this.getWidth()/3 : this.getHeight()/3, paint);
 	}
 
