@@ -7,8 +7,8 @@
 
 	<com.cah.customviews.GameTable
 	    android:id="@+id/gameTable"
-        android:layout_width="match_parent"
-        android:layout_height="330dp" >
+	    android:layout_width="wrap_content"
+	    android:layout_height="274dp" >
 
     </com.cah.customviews.GameTable>
 

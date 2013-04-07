@@ -94,14 +94,14 @@ public class Cah extends Activity
 
 	private void addDummyPlayersAndCards() {
 		// Dynamically add 10 cards to the game.
-		String dummyCards[] = {"Pretending to be happy",
-				"Test, Test, Test, Test, Test, Test, Test, Test, Test!",
-				"This card should hang off the right side of the screen!",
-				"Bla bla bla",
-				"greetings cheese popsicle the number you have dialed is currently out of porkchops",
+		String dummyCards[] = {"Licking things to claim them as your own",
+				"Leaving an awkward voicemail.",
+				"50,000 volts straight to the nipples.",
+				"Panda Sex.",
+				"Fabricating Statistics.",
 				"friends dont let friends let scientific progress go boink",
-				"oh yeah alright were gonna shake it up with the party bear tonight",
-				"f of two equals f of one equals one",
+				"Finding Waldo.",
+				"Old-people smell.",
 				"oh hai im in ur computer eating your cheezburgers and CAHing your textz",
 				"how are you holding up because im a potato"};
 		for(int i = 0; i<dummyCards.length; i++) {
