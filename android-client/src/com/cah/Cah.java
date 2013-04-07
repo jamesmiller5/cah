@@ -116,7 +116,11 @@ public class Cah extends Activity
 			ImageView crownImageView = (ImageView)playerCard.findViewById(R.id.playerCrown);
 			if(i == 7)
 				crownImageView.setVisibility(View.VISIBLE);
-			QuickContactBadge playerPicture = (QuickContactBadge)playerCard.findViewById(R.id.playerBadge);
+	//		if(i==1){
+	//			TempContactBadge playerPicture = (TempContactBadge)playerCard.findViewById(R.id.playerBadge);
+	//		}else{
+				QuickContactBadge playerPicture = (QuickContactBadge)playerCard.findViewById(R.id.playerBadge);
+	//		}
 			table.addView(playerCard);
 		}
 	}
