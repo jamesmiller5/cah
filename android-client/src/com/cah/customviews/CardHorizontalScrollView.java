@@ -181,7 +181,8 @@ public class CardHorizontalScrollView extends HorizontalScrollView {
 				DisplayMetrics displayMetrics = new DisplayMetrics();
 				((WindowManager)context.getSystemService(Context.WINDOW_SERVICE)).getDefaultDisplay().getMetrics(displayMetrics);
 				float percentageOfScreenMoved = -((event.getRawY() - startingPoint.y)/displayMetrics.heightPixels) * 100;
-				System.out.println("percentageOfScreenMoved = "+ percentageOfScreenMoved);
+				
+				// Set colors/filters based on percentageOfScreenMoved
 				((CardView)cardToMove).setRedFadePercent((int)percentageOfScreenMoved);
 			}
 		}

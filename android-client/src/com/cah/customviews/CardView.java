@@ -6,7 +6,7 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
 import android.graphics.Color;
-import android.graphics.ColorMatrix;
+import android.graphics.ColorFilter;
 import android.graphics.ColorMatrixColorFilter;
 import android.graphics.Paint;
 import android.graphics.Typeface;
@@ -19,17 +19,17 @@ import android.view.View;
 import com.cah.Cah;
 import com.cah.R;
 
-/**
- * TODO: document your custom view class.
- */
 public class CardView extends View {
-	private String mCardText = "Test"; // TODO: use a default from R.string...
-	private int mTextColor = Color.BLACK; // TODO: Set this based on background color
+	private String mCardText = "Test";
+	private int mTextColor = Color.BLACK;
 	private int mCardColor = Color.WHITE;
 
 	private Bitmap mCahLogo;
 	private TextPaint mTextPaint;
 	private StaticLayout mTextLayout;
+	
+	private ColorFilter mColorFilter;
+	private Paint mCardPaint;
 	
 	private int mCardWidth;
 
@@ -60,6 +60,9 @@ public class CardView extends View {
 		int[] otherAttributes = {android.R.attr.layout_width};
 		final TypedArray w = getContext().obtainStyledAttributes(attrs,
 				otherAttributes, defStyle, 0);
+		
+		mCardPaint = new Paint();
+		mColorFilter = new ColorFilter();
 
 		if(this.isInEditMode() || attrs == null) {
 			mCardText = "This is an example card";
@@ -103,13 +106,13 @@ public class CardView extends View {
 	private void invalidateTextPaintAndMeasurements() {
 		mTextPaint.setTextSize(this.TEXT_SIZE);
 		mTextPaint.setColor(mTextColor);
-
-		Paint.FontMetrics fontMetrics = mTextPaint.getFontMetrics();
 	}
 	
 	@Override
 	protected void onDraw(Canvas canvas) {
 		super.onDraw(canvas);
+		
+		mCardPaint.setColorFilter(mColorFilter);
 		
 		if(mCardWidth < 0) {
 			mCardWidth = getWidth();
@@ -117,7 +120,7 @@ public class CardView extends View {
 		}
 
 		// TODO: consider storing these as member variables to reduce
-		// allocations per draw cycle.
+		// code run per draw cycle.
 		int paddingLeft = (int) (10. * DPI_MULTIPLIER);
 		int paddingTop = getPaddingTop();
 		int paddingRight = getPaddingRight();
@@ -134,7 +137,7 @@ public class CardView extends View {
 		// Draw the text.
 		//canvas.drawText(mCardText, paddingLeft, paddingTop + 50, mTextPaint);
 		canvas.translate((float)0, (float)0);
-		canvas.drawBitmap(mCahLogo, 0, (float) (this.getHeight()-mCahLogo.getHeight()-(37.5 * DPI_MULTIPLIER)), null);
+		canvas.drawBitmap(mCahLogo, 0, (float) (this.getHeight()-mCahLogo.getHeight()-(37.5 * DPI_MULTIPLIER)), mCardPaint);
 
 	}
 	
@@ -209,9 +212,15 @@ public class CardView extends View {
 	 * @param percentageRed value from 0-100 that determines how strong the red color is on the card.
 	 */
 	public void setRedFadePercent(int percentageRed) {
-		int redValue = (int) ((((float)percentageRed)/100f) * 255f);
-		this.setBackgroundColor(Color.argb(255, (255-redValue)+redValue, 255-redValue, 255-redValue));
-
+		int redValue = (int) ((((float)percentageRed)/100f) * 255f); // Value from 0-255 of the red level
+		this.setBackgroundColor(Color.argb(255, 255, 255-redValue, 255-redValue));
+		float[] colorMatrixArray = new float[] { 
+		        1, 1, 1, 1, 1, //red
+		        0, 0, 0, 0, 0, //green
+		        0, 0, 0, 0, 0, //blue
+		        1, 1, 1, 1, 1 //alpha;
+		    };
+		mColorFilter = new ColorMatrixColorFilter(colorMatrixArray);
 	}
 
 }
