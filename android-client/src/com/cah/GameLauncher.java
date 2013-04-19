@@ -1,6 +1,8 @@
 package com.cah;
 
 import android.app.Activity;
+import android.app.AlertDialog;
+import android.app.AlertDialog.Builder;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.Menu;
@@ -46,9 +48,9 @@ public class GameLauncher extends Activity {
 		showCzarCardButton.setOnClickListener(new OnClickListener() {
 			@Override
 			public void onClick(View v) {
-				Intent intent = new Intent(v.getContext(), CzarActivity.class);
-				intent.putExtra("CARD_TEXT", czarCardText.getText());
-				startActivity(intent);
+				AlertDialog.Builder dialogBuilder = new AlertDialog.Builder(GameLauncher.this);
+				dialogBuilder.setView(CzarActivity.getBlackCardView(czarCardText.getText().toString(), GameLauncher.this));
+				dialogBuilder.show();
 			}
 		});
 	}
