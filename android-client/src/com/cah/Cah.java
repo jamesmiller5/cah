@@ -52,6 +52,11 @@ public class Cah extends Activity
 		
 		super.onStop(); // Required!
 	}
+	
+	@Override
+	protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+		
+	}
 
 	public void addPlayerToTable(Bitmap playerBitmap, boolean isCzar) {
 		GameTable table = (GameTable)this.findViewById(R.id.gameTable);
