@@ -37,7 +37,7 @@ type DeckDelta struct {
 	Player   int
 	DeckTo   string
 	DeckFrom string
-	Cards    []string
+	Cards    []Card
 	Delta
 }
 
@@ -69,6 +69,7 @@ type Player struct {
 	dec                  *NetDecoder
 	enc                  *NetEncoder
 	//TODO: add hand of cards
+	hand				[]Card
 }
 
 const PLAYER_TIMEOUT = 10 * time.Minute
@@ -146,6 +147,10 @@ func (p *Player) DecodeDeltas(incomingPlayerDeltas chan *PlayerDelta, incomingDe
 	}
 exit:
 	incomingPlayerDeltas <- p.Leave()
+}
+
+func (p *Player) sendCards() {
+	//TODO: send cards
 }
 
 func (p *Player) EncodeDeltas() {

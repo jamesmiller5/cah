@@ -44,9 +44,12 @@ func (game *Game) playRound() {
 		case "join":
 			//let this client join the game
 			//TODO: if they already existed, send them their cards
+			game.RLock()
+			player.sendCards()
+			game.RUnlock()
 
 			// Give the new player a new hand of 7 cards
-			cards := []string{}
+			cards := []Card{}
 			for i := 0; i < 7; i++ {
 				cards = append(cards, GetNewWhiteCard())
 			}
@@ -63,7 +66,6 @@ func (game *Game) playRound() {
 			player.Shutdown();
 			multicast = true
 		default:
-			//error, should have been something above
 		}
 
 		//If we should reflect this message to all players
