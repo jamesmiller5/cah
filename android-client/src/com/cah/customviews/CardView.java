@@ -6,10 +6,12 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
 import android.graphics.Color;
-import android.graphics.ColorFilter;
 import android.graphics.ColorMatrixColorFilter;
+import android.graphics.LinearGradient;
 import android.graphics.Paint;
+import android.graphics.Shader.TileMode;
 import android.graphics.Typeface;
+import android.graphics.drawable.BitmapDrawable;
 import android.text.Layout.Alignment;
 import android.text.StaticLayout;
 import android.text.TextPaint;
@@ -24,11 +26,10 @@ public class CardView extends View {
 	private int mTextColor = Color.BLACK;
 	private int mCardColor = Color.WHITE;
 
-	private Bitmap mCahLogo;
+	private BitmapDrawable mCahLogo;
 	private TextPaint mTextPaint;
 	private StaticLayout mTextLayout;
 	
-	private ColorFilter mColorFilter;
 	private Paint mCardPaint;
 	
 	private int mCardWidth;
@@ -62,7 +63,6 @@ public class CardView extends View {
 				otherAttributes, defStyle, 0);
 		
 		mCardPaint = new Paint();
-		mColorFilter = new ColorFilter();
 
 		if(this.isInEditMode() || attrs == null) {
 			mCardText = "This is an example card";
@@ -100,7 +100,7 @@ public class CardView extends View {
 		int goalLogoWidth = (mCardWidth / 10) * 5;
 		int goalLogoHeight = (int) (goalLogoWidth/5.8);
 		System.out.println("Card width = " + goalLogoWidth + ", height = " + goalLogoHeight);
-		mCahLogo = Bitmap.createScaledBitmap(mCahLogo, goalLogoWidth, goalLogoHeight, false);
+		mCahLogo.setBounds(0,this.getHeight()-goalLogoHeight,goalLogoWidth,goalLogoHeight);
 	}
 
 	private void invalidateTextPaintAndMeasurements() {
@@ -111,8 +111,7 @@ public class CardView extends View {
 	@Override
 	protected void onDraw(Canvas canvas) {
 		super.onDraw(canvas);
-		
-		mCardPaint.setColorFilter(mColorFilter);
+				
 		
 		if(mCardWidth < 0) {
 			mCardWidth = getWidth();
@@ -137,8 +136,9 @@ public class CardView extends View {
 		// Draw the text.
 		//canvas.drawText(mCardText, paddingLeft, paddingTop + 50, mTextPaint);
 		canvas.translate((float)0, (float)0);
-		canvas.drawBitmap(mCahLogo, 0, (float) (this.getHeight()-mCahLogo.getHeight()-(37.5 * DPI_MULTIPLIER)), mCardPaint);
 
+		mCahLogo.setBounds(0,this.getBottom()-50, mCahLogo.getBounds().right, this.getBottom());
+		mCahLogo.draw(canvas);
 	}
 	
 	protected void onCardPlayed() {
@@ -197,12 +197,12 @@ public class CardView extends View {
 			mTextColor = Color.BLACK;
 			this.setBackgroundDrawable(this.getResources().getDrawable(R.drawable.card_background_white));
 			// Get bitmap image for icon
-			mCahLogo = BitmapFactory.decodeResource(this.getContext().getResources(), R.drawable.icon_w);
+			mCahLogo = new BitmapDrawable(BitmapFactory.decodeResource(this.getContext().getResources(), R.drawable.icon_w));
 		} else {
 			mTextColor = Color.WHITE;
 			this.setBackgroundDrawable(this.getResources().getDrawable(R.drawable.card_background_black));
 			// Get bitmap image for icon
-			mCahLogo = BitmapFactory.decodeResource(this.getContext().getResources(), R.drawable.icon_b);			
+			mCahLogo = new BitmapDrawable(BitmapFactory.decodeResource(this.getContext().getResources(), R.drawable.icon_b));			
 		}
 	}
 	
@@ -214,13 +214,6 @@ public class CardView extends View {
 	public void setRedFadePercent(int percentageRed) {
 		int redValue = (int) ((((float)percentageRed)/100f) * 255f); // Value from 0-255 of the red level
 		this.setBackgroundColor(Color.argb(255, 255, 255-redValue, 255-redValue));
-		float[] colorMatrixArray = new float[] { 
-		        1, 1, 1, 1, 1, //red
-		        0, 0, 0, 0, 0, //green
-		        0, 0, 0, 0, 0, //blue
-		        1, 1, 1, 1, 1 //alpha;
-		    };
-		mColorFilter = new ColorMatrixColorFilter(colorMatrixArray);
 	}
 
 }
