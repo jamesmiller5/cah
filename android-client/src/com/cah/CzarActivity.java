@@ -1,6 +1,7 @@
 package com.cah;
 
 import java.util.ArrayList;
+import java.util.Collection;
 
 import android.app.Activity;
 import android.content.Context;
@@ -8,6 +9,7 @@ import android.content.Intent;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.text.SpannableString;
+import android.util.Pair;
 import android.view.Gravity;
 import android.view.Menu;
 import android.view.View;
@@ -31,7 +33,7 @@ public class CzarActivity extends Activity {
 			int index = 0;
 			for(String cardText : whiteCards) {
 				Card card = new Card(Card.Color.WHITE, cardText);
-				this.addChoosableCardToHand(card, index++);
+				//this.addChoosableCardToHand(card, index++);
 			}
 		} else {
 			setContentView(R.layout.activity_czar);
@@ -67,36 +69,6 @@ public class CzarActivity extends Activity {
 		return cardContainer;
 	}
 
-	public void addChoosableCardToHand(Card card, final int index) {
-		LinearLayout cardContainer = (LinearLayout) findViewById(R.id.cardContainer);
-		CardView cv = new CardView(getApplicationContext());
-		cv.setCardString(card.text);
-		if(card.color == Card.Color.WHITE){
-			cv.setTextColor(Color.BLACK);
-			cv.setCardColor(Color.WHITE);
-		} else {
-			cv.setTextColor(Color.WHITE);
-			cv.setCardColor(Color.BLACK);
-		}
-		LayoutParams lp = new LayoutParams((int) (235* (this.getResources().getDisplayMetrics().densityDpi/160.)), (int) (300* (this.getResources().getDisplayMetrics().densityDpi/160.)));
-		cv.setLayoutParams(lp);
-		cv.setOnClickListener(new OnClickListener() {
-			@Override
-			public void onClick(View arg0) {
-				Bundle bundle = new Bundle();
-				bundle.putInt("CHOSEN_CARD", index);
-				Intent intent = new Intent();
-				intent.putExtras(bundle);
-				if(getParent() == null) {
-					setResult(Activity.RESULT_OK, intent);
-				} else {
-					getParent().setResult(Activity.RESULT_OK, intent);
-				}
-				finish();
-			}
-		});
-		cardContainer.addView(cv);
-	}
 	
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {

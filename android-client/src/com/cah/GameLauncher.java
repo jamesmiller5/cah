@@ -50,7 +50,25 @@ public class GameLauncher extends Activity {
 			public void onClick(View v) {
 				AlertDialog.Builder dialogBuilder = new AlertDialog.Builder(GameLauncher.this);
 				dialogBuilder.setView(CzarActivity.getBlackCardView(czarCardText.getText().toString(), GameLauncher.this));
-				dialogBuilder.show();
+				final AlertDialog dialog = dialogBuilder.show();
+				
+				new Thread(new Runnable() {
+					@Override
+					public void run() {
+						try {
+							Thread.sleep(5000);
+						} catch (InterruptedException e) {
+							// TODO Auto-generated catch block
+							e.printStackTrace();
+						}
+						runOnUiThread(new Runnable() {
+							@Override
+							public void run() {
+								dialog.dismiss();
+							}
+						});
+					}
+				}).start();
 			}
 		});
 	}
