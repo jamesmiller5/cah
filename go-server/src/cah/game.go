@@ -43,26 +43,17 @@ func (game *Game) playRound() {
 			player.outgoingPlayerDeltas <- &PlayerDelta{Id: player.Id, Message: "your-id"}
 		case "join":
 			//let this client join the game
+
 			//TODO: if they already existed, send them their cards
+
 			game.RLock()
 			player.sendCards()
 			game.RUnlock()
 
-			// Give the new player a new hand of 7 cards
-			cards := []Card{}
-			for i := 0; i < 7; i++ {
-				cards = append(cards, GetNewWhiteCard())
-			}
-			player.outgoingDeckDeltas <- &DeckDelta{Player: player.Id, DeckTo: "hand", DeckFrom: "draw", Cards: cards}
+			//TODO: send them the player list
 
 			multicast = true
 		case "leave":
-			//remove from player list and reflect to others
-			/*
-			game.Lock()
-			delete(game.players, pd.Id)
-			game.Unlock()
-			*/
 			player.Shutdown();
 			multicast = true
 		default:

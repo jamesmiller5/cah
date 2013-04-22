@@ -37,7 +37,7 @@ type DeckDelta struct {
 	Player   int
 	DeckTo   string
 	DeckFrom string
-	Cards    []Card
+	Cards    []*Card
 	Delta
 }
 
@@ -68,8 +68,7 @@ type Player struct {
 	outgoingDeckDeltas   chan *DeckDelta
 	dec                  *NetDecoder
 	enc                  *NetEncoder
-	//TODO: add hand of cards
-	hand				[]Card
+	hand				 *Deck
 }
 
 const PLAYER_TIMEOUT = 10 * time.Minute
@@ -83,6 +82,7 @@ func NewPlayer(dec *NetDecoder, enc *NetEncoder, id int) *Player {
 		outgoingDeckDeltas:   make(chan *DeckDelta),
 		//We want 2 slots in case both goroutines quit at the same time
 		quit: make(chan bool, 2),
+		hand: 				  NewDeck("hand", nil),
 	}
 }
 
@@ -150,7 +150,12 @@ exit:
 }
 
 func (p *Player) sendCards() {
-	//TODO: send cards
+	// Give the new player a new hand of 7 cards
+	cards := []*Card{}
+	for i := 0; i < 7; i++ {
+	    cards = append(cards, nil)
+	}
+	p.outgoingDeckDeltas <- &DeckDelta{Player: p.Id, DeckTo: "hand", DeckFrom: "draw", Cards: cards}
 }
 
 func (p *Player) EncodeDeltas() {
