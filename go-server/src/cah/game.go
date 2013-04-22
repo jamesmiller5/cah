@@ -35,23 +35,21 @@ func (game *Game) playRound() {
 
 	select {
 	case pd := <-game.playerDeltas:
-		multicast := false
+		multicast, me_to := false, false
 		player := pd.fromPlayer
 		switch pd.Message {
 		case "my-id?":
-			//let this client know their id so they can join
-			player.outgoingPlayerDeltas <- &PlayerDelta{Id: player.Id, Message: "your-id"}
+			player.sendYourId()
 		case "join":
-			//let this client join the game
-
+			game.RLock()
 			//TODO: if they already existed, send them their cards
 
-			game.RLock()
-			player.sendCards()
-			game.RUnlock()
+			//player.sendCards()
 
 			//TODO: send them the player list
+			player.sendPlayers(game.players)
 
+			game.RUnlock()
 			multicast = true
 		case "leave":
 			player.Shutdown();
@@ -62,6 +60,9 @@ func (game *Game) playRound() {
 		//If we should reflect this message to all players
 		if multicast {
 			for _, p := range game.players {
+				if !me_to && p == player {
+					continue
+				}
 				p.outgoingPlayerDeltas <- pd
 			}
 		}

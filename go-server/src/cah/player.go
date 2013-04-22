@@ -158,6 +158,19 @@ func (p *Player) sendCards() {
 	p.outgoingDeckDeltas <- &DeckDelta{Player: p.Id, DeckTo: "hand", DeckFrom: "draw", Cards: cards}
 }
 
+func (p *Player) sendPlayers( players map[int]*Player ) {
+	log.Println("Sending players")
+	for id,_ := range players {
+		if id != p.Id {
+			p.outgoingPlayerDeltas <- &PlayerDelta{Id: id, Message: "join"}
+		}
+	}
+}
+
+func (p *Player) sendYourId() {
+	p.outgoingPlayerDeltas <- &PlayerDelta{Id: p.Id, Message: "your-id"}
+}
+
 func (p *Player) EncodeDeltas() {
 	defer func() { p.quit <- true }()
 
