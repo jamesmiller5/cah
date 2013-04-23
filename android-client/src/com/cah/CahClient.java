@@ -80,16 +80,11 @@ public class CahClient extends Thread implements JsonDeserializer<Delta>, JsonSe
 			assert p2_table_reply.Command.equals("ok");
 			assert p2_table_reply.Id.equals(table_reply.Id);
 
-			// after we join, we should get information about all players at the table
-			PlayerDelta playersAtTableReply = (PlayerDelta) player2.incoming.take();
-			assert playersAtTableReply.Id == 1;
-			
 			//ask for an id for player 2
 			player2.outgoing.put(new PlayerDelta(0, "my-id?"));
 			PlayerDelta p2_id_reply = (PlayerDelta) player2.incoming.take();
 			assert p2_id_reply.Id == 2;
 			assert p2_id_reply.Message.equals("your-id");
-			
 
 			player2.outgoing.put(new PlayerDelta(2, "join"));
 			//TODO: get cards
