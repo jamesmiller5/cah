@@ -95,8 +95,8 @@ public class CahClient extends Thread implements JsonDeserializer<Delta>, JsonSe
 			//TODO: get cards
 
 			// after we join, we should get information about all players at the table
-			PlayerDelta playersAtTableReply = (PlayerDelta) player2.incoming.take();
-			assert playersAtTableReply.Id == 1;
+			PlayerDelta playersAtTableReply2 = (PlayerDelta) player2.incoming.take();
+			assert playersAtTableReply2.Id == 1;
 
 			// player1 should now see player 2 join
 			PlayerDelta p1_joining_of_p2 = (PlayerDelta) player1.incoming.take();
