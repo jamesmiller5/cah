@@ -1,52 +1,71 @@
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:gravity="center_horizontal"
+    android:orientation="vertical"
     tools:context=".GameLauncher" >
 
-    <Button
-        android:id="@+id/buttonCreateNewTable"
-        android:layout_width="wrap_content"
+    <TextView
+        android:id="@+id/titleTextView"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_alignParentLeft="true"
-        android:layout_alignParentTop="true"
-        android:text="Create New Table" />
+        android:layout_weight="1"
+        android:gravity="bottom"
+        android:textSize="50sp"
+        android:textColor="@android:color/white"
+        android:background="@android:color/black"
+        android:text="Cards\nAgainst\nHumanity" />
 
-    <Button
-        android:id="@+id/buttonJoinExistingTable"
-        android:layout_width="wrap_content"
+    <RelativeLayout 
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_alignParentLeft="true"
-        android:layout_below="@+id/buttonCreateNewTable"
-        android:text="Join Existing Table" />
+        android:layout_weight="1" >
 
-    <EditText
-        android:id="@+id/editTextTableId"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignTop="@+id/buttonJoinExistingTable"
-        android:layout_toRightOf="@+id/buttonJoinExistingTable"
-        android:hint="Enter table ID"
-        android:ems="10" >
+        <Button
+            android:id="@+id/buttonCreateNewTable"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentLeft="true"
+            android:layout_alignParentTop="true"
+            android:text="Create New Table" />
 
-        <requestFocus />
-    </EditText>
+        <Button
+            android:id="@+id/buttonJoinExistingTable"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentLeft="true"
+            android:layout_below="@+id/buttonCreateNewTable"
+            android:text="Join Existing Table" />
 
-    <Button
-        android:id="@+id/buttonShowCzarCard"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignParentLeft="true"
-        android:layout_below="@+id/buttonJoinExistingTable"
-        android:text="Show Demo Czar View (5 seconds)" />
+        <EditText
+            android:id="@+id/editTextTableId"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignTop="@+id/buttonJoinExistingTable"
+            android:layout_toRightOf="@+id/buttonJoinExistingTable"
+            android:ems="10"
+            android:hint="Enter table ID" >
 
-    <EditText
-        android:id="@+id/czarCardText"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignParentLeft="true"
-        android:layout_below="@+id/buttonShowCzarCard"
-        android:hint="Enter text to appear on Czar card."
-        android:ems="10" />
+            <requestFocus />
+        </EditText>
 
-</RelativeLayout>
+        <Button
+            android:id="@+id/buttonShowCzarCard"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentLeft="true"
+            android:layout_below="@+id/buttonJoinExistingTable"
+            android:text="Show Demo Czar View (5 seconds)" />
+
+        <EditText
+            android:id="@+id/czarCardText"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentLeft="true"
+            android:layout_below="@+id/buttonShowCzarCard"
+            android:ems="10"
+            android:hint="Enter text to appear on Czar card." />
+    </RelativeLayout>
+
+</LinearLayout>
