@@ -1,6 +1,8 @@
 package com.cah;
 
 import java.util.Arrays;
+import java.util.List;
+import java.util.ArrayList;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.atomic.AtomicBoolean;
 
@@ -10,7 +12,6 @@ import android.content.Intent;
 import android.widget.TextView;
 
 import com.cah.datastructures.Card;
-import com.cah.datastructures.Player;
 
 /**
  * Class that handles all gameplay interactions with the UI
@@ -25,6 +26,7 @@ public class CahPlayer {
 	int playerId;
 	boolean playerIsCzar = false;
 	Thread messageHandler;
+	public final static List<Player> currentList = new ArrayList<Player>();
 
 	/**
 	 * 
@@ -37,8 +39,9 @@ public class CahPlayer {
 		this.cahActivity = cahActivity;
 		this.client = client;
 		this.tableID = tableToJoin;
+		
 
-		Cah.performOnBackgroundThread(new Runnable() {
+	    Cah.performOnBackgroundThread(new Runnable() {
 
 			@Override
 			public void run() {
@@ -107,6 +110,7 @@ public class CahPlayer {
 					outgoing.put(new PlayerDelta(this.playerId, "join"));
 				} else if (delta.Id != this.playerId && delta.Message.equals("join")){
 					// Another player has joined the table
+					playerJoined(delta.Id, false);
 					cahActivity.runOnUiThread(new Runnable() {
 						@Override
 						public void run() {
@@ -114,8 +118,10 @@ public class CahPlayer {
 						}
 					});
 				} else if (delta.Message.equals("is-czar")) {
-					if(delta.Id == this.playerId)
+					if(delta.Id == this.playerId){
 						this.playerIsCzar = true;
+						playerBecomesCzar(delta.Id);
+					}
 					else
 						this.playerIsCzar = false;
 				}
@@ -143,6 +149,19 @@ public class CahPlayer {
 			}
 		}
 	}
+	
+	public class Player { 
+		public final int id;
+		public boolean czar;
+		
+		public Player(int playerId, boolean isCzar) {
+			this.id = playerId;
+			this.czar = isCzar;
+		
+		}
+
+	}
+	
 
 	public void shutdown() {
 		go.set(false);
@@ -190,8 +209,9 @@ public class CahPlayer {
 	 * @param player
 	 *            The player that joined
 	 */
-	public void playerJoined(Player player) {
+	public void playerJoined(int id, boolean isCzar) {
 		// TODO: Implement this function.
+		currentList.add(new Player(id, isCzar));
 	}
 
 	/**
@@ -201,8 +221,18 @@ public class CahPlayer {
 	 * @param player
 	 *            The player that left
 	 */
-	public void playerLeft(Player player) {
+	public void playerLeft(int id) {
 		// TODO: Implement this function.
+		//loop through currentList to find correct id and delete that member from the list
+		for (int i = 0; i < currentList.size(); i++) {
+			Player player = currentList.get(i);
+			if (player.id == id) { 
+				currentList.remove(i);
+				break;
+			}
+			else { System.out.println("Player does not exist in list");}
+		}
+		
 	}
 
 	/**
@@ -212,8 +242,16 @@ public class CahPlayer {
 	 * @param player
 	 *            The player that is now the czar
 	 */
-	public void playerIsCzar(Player player) {
+	public void playerBecomesCzar(int id) {
 		// TODO: Implement this function.
+		//loop through list to find the correct id and change the isCzar variable for that Player object to be true
+		for (int i = 0; i < currentList.size(); i++) {
+			Player player = currentList.get(i);
+			if (player.id == id) {
+				player.czar = true;
+			}
+			else { System.out.println("Player does not exist in list");}
+		}
 	}
 
 	public void showError(final String error, final String errorMessage) {
