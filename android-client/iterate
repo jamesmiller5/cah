@@ -3,7 +3,7 @@ ANDROID_PATH=$( cd "$( dirname "$0" )" && pwd )
 ANDROID_TARGET="android-8"
 NAME="CAH"
 PACKAGE="com.cah"
-ACTIVITY=Cah
+ACTIVITY=GameLauncher
 
 function clean {
 	#fix for multi-user environment
