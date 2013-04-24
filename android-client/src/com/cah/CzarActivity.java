@@ -48,10 +48,6 @@ public class CzarActivity extends Activity {
 			card.setLayoutParams(lp);
 			cardContainer.addView(card);
 		}
-		
-		
-		
-		
 	}
 	
 	public static View getBlackCardView(String cardText, Context context) {
@@ -69,7 +65,6 @@ public class CzarActivity extends Activity {
 		return cardContainer;
 	}
 
-	
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {
 		// Inflate the menu; this adds items to the action bar if it is present.

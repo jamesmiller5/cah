@@ -223,7 +223,6 @@ public class CahPlayer {
 		}
 	}
 	
-
 	public void shutdown() {
 		go.set(false);
 		messageHandler.interrupt();

@@ -46,7 +46,6 @@ public class GameLauncher extends Activity {
 				startActivity(intent);
 			}
 		});
-		
 	}
 
 	@Override
@@ -55,5 +54,4 @@ public class GameLauncher extends Activity {
 		getMenuInflater().inflate(R.menu.activity_game_launcher, menu);
 		return true;
 	}
-
 }
