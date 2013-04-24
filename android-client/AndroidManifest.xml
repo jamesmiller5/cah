@@ -13,10 +13,10 @@
 
     <application
         android:allowBackup="true"
-        android:label="@string/app_name" >
+        android:label="@string/app_name" android:icon="@drawable/cardsaww">
         <activity
             android:name="com.cah.Cah"
-            android:icon="@drawable/droid_small"
+            android:icon="@drawable/cardsaww"
             android:label="Cards Against Humanity Table Debug"
             android:screenOrientation="portrait"
             android:theme="@android:style/Theme.Black.NoTitleBar.Fullscreen" >
