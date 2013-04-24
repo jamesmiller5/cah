@@ -1,6 +1,9 @@
 package cah
 
-var wcList = []Card{"A vagina that leads to another dimension.", "A cat video so cute that your eyes roll back and your spine slides out of your anus.", "Going around punching people.", "The systematic destruction of an entire people and their way of life.", "Filling every orifice with butterscotch pudding.", "Slapping a racist old lady.", "Actually getting shot, for real.", "My manservant, Claude.", "Girls that always be textin'.", "A surprising amount of hair.", "Eating Tom Selleck's mustache to gain his powers.", "Samuel L. Jackson.", "An ass disaster.", "Indescribable loneliness.", "Blood farts.", "Unlimited soup, salad, and breadsticks.", "Mufasa's death scene.", "Chugging a lava lamp.", "A cop who is also a dog.", "Spending lots of money.", "A spontaneous conga line.", "The land of chocolate.", "Fisting.", "Cock.", "Crying into the pages of Sylvia Plath.", "Self-flagellation.", "The moist, demanding chasm of his mouth.", "The Harlem Globetrotters.", "Putting an entire peanut butter and jelly sandwich into the VCR.",
+import "fmt"
+import "math/rand"
+
+var wcList = []string{"A vagina that leads to another dimension.", "A cat video so cute that your eyes roll back and your spine slides out of your anus.", "Going around punching people.", "The systematic destruction of an entire people and their way of life.", "Filling every orifice with butterscotch pudding.", "Slapping a racist old lady.", "Actually getting shot, for real.", "My manservant, Claude.", "Girls that always be textin'.", "A surprising amount of hair.", "Eating Tom Selleck's mustache to gain his powers.", "Samuel L. Jackson.", "An ass disaster.", "Indescribable loneliness.", "Blood farts.", "Unlimited soup, salad, and breadsticks.", "Mufasa's death scene.", "Chugging a lava lamp.", "A cop who is also a dog.", "Spending lots of money.", "A spontaneous conga line.", "The land of chocolate.", "Fisting.", "Cock.", "Crying into the pages of Sylvia Plath.", "Self-flagellation.", "The moist, demanding chasm of his mouth.", "The Harlem Globetrotters.", "Putting an entire peanut butter and jelly sandwich into the VCR.",
 "Letting everyone down.", "Not contributing to society in any meaningful way.", "A black male in his early 20s, last seen wearing a hoodie.", "All my friends dying.", "Warm, velvety muppet sex.", "Dying alone and in pain.", "Bill Clinton, naked on a bearskin rug with a saxophone.", "A boo-boo.", "A greased-up Matthew McConaughey.", "Drinking ten 5-hour ENERGY(R)s to get 50 continuous hours of energy.", "An all-midget production of Shakespeare's Richard III.", "Some douche with an acoustic guitar.", "Disco fever.", "Screaming like a maniac.", "Flying robots that kill people.", "A botched circumcision.", "Jumping out at people.", "That ass.", "Demonic possession.", "Vomiting mid-blowjob.", "Sneezing, farting, and coming at the same time.", "Three months in the hole.", "Having sex on top of a pizza.", "A pile of squirming bodies.", "Blowing some dudes in an alley.", "Getting your dick stuck in a Chinese finger trap with another dick.", "The entire Internet.", "The primal, ball-slapping sex your parents are having right now.",
 "Buying the right pants to be cool.", "The thin veneer of situational causality that underlies porn.", "Velcro(TM).", "Reverse cowgirl.", "The Quesadilla Explosion Salad(TM) from Chili.s(R).", "Nothing.", "An unstoppable wave of fire ants.", "Having shotguns for legs.", "Shutting the fuck up.", "The way white people is.", "A PowerPoint presentation.", "Roland the Farter, flatulist to the king.", "Vietnam flashbacks.", "A lamprey swimming up the toilet and latching onto your taint.", "Some kind of bird man.", "Running naked through a mall, pissing and shitting everywhere.", "Gay aliens.", "Not having sex.", "A bucket of fish heads.", "Silence.", "A sausage festival.", "An honest cop with nothing left to lose.", "Famine.", "Flesh-eating bacteria.", "Flying sex snakes.", "Not giving a shit about the Third World.", "Sexting.", "Shapeshifters.", "Porn stars.", "Raping and pillaging.", "72 virgins.", "A live studio audience.", "A time travel paradox.", "Authentic Mexican cuisine.", "Bling.", "Synergistic management solutions.", "Crippling debt.", "Daddy issues.", "Used panties.", "Dropping a chandelier on your enemies and riding the rope up.", "Former President George W. Bush.", "Full frontal nudity.", "Hormone injections.", "Laying an egg.", "Getting naked and watching Nickelodeon.", "Pretending to care.", "Public ridicule.", "Sharing needles.", "Boogers.", "The inevitable heat death of the universe.", "The miracle of childbirth.", "The Rapture.", "Whipping it out.", "White privilege.", "Wifely duties.", "The Hamburglar.", "AXE Body Spray.", "The Blood of Christ.", "Horrifying laser hair removal accidents.", "BATMAN!!!", "Agriculture.", "A robust mongoloid.", "Natural selection.", "Coat hanger abortions.", "Eating all of the cookies before the AIDS bake-sale.", "Michelle Obama's arms.", "The World of Warcraft.", "Swooping.", "Obesity.", "A homoerotic volleyball montage.", "Lockjaw.", "A mating display.", "Testicular torsion.", "All-you-can-eat shrimp for $4.99.", "Domino's(TM) Oreo(TM) Dessert Pizza.", "Kanye West.", "Hot cheese.",
 "Raptor attacks.", "Taking off your shirt.", "Smegma.", "Alcoholism.", "A middle-aged man on roller skates.", "The Care Bear Stare.", "Bingeing and purging.", "Oversized lollipops.", "Self-loathing.", "Children on leashes.", "Half-assed foreplay.", "The Holy Bible.", "German dungeon porn.", "Being on fire.", "Teenage pregnancy.", "Gandhi.", "Leaving an awkward voicemail.", "An uppercut.", "A pyramid of severed heads.", "An erection that lasts longer than four hours.", "My genitals.", "Picking up girls at the abortion clinic.", "Science.", "Not reciprocating oral sex.", "Flightless birds.", "A good sniff.", "50,000 volts straight to the nipples.", "A balanced breakfast.", "Historically black colleges.", "Actually taking candy from a baby.", "The Make-A-Wish(R) Foundation.", "A tribe of warrior women.", "Passive-aggressive Post-it notes.", "The Chinese gymnastics team.", "Switching to Geico(R).", "Peeing a little bit.", "Home video of Oprah sobbing into a Lean Cuisine(R).", "Wet dreams.", "The Jews.", "My humps.",
@@ -16,7 +19,7 @@ var wcList = []Card{"A vagina that leads to another dimension.", "A cat video so
 "Historical revisionism.", "A woman scorned.", "24-hour media coverage.", "Being a dinosaur.", "George Clooney's musk.", "A crappy little hand.", "A beached whale.", "Apologizing.", "A passionate Latino lover.", "Being a busy adult with many important things to do.", "Gladiatorial combat.", "Getting in her pants, politely.", "Mad hacky-sack skills.", "Santa Claus.", "A bloody pacifier.", "Finding a skeleton.", "Fabricating statistics.", "My machete.", "Ripping into a man's chest and pulling out his still-beating heart.", "Syphilitic insanity.", "A low standard of living.", "Deflowering the princess.", "Panty raids.", "Statistically validated stereotypes.", "Medieval Times(R) Dinner & Tournament.", "Genetically engineered super-soldiers.", "Quivering jowls.", "Bosnian chicken farmers.", "Salvia.", "Carnies.", "The harsh light of day.", "Gandalf.", "A rival dojo.", "A bigger, blacker dick.", "A sad fat dragon with no friends.", "The mere concept of Applebee's(R).", "Catastrophic urethral trauma.", "Hillary Clinton's death stare.",
 "Existing.", "Mooing.", "Swiftly achieving orgasm.", "Daddy's belt.", "Double penetration.", "Weapons-grade plutonium.", "Some really fucked-up shit.", "Subduing a grizzly bear and making her your wife.", "Rising from the grave.", "The mixing of the races.", "Taking a man's eyes and balls out and putting his eyes where his balls go and then his balls in the eye holes.", "Scrotal frostbite.", "All of this blood.", "Loki, the trickster god.", "Whining like a little bitch.", "Pumping out a baby every nine months.", "Tongue.", "Finding Waldo.", "Upgrading homeless people to mobile hotspots.", "Wearing an octopus for a hat.", "An unhinged ferris wheel rolling toward the sea.", "Living in a trashcan.", "The corporations.", "A magic hippie love cloud.", "Fuck Mountain.", "Survivor's guilt.", "Me.", "Getting hilariously gang-banged by the Blue Man Group.", "Jeff Goldblum.", "Making a friend.", "A soulful rendition of 'Ol' Man River.'", "Intimacy problems.", "A sweaty, panting leather daddy.", "Spring break!", "Being awesome at sex.",
 "Dining with cardboard cutouts of the cast of 'Friends.'", "Another shot of morphine.", "Beefin' over turf.", "A squadron of moles wearing aviator goggles.", "Bullshit.", "The Google.", "Pretty Pretty Princess Dress-Up Board Game.", "The new Radiohead album.", "An army of skeletons.", "A man in yoga pants with a ponytail and feather earrings.", "Mild autism.", "Nunchuck moves.", "Whipping a disobedient slave.", "An ether-soaked rag.", "A sweet spaceship.", "A 55-gallon drum of lube.,", "Special musical guest, Cher.", "The human body.", "Boris the Soviet Love Hammer.", "The grey nutrient broth that sustains Mitt Romney.", "Tiny nipples.", "Power.", "Oncoming traffic.", "A dollop of sour cream.", "A slightly shittier parallel universe.", "My first kill.", "Graphic violence, adult language, and some sexual content.", "Fetal alcohol syndrome.", "The day the birds attacked.", "One Ring to rule them all.", "Grandpa's ashes.", "Basic human decency.", "A Burmese tiger pit.", "Death by Steven Seagal."}
-var bcList = []Card{"_____________. Awesome in theory, kind of a mess in practice.", "A successful job interview begins with a firm handshake and ends with _____________.", "And what did _you_ bring for show-and-tell?", "As part of his contract, Prince won't perform without _____________ in his dressing room.", "As part of his daily regimen, Anderson Cooper sets aside 15 minutes for _____________.", "Call the law offices of Goldstein and Goldstein, because no one should have to tolerate  _____________ in the workplace.", "During high school, I never really fit in until I found _____________ Club.", "Finally! A service that delivers _____________ right to your door.", "Hey baby, come back to my place and I'll show you _____________.", "I'm not like the rest of you. I'm too rich and busy for _____________.", "In the seventh circle of Hell, sinners must endure _____________ for all eternity.", "Lovin' you is easy 'cause you're _____________.", "Money can't buy me love, but it can buy me _____________.",
+var bcList = []string{"_____________. Awesome in theory, kind of a mess in practice.", "A successful job interview begins with a firm handshake and ends with _____________.", "And what did _you_ bring for show-and-tell?", "As part of his contract, Prince won't perform without _____________ in his dressing room.", "As part of his daily regimen, Anderson Cooper sets aside 15 minutes for _____________.", "Call the law offices of Goldstein and Goldstein, because no one should have to tolerate  _____________ in the workplace.", "During high school, I never really fit in until I found _____________ Club.", "Finally! A service that delivers _____________ right to your door.", "Hey baby, come back to my place and I'll show you _____________.", "I'm not like the rest of you. I'm too rich and busy for _____________.", "In the seventh circle of Hell, sinners must endure _____________ for all eternity.", "Lovin' you is easy 'cause you're _____________.", "Money can't buy me love, but it can buy me _____________.",
 "My gym teacher got fired for adding _____________ to the obstacle course.", "The blind date was going horribly until we discovered our shared interest in _____________.", "To prepare for his upcoming role, Daniel Day-Lewis immersed himself in the world of _____________.", "Turns out that _____________-Man was neither the hero we needed nor wanted.", "What left this stain on my couch?", "What's the most emo?", "Here is the church / Here is the steeple / Open the doors / And there is _____________.", "Daddy, why is mommy crying?", "During his childhood, Salvador Dali produced hundreds of paintings of _____________.", "How did I lose my virginity?", "In 1,000 years, when paper money is a distant memory, how will we pay for goods and services?", "The Smithsonian Museum of Natural History has just opened an interactive exhibit on _____________.", "TSA guidelines now prohibit _____________ on airplanes.", "It's a pity that kids these days are all getting involved with _____________.", "Major League Baseball has banned _____________ for giving players an unfair advantage.",
 "What is Batman's guilty pleasure?", "Next from J.K. Rowling: Harry Potter and the Chamber of _____________.", "I'm sorry, Professor, but I couldn't complete my homework because of _____________.", "What did I bring back from Mexico?", "_____________. Betcha can't have just one!", "What's my anti-drug?", "While the United States raced the Soviet Union to the moon, the Mexican government funneled millions of pesos into research on _____________.", "In the new Disney Channel Original Movie, Hannah Montana struggles with _____________ for the first time.", "What's my secret power?", "What's the new fad diet?", "What did Vin Diesel eat for dinner?", "When Pharaoh remained unmoved, Moses called down a Plague of _____________.", "How am I maintaining my relationship status?", "In L.A. County Jail, word is you can trade 200 cigarettes for _____________.", "After the earthquake, Sean Penn brought _____________ to the people of Haiti.", "Instead of coal, Santa now gives the bad children _____________.",
 "Life for American Indians was forever changed when the White Man introduced them to _____________.", "What's Teach for America using to inspire inner city students to succeed?", "Maybe she's born with it. Maybe it's _____________.", "In Michael Jackson's final moments, he thought about _____________.", "White people like _____________.", "Why do I hurt all over?", "A romantic, candlelit dinner would be incomplete without _____________.", "What will I bring back in time to convince people that I am a powerful wizard?", "BILLY MAYS HERE FOR _____________.", "The class field trip was completely ruined by _____________.", "What's a girl's best friend?", "Dear Abby, I'm having some trouble with _____________ and would like your advice.", "When I am President of the United States, I will create the Department of _____________.", "What are my parents hiding from me?", "What never fails to liven up the party?", "What gets better with age?", "_____________: Good to the last drop.", "I got 99 problems but _____________ ain't one.",
@@ -27,22 +30,108 @@ var bcList = []Card{"_____________. Awesome in theory, kind of a mess in practic
 "Tonight on 20/20: What you don't know about _____________ could kill you."}
 
 //for now a "Card" is just a string, maybe later we'll mark them differently
-type Card string
-
-var whiteCardIndex = 0
-var wcListLength = len(wcList)
-
-var blackCardIndex = 0
-var bcListLength = len(bcList)
-
-func GetNewWhiteCard() Card {
-	toReturn := wcList[whiteCardIndex%wcListLength]
-	whiteCardIndex++
-	return toReturn
+//type Card string
+type Card struct {
+	string
 }
 
-func GetNewBlackCard() Card {
-	toReturn := bcList[blackCardIndex%bcListLength]
-	blackCardIndex++
-	return toReturn
+type Deck struct {
+	cards map[*Card]bool
+	name string
+}
+
+func NewDeck(name string, init []*Card) *Deck {
+	deck := &Deck{ cards: make(map[*Card]bool), name: name}
+	if init != nil {
+		for _, item := range init {
+			deck.cards[item] = true
+		}
+	}
+
+	return deck
+}
+
+func (deck *Deck) remove(card *Card) (has bool) {
+	var ok bool
+	has, ok = deck.cards[card]
+	if !ok {
+		panic("Tried to remove a card that doesn't exist!")
+	}
+	delete(deck.cards, card)
+	return
+}
+
+func (deck *Deck) add(card *Card) (has bool) {
+	has = deck.cards[card]
+
+	deck.cards[card] = true
+	return
+}
+
+//Safetly check if a card exists
+func (deck *Deck) has(card *Card) (has bool) {
+	has, _ = deck.cards[card]
+	return
+}
+
+func TransferSome(from *Deck, to *Deck, tomove []*Card) (ret *DeckDelta, err bool) {
+	ret = &DeckDelta{ Player: 0, DeckTo: to.name, DeckFrom: from.name, Cards: tomove }
+	//check for trouble
+	for _, item := range tomove {
+		if from.has(item) != true {
+			err = true
+			return
+		}
+		if to.has(item) == true {
+			err = true
+			return
+		}
+	}
+	//commit change
+	for _, item := range tomove {
+		from.remove(item)
+		to.add(item)
+	}
+	return
+}
+
+func TransferAll(from *Deck, to *Deck) (ret *DeckDelta) {
+	for item := range from.cards {
+		from.remove(item)
+		to.add(item)
+	}
+	ret = &DeckDelta{ Player: 0, DeckTo: to.name, DeckFrom: from.name, Cards: nil }
+	return
+}
+
+func (deck *Deck) randomCards() (randomList []*Card) {
+	//make enough room for all the cards
+	randomList = make([]*Card, len(deck.cards))
+	count := 0
+	//fill randomList with *Card
+	for item := range deck.cards {
+		randomList[count] = item
+		count++
+	}
+	//shuffle list
+	for i := cap(randomList) - 1; i > 0; i-- {
+		r := rand.Int() % i
+		randomList[r], randomList[i] = randomList[i], randomList[r]
+	}
+
+	return
+}
+
+func testdeck() {
+	list_one, list_two := []*Card{{"Hi"}, {"there"}}, []*Card{{"I'm"}, {"James"}}
+	deck_left := NewDeck("list-one", list_one)
+	deck_right := NewDeck("list-two", list_two)
+
+	fmt.Println("Before", deck_left, deck_right)
+	deck := TransferAll(deck_left, deck_right)
+	fmt.Println("After", deck_left, deck_right)
+
+	fmt.Println("DeckDelta:", deck)
+
+	fmt.Println("Shuffle", deck_right.randomCards())
 }

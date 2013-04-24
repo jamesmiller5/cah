@@ -38,7 +38,7 @@
         android:layout_height="wrap_content"
         android:layout_alignParentLeft="true"
         android:layout_below="@+id/buttonJoinExistingTable"
-        android:text="Show Demo Czar View" />
+        android:text="Show Demo Czar View (5 seconds)" />
 
     <EditText
         android:id="@+id/czarCardText"

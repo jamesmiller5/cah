@@ -67,6 +67,10 @@ public class CahClient extends Thread implements JsonDeserializer<Delta>, JsonSe
 			assert id_reply.Id == 1;
 			assert id_reply.Message.equals("your-id");
 
+			//join the game
+			player1.outgoing.put(new PlayerDelta(1, "join"));
+			//TODO: get cards from server
+
 			//start player 2
 			player2.start();
 
@@ -82,8 +86,21 @@ public class CahClient extends Thread implements JsonDeserializer<Delta>, JsonSe
 			assert p2_id_reply.Id == 2;
 			assert p2_id_reply.Message.equals("your-id");
 
+			player2.outgoing.put(new PlayerDelta(2, "join"));
+			//TODO: get cards
+
+			// after we join, we should get information about all players at the table
+			PlayerDelta playersAtTableReply2 = (PlayerDelta) player2.incoming.take();
+			assert playersAtTableReply2.Id == 1;
+
+			// player1 should now see player 2 join
+			PlayerDelta p1_joining_of_p2 = (PlayerDelta) player1.incoming.take();
+			assert p1_joining_of_p2.Id == 2;
+			assert p1_joining_of_p2.Message.equals("join");
+
 			//have player 1 leave and see player 2's update
 			System.out.println("Player 1 is disconnecting, should show up on player 2");
+			Thread.sleep(1000);
 
 			//Assert that player2 saw that player1 left the game
 			player1.shutdown();
@@ -184,7 +201,7 @@ public class CahClient extends Thread implements JsonDeserializer<Delta>, JsonSe
 		while( go.get() ) {
 			try {
 				Delta message_out = outgoing.take();
-				//System.out.println("Message_out: " + message_out);
+				System.out.println("Message_out: " + message_out);
 				gson.toJson(message_out, Delta.class, writer);
 				writer.flush(); //Flush writer to ensure message delivery asap
 			} catch (InterruptedException e ) {
@@ -198,7 +215,7 @@ public class CahClient extends Thread implements JsonDeserializer<Delta>, JsonSe
 		while( go.get() ) {
 			//block and wait for messages from Socket
 			Delta message_in = gson.fromJson(reader, Delta.class);
-			//System.out.println("Message_in: " + message_in);
+			System.out.println("Message_in: " + message_in);
 			try {
 				incoming.put( message_in );
 			} catch (InterruptedException e ) {
@@ -267,6 +284,8 @@ abstract class Delta {
 				}
 			} catch ( IllegalAccessException ex ) {
 				System.out.println(ex);
+			} catch ( NullPointerException ex ) {
+				result.append("<null>");
 			}
 			result.append(newLine);
 		}

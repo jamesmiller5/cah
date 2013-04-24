@@ -1,16 +1,23 @@
 package com.cah;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.util.ArrayList;
+import java.util.Collection;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import android.app.AlertDialog;
-import android.app.AlertDialog.Builder;
-import android.content.Intent;
+import android.content.Context;
+import android.graphics.Color;
+import android.util.Pair;
+import android.view.View;
+import android.view.View.OnClickListener;
+import android.widget.LinearLayout;
 import android.widget.TextView;
+import android.widget.LinearLayout.LayoutParams;
 
+import com.cah.customviews.CardView;
 import com.cah.datastructures.Card;
 
 /**
@@ -24,7 +31,10 @@ public class CahPlayer {
 	final CahClient client;
 	String tableID;
 	int playerId;
+	int numberOfPlayers = 0;
 	boolean playerIsCzar = false;
+	AlertDialog czarDialog;
+	ArrayList<Pair<Integer, String>> czarWhiteCards = new ArrayList<Pair<Integer, String>>();
 	Thread messageHandler;
 	public final static List<Player> currentList = new ArrayList<Player>();
 
@@ -95,12 +105,20 @@ public class CahPlayer {
 						addCardToHand(new Card(Card.Color.WHITE, cardText));
 					}
 				} else if (delta.DeckTo.equals("czar-hand") && delta.DeckFrom.equals("draw") && this.playerIsCzar == true) {
-					// Launch CzarActivity showing only the black card.
+					// Show AlertDialog showing only the black card.
 					AlertDialog.Builder dialogBuilder = new AlertDialog.Builder(cahActivity);
 					dialogBuilder.setView(CzarActivity.getBlackCardView(delta.Cards[0], cahActivity));
 					dialogBuilder.setCancelable(false);
-					dialogBuilder.show();
+					czarDialog = dialogBuilder.show();
 					//TODO: Dismiss the dialog when we recieve all player's white cards.
+				} else if (delta.DeckTo.equals("play") && this.playerIsCzar == true) {
+					for(String card : delta.Cards){
+						czarWhiteCards.add(new Pair<Integer, String>(delta.Player, card));
+					}
+					if(czarWhiteCards.size() == numberOfPlayers-1) {
+						// All players have played a card. Czar should now choose best card.
+						showWhiteCardChooser(czarWhiteCards, cahActivity);
+					}
 				}
 			} else if (c == PlayerDelta.class) {
 				//TODO: Implement this type of delta.
@@ -108,6 +126,7 @@ public class CahPlayer {
 				if(delta.Message.equals("your-id")) {
 					this.playerId = delta.Id;
 					outgoing.put(new PlayerDelta(this.playerId, "join"));
+					numberOfPlayers++;
 				} else if (delta.Id != this.playerId && delta.Message.equals("join")){
 					// Another player has joined the table
 					playerJoined(delta.Id, false);
@@ -117,6 +136,10 @@ public class CahPlayer {
 							cahActivity.playerCanPlayCard(true);
 						}
 					});
+					numberOfPlayers++;
+				} else if (delta.Message.equals("leave")) {
+					//TODO: Remove player from table here
+					numberOfPlayers--;
 				} else if (delta.Message.equals("is-czar")) {
 					if(delta.Id == this.playerId){
 						this.playerIsCzar = true;
@@ -132,6 +155,36 @@ public class CahPlayer {
 				//TODO: Implement this type of delta.
 			}
 		}
+	}
+	
+	public void showWhiteCardChooser(Collection<Pair<Integer, String>> cards, Context context) {
+		LinearLayout cardContainer = new LinearLayout(context);
+		for(final Pair<Integer, String> card : cards) {
+			CardView cv = new CardView(context);
+			cv.setCardString(card.second);
+			cv.setTextColor(Color.BLACK);
+			cv.setCardColor(Color.WHITE);
+			
+			LayoutParams lp = new LayoutParams((int) (235* (context.getResources().getDisplayMetrics().densityDpi/160.)), (int) (300* (context.getResources().getDisplayMetrics().densityDpi/160.)));
+			cv.setLayoutParams(lp);
+			cv.setOnClickListener(new OnClickListener() {
+				@Override
+				public void onClick(View arg0) {
+					czarChoseCard(card.first, card.second);
+				}
+			});
+			cardContainer.addView(cv);
+		}
+		AlertDialog.Builder builder = new AlertDialog.Builder(context);
+		builder.setTitle("Choose wining card");
+		builder.setView(cardContainer);
+		czarDialog = builder.show();
+	}
+	
+	protected void czarChoseCard(int winnerID, String cardText) {
+		//TODO: Send message to server saying which card won.
+		czarDialog.dismiss();
+		
 	}
 
 	// Helper thread to handle incoming messages in a blocking fashion
