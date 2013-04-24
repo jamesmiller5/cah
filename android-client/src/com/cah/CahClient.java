@@ -97,6 +97,15 @@ public class CahClient extends Thread implements JsonDeserializer<Delta>, JsonSe
 			PlayerDelta p1_joining_of_p2 = (PlayerDelta) player1.incoming.take();
 			assert p1_joining_of_p2.Id == 2;
 			assert p1_joining_of_p2.Message.equals("join");
+			
+			// player1 should now be the czar
+			PlayerDelta p1_is_czar = (PlayerDelta) player1.incoming.take();
+			assert p1_is_czar.Message.equals("is-czar");
+			assert p1_is_czar.Id == 1;
+			
+			p1_is_czar = (PlayerDelta) player2.incoming.take();
+			assert p1_is_czar.Message.equals("is-czar");
+			assert p1_is_czar.Id == 1;
 
 			//have player 1 leave and see player 2's update
 			System.out.println("Player 1 is disconnecting, should show up on player 2");

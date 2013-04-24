@@ -3,26 +3,28 @@ package com.cah;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.List;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import android.app.AlertDialog;
 import android.content.Context;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.graphics.Color;
 import android.util.Pair;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.LinearLayout;
-import android.widget.TextView;
 import android.widget.LinearLayout.LayoutParams;
+import android.widget.TextView;
 
 import com.cah.customviews.CardView;
+import com.cah.customviews.GameTable;
 import com.cah.datastructures.Card;
-import com.cah.datastructures.Player;
 
 /**
  * Class that handles all gameplay interactions with the UI
- * 
  */
 public class CahPlayer {
 
@@ -36,9 +38,9 @@ public class CahPlayer {
 	AlertDialog czarDialog;
 	ArrayList<Pair<Integer, String>> czarWhiteCards = new ArrayList<Pair<Integer, String>>();
 	Thread messageHandler;
+	public final static List<Player> currentList = new ArrayList<Player>();
 
 	/**
-	 * 
 	 * @param cahActivity
 	 * @param client
 	 * @param tableToJoin
@@ -48,8 +50,9 @@ public class CahPlayer {
 		this.cahActivity = cahActivity;
 		this.client = client;
 		this.tableID = tableToJoin;
+		
 
-		Cah.performOnBackgroundThread(new Runnable() {
+	    Cah.performOnBackgroundThread(new Runnable() {
 
 			@Override
 			public void run() {
@@ -72,18 +75,27 @@ public class CahPlayer {
 					e.printStackTrace();
 				}
 			}
-
 		}); // End performOnBackgroundThread
-
 	}
 
 	public void handleIncomingMessages(BlockingQueue<Delta> incoming, BlockingQueue<Delta> outgoing) throws InterruptedException {
+		System.out.println("HelloWorld");
+		playerJoined(1, false);
+		playerJoined(2, false);
+		playerJoined(3, false);
+		playerJoined(4, false);
+		playerBecomesCzar(4);
+		playerLeft(3);
+		for (int i = 0; i < currentList.size(); i++){
+			Player player = currentList.get(i);
+			System.out.print("Player ID is" + player.id + ",");
+			System.out.println("Player czar status is" + player.czar);
+		}
 		while( go.get() ) {
 			Delta incoming_message = incoming.take(); // This will block until something comes in.
 			// Print out debug information
 			System.out.println("in handleIncomingMessages(): " + incoming_message.toString());
 			this.showDebugText(incoming_message.toString());
-			
 			
 			Class<? extends Delta> c = incoming_message.getClass();
 			if(c == TableDelta.class){
@@ -127,6 +139,7 @@ public class CahPlayer {
 					numberOfPlayers++;
 				} else if (delta.Id != this.playerId && delta.Message.equals("join")){
 					// Another player has joined the table
+					playerJoined(delta.Id, false);
 					cahActivity.runOnUiThread(new Runnable() {
 						@Override
 						public void run() {
@@ -136,10 +149,13 @@ public class CahPlayer {
 					numberOfPlayers++;
 				} else if (delta.Message.equals("leave")) {
 					//TODO: Remove player from table here
+					playerLeft(delta.Id);
 					numberOfPlayers--;
 				} else if (delta.Message.equals("is-czar")) {
-					if(delta.Id == this.playerId)
+					if(delta.Id == this.playerId){
 						this.playerIsCzar = true;
+						playerBecomesCzar(delta.Id);
+					}
 					else
 						this.playerIsCzar = false;
 				}
@@ -179,7 +195,6 @@ public class CahPlayer {
 	protected void czarChoseCard(int winnerID, String cardText) {
 		//TODO: Send message to server saying which card won.
 		czarDialog.dismiss();
-		
 	}
 
 	// Helper thread to handle incoming messages in a blocking fashion
@@ -197,7 +212,17 @@ public class CahPlayer {
 			}
 		}
 	}
-
+	
+	public class Player { 
+		public final int id;
+		public boolean czar;
+		
+		public Player(int playerId, boolean isCzar) {
+			this.id = playerId;
+			this.czar = isCzar;
+		}
+	}
+	
 	public void shutdown() {
 		go.set(false);
 		messageHandler.interrupt();
@@ -218,7 +243,6 @@ public class CahPlayer {
 				cahActivity.addCardToHand(card);
 			}
 		});
-
 	}
 
 	public void playCard(final Card card) {
@@ -234,7 +258,6 @@ public class CahPlayer {
 				}
 			}
 		});
-
 	}
 
 	/**
@@ -244,8 +267,18 @@ public class CahPlayer {
 	 * @param player
 	 *            The player that joined
 	 */
-	public void playerJoined(Player player) {
+	public void playerJoined(int id, final boolean isCzar) {
 		// TODO: Implement this function.
+		currentList.add(new Player(id, isCzar));
+		cahActivity.runOnUiThread(new Runnable() {
+
+			@Override
+			public void run() {
+				GameTable table = (GameTable) cahActivity.findViewById(R.id.gameTable);
+				Bitmap playerBitmap = BitmapFactory.decodeResource(cahActivity.getResources(), R.drawable.cartman_tiny_bw);
+				table.addPlayerToTable(playerBitmap, isCzar);
+			}
+		});
 	}
 
 	/**
@@ -255,8 +288,17 @@ public class CahPlayer {
 	 * @param player
 	 *            The player that left
 	 */
-	public void playerLeft(Player player) {
+	public void playerLeft(int id) {
 		// TODO: Implement this function.
+		//loop through currentList to find correct id and delete that member from the list
+		for (int i = 0; i < currentList.size(); i++) {
+			Player player = currentList.get(i);
+			if (player.id == id) { 
+				currentList.remove(i);
+				break;
+			}
+			else { System.out.println("Player does not exist in list");}
+		}
 	}
 
 	/**
@@ -266,8 +308,16 @@ public class CahPlayer {
 	 * @param player
 	 *            The player that is now the czar
 	 */
-	public void playerIsCzar(Player player) {
+	public void playerBecomesCzar(int id) {
 		// TODO: Implement this function.
+		//loop through list to find the correct id and change the isCzar variable for that Player object to be true
+		for (int i = 0; i < currentList.size(); i++) {
+			Player player = currentList.get(i);
+			if (player.id == id) {
+				player.czar = true;
+			}
+			else { System.out.println("Player does not exist in list");}
+		}
 	}
 
 	public void showError(final String error, final String errorMessage) {
@@ -282,7 +332,6 @@ public class CahPlayer {
 				alertBuilder.setPositiveButton("Close", null);
 				alertBuilder.show();
 			}
-
 		});
 	}
 
