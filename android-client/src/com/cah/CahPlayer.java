@@ -2,22 +2,25 @@ package com.cah;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.List;
 import java.util.Collection;
+import java.util.List;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import android.app.AlertDialog;
 import android.content.Context;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.graphics.Color;
 import android.util.Pair;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.LinearLayout;
-import android.widget.TextView;
 import android.widget.LinearLayout.LayoutParams;
+import android.widget.TextView;
 
 import com.cah.customviews.CardView;
+import com.cah.customviews.GameTable;
 import com.cah.datastructures.Card;
 
 /**
@@ -275,9 +278,20 @@ public class CahPlayer {
 	 * @param player
 	 *            The player that joined
 	 */
-	public void playerJoined(int id, boolean isCzar) {
+	public void playerJoined(int id, final boolean isCzar) {
 		// TODO: Implement this function.
 		currentList.add(new Player(id, isCzar));
+		cahActivity.runOnUiThread(new Runnable() {
+
+			@Override
+			public void run() {
+				GameTable table = (GameTable) cahActivity.findViewById(R.id.gameTable);
+				Bitmap playerBitmap = BitmapFactory.decodeResource(cahActivity.getResources(), R.drawable.cartman_tiny_bw);
+				table.addPlayerToTable(playerBitmap, isCzar);
+			}
+			
+		});
+		
 	}
 
 	/**

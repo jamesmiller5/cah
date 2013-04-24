@@ -1,6 +1,9 @@
 package com.cah.customviews;
 
+import com.cah.R;
+
 import android.content.Context;
+import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
@@ -8,21 +11,41 @@ import android.graphics.RadialGradient;
 import android.graphics.Shader;
 import android.graphics.SweepGradient;
 import android.util.AttributeSet;
+import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
+import android.widget.QuickContactBadge;
 
 public class GameTable extends ViewGroup {
 
 	Paint paint;
+	Context context;
 	
 	public GameTable(Context context, AttributeSet attrs) {
 		super(context, attrs);
+		this.context = context;
 		this.setWillNotDraw(false);
 		paint = new Paint();
 		paint.setColor(Color.LTGRAY);
 		paint.setStrokeWidth(1);
 		
 	//	paint.setShader(new RadialGradient(10f,100f,100f,Color.LTGRAY,Color.GRAY, Shader.TileMode.MIRROR));
+	}
+	
+	public void addPlayerToTable(Bitmap playerBitmap, boolean isCzar) {
+		LayoutInflater inflater = (LayoutInflater)context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+
+		View playerCard = inflater.inflate(R.layout.player_card, null);
+		ImageView crownImageView = (ImageView)playerCard.findViewById(R.id.playerCrown);
+		if(isCzar) {
+			crownImageView.setVisibility(View.VISIBLE);
+		}
+		QuickContactBadge playerPicture = (QuickContactBadge)playerCard.findViewById(R.id.playerBadge);
+		if(playerBitmap!=null) {
+			playerPicture.setImageBitmap(playerBitmap);
+		}
+		this.addView(playerCard);
 	}
 
 	@Override

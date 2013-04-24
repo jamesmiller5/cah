@@ -58,24 +58,6 @@ public class Cah extends Activity
 		
 	}
 
-	public void addPlayerToTable(Bitmap playerBitmap, boolean isCzar) {
-		GameTable table = (GameTable)this.findViewById(R.id.gameTable);
-
-		//TODO: Decide if this inflater should be a private member variable of Cah
-		LayoutInflater inflater = (LayoutInflater)this.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-
-		View playerCard = inflater.inflate(R.layout.player_card, null);
-		ImageView crownImageView = (ImageView)playerCard.findViewById(R.id.playerCrown);
-		if(isCzar) {
-			crownImageView.setVisibility(View.VISIBLE);
-		}
-		QuickContactBadge playerPicture = (QuickContactBadge)playerCard.findViewById(R.id.playerBadge);
-		if(playerBitmap!=null) {
-			playerPicture.setImageBitmap(playerBitmap);
-		}
-		table.addView(playerCard);
-	}
-
 	public void addCardToHand(Card card) {
 		LinearLayout cardContainer = (LinearLayout) findViewById(R.id.cardContainer);
 		CardView cv = new CardView(getApplicationContext());
