@@ -17,11 +17,13 @@
         android:background="@android:color/black"
         android:text="Cards\nAgainst\nHumanity" />
 
-    <RelativeLayout 
+    <LinearLayout 
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_weight="1" >
-
+        android:layout_weight="1"
+        android:orientation="vertical"
+        android:gravity="center" >
+        
         <Button
             android:id="@+id/buttonCreateNewTable"
             android:layout_width="wrap_content"
@@ -30,42 +32,28 @@
             android:layout_alignParentTop="true"
             android:text="Create New Table" />
 
-        <Button
-            android:id="@+id/buttonJoinExistingTable"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_alignParentLeft="true"
-            android:layout_below="@+id/buttonCreateNewTable"
-            android:text="Join Existing Table" />
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content" >
 
-        <EditText
-            android:id="@+id/editTextTableId"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_alignTop="@+id/buttonJoinExistingTable"
-            android:layout_toRightOf="@+id/buttonJoinExistingTable"
-            android:ems="10"
-            android:hint="Enter table ID" >
+            <Button
+                android:id="@+id/buttonJoinExistingTable"
+                android:layout_width="0sp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="Join Existing Table" />
 
-            <requestFocus />
-        </EditText>
+            <EditText
+                android:id="@+id/editTextTableId"
+                android:layout_width="0sp"
+                android:layout_height="wrap_content"
+                android:ems="10"
+                android:layout_weight="1"
+                android:hint="Enter table ID" >
 
-        <Button
-            android:id="@+id/buttonShowCzarCard"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_alignParentLeft="true"
-            android:layout_below="@+id/buttonJoinExistingTable"
-            android:text="Show Demo Czar View (5 seconds)" />
-
-        <EditText
-            android:id="@+id/czarCardText"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_alignParentLeft="true"
-            android:layout_below="@+id/buttonShowCzarCard"
-            android:ems="10"
-            android:hint="Enter text to appear on Czar card." />
-    </RelativeLayout>
+                <requestFocus />
+            </EditText>
+        </LinearLayout>
+    </LinearLayout>
 
 </LinearLayout>

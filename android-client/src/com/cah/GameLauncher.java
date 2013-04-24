@@ -28,9 +28,6 @@ public class GameLauncher extends Activity {
 		final Button joinExistingTableButton = (Button) findViewById(R.id.buttonJoinExistingTable);
 		final EditText tableIdEditText = (EditText) findViewById(R.id.editTextTableId);
 		
-		final Button showCzarCardButton = (Button) findViewById(R.id.buttonShowCzarCard);
-		final EditText czarCardText = (EditText) findViewById(R.id.czarCardText);
-		
 		createNewTableButton.setOnClickListener(new OnClickListener() {
 			@Override
 			public void onClick(View button) {
@@ -50,32 +47,6 @@ public class GameLauncher extends Activity {
 			}
 		});
 		
-		showCzarCardButton.setOnClickListener(new OnClickListener() {
-			@Override
-			public void onClick(View v) {
-				AlertDialog.Builder dialogBuilder = new AlertDialog.Builder(GameLauncher.this);
-				dialogBuilder.setView(CzarActivity.getBlackCardView(czarCardText.getText().toString(), GameLauncher.this));
-				final AlertDialog dialog = dialogBuilder.show();
-				
-				new Thread(new Runnable() {
-					@Override
-					public void run() {
-						try {
-							Thread.sleep(5000);
-						} catch (InterruptedException e) {
-							// TODO Auto-generated catch block
-							e.printStackTrace();
-						}
-						runOnUiThread(new Runnable() {
-							@Override
-							public void run() {
-								dialog.dismiss();
-							}
-						});
-					}
-				}).start();
-			}
-		});
 	}
 
 	@Override
