@@ -139,6 +139,7 @@ public class CahPlayer {
 					numberOfPlayers++;
 				} else if (delta.Message.equals("leave")) {
 					//TODO: Remove player from table here
+					playerLeft(delta.Id);
 					numberOfPlayers--;
 				} else if (delta.Message.equals("is-czar")) {
 					if(delta.Id == this.playerId){
