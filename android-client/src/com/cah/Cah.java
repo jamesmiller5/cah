@@ -20,7 +20,6 @@ import com.cah.datastructures.Card;
 
 public class Cah extends Activity
 {
-
 	CahClient client;
 	public static CahPlayer player;
 
@@ -80,17 +79,14 @@ public class Cah extends Activity
 	}
 
 	private void addDummyPlayersAndCards() {
-		// Dynamically add 10 cards to the game.
+		// Dynamically add 7 cards to the game.
 		String dummyCards[] = {"Licking things to claim them as your own",
 				"Leaving an awkward voicemail.",
 				"50,000 volts straight to the nipples.",
 				"Panda Sex.",
 				"Fabricating Statistics.",
-				"friends dont let friends let scientific progress go boink",
 				"Finding Waldo.",
-				"Old-people smell.",
-				"oh hai im in ur computer eating your cheezburgers and CAHing your textz",
-				"how are you holding up because im a potato"};
+				"Old-people smell."};
 		for(int i = 0; i<dummyCards.length; i++) {
 			this.addCardToHand(new Card(i%2 == 0 ? Card.Color.WHITE : Card.Color.BLACK, dummyCards[i]));
 		}

@@ -25,7 +25,6 @@ import com.cah.datastructures.Card;
 
 /**
  * Class that handles all gameplay interactions with the UI
- * 
  */
 public class CahPlayer {
 
@@ -42,7 +41,6 @@ public class CahPlayer {
 	public final static List<Player> currentList = new ArrayList<Player>();
 
 	/**
-	 * 
 	 * @param cahActivity
 	 * @param client
 	 * @param tableToJoin
@@ -77,9 +75,7 @@ public class CahPlayer {
 					e.printStackTrace();
 				}
 			}
-
 		}); // End performOnBackgroundThread
-
 	}
 
 	public void handleIncomingMessages(BlockingQueue<Delta> incoming, BlockingQueue<Delta> outgoing) throws InterruptedException {
@@ -100,7 +96,6 @@ public class CahPlayer {
 			// Print out debug information
 			System.out.println("in handleIncomingMessages(): " + incoming_message.toString());
 			this.showDebugText(incoming_message.toString());
-			
 			
 			Class<? extends Delta> c = incoming_message.getClass();
 			if(c == TableDelta.class){
@@ -200,7 +195,6 @@ public class CahPlayer {
 	protected void czarChoseCard(int winnerID, String cardText) {
 		//TODO: Send message to server saying which card won.
 		czarDialog.dismiss();
-		
 	}
 
 	// Helper thread to handle incoming messages in a blocking fashion
@@ -226,9 +220,7 @@ public class CahPlayer {
 		public Player(int playerId, boolean isCzar) {
 			this.id = playerId;
 			this.czar = isCzar;
-		
 		}
-
 	}
 	
 
@@ -252,7 +244,6 @@ public class CahPlayer {
 				cahActivity.addCardToHand(card);
 			}
 		});
-
 	}
 
 	public void playCard(final Card card) {
@@ -268,7 +259,6 @@ public class CahPlayer {
 				}
 			}
 		});
-
 	}
 
 	/**
@@ -289,9 +279,7 @@ public class CahPlayer {
 				Bitmap playerBitmap = BitmapFactory.decodeResource(cahActivity.getResources(), R.drawable.cartman_tiny_bw);
 				table.addPlayerToTable(playerBitmap, isCzar);
 			}
-			
 		});
-		
 	}
 
 	/**
@@ -312,7 +300,6 @@ public class CahPlayer {
 			}
 			else { System.out.println("Player does not exist in list");}
 		}
-		
 	}
 
 	/**
@@ -346,7 +333,6 @@ public class CahPlayer {
 				alertBuilder.setPositiveButton("Close", null);
 				alertBuilder.show();
 			}
-
 		});
 	}
 
