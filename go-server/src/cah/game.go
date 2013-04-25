@@ -1,8 +1,12 @@
 package cah
 
 import (
+	"log"
 	"sync"
+	"time"
 )
+
+const MIN_PLAYERS = 2
 
 type Game struct {
 	sync.RWMutex
@@ -10,7 +14,7 @@ type Game struct {
 	playerInc    int
 	playerDeltas chan *PlayerDelta
 	deckDeltas   chan *DeckDelta
-	czar *Player
+	czar         *Player
 }
 
 func NewGame() *Game {
@@ -23,71 +27,152 @@ func NewGame() *Game {
 	}
 }
 
-func (game *Game) playRound() {
-
+func (game *Game) playRound(pd_filtered <-chan *PlayerDelta) {
+	//deal up to x cards
 	//pick czar : Emit PlayerDelta{ "is-czar" }
 	//pick black card : Emit DeckDelta{ }
 	//wait for player input : foreach player-czar { get DeckDelta }
 	//wait for czar input : czar { get DeckDelta }
 	//send czar's choice : Emit DeckDelta { }
 	//win?
-	//deal up to x cards
 
-	select {
-	case pd := <-game.playerDeltas:
+	//wait for MIN_PLAYERS
+	start:
+	for {
+		l := game.playerCount()
+		if l < MIN_PLAYERS {
+			pd, ok := <-pd_filtered
+			println("released", pd.Message, ok)
+		} else {
+			break
+		}
+	}
+
+	game.RLock()
+
+	println("WE HAVE ENOUGH", len(game.players))
+
+	//ugly hack to make sure czar is not b4 join on client
+	time.Sleep(1)
+	//next czar
+	czar_id := 0
+	if game.czar != nil {
+		czar_id = game.czar.Id
+	}
+	next_id := int( ^uint(0) >> 1 )
+	max_id := next_id
+	min_id := next_id
+
+	for key := range game.players {
+		//find the key closest to the czars but at least 1 greater
+		if key < next_id && key > czar_id {
+			next_id = key
+		}
+
+		if key < min_id {
+			min_id = key
+		}
+	}
+
+	if next_id == max_id {
+		next_id = min_id
+	}
+
+	game.players[next_id].czarify()
+	game.RUnlock()
+
+	for {
+		pd, ok := <-pd_filtered
+		if !ok {
+			return
+		}
+		if pd.Message == "leave" {
+			if game.playerCount() < MIN_PLAYERS {
+				goto start
+			}
+		} else {
+			goto black
+		}
+	}
+
+	black:
+}
+
+func (game *Game) playerCount() (l int) {
+	game.RLock()
+	l = len(game.players)
+	game.RUnlock();
+
+	return
+}
+
+func (game *Game) Play() {
+	pd_filtered := make(chan *PlayerDelta)
+
+	go func() {
+		for {
+			game.playRound(pd_filtered)
+		}
+	}()
+
+	//filter PlayerDeltas
+	for pd := range game.playerDeltas {
 		multicast, me_to := false, false
 		player := pd.fromPlayer
 		switch pd.Message {
 		case "my-id?":
-			player.sendYourId()
+			//assign an id to this player and add them
+			//to the game list
+			id := player.Id
+			if id == 0 {
+				game.Lock()
+				id = game.playerInc
+				game.playerInc++
+				game.Unlock()
+			}
+			player.sendYourId(id)
+			log.Println("Assigned a new id", id)
 		case "join":
-			game.RLock()
-			//TODO: if they already existed, send them their cards
+			//add to game board
+			log.Println("Join start")
+			game.Lock()
+			game.players[player.Id] = player
+			game.Unlock()
 
-			//player.sendCards()
-
-			//TODO: send them the player list
+			player.sendHand()
 			player.sendPlayers(game.players)
-
-			game.RUnlock()
 			multicast = true
+			pd_filtered <- pd
 		case "leave":
-			player.Shutdown();
+			game.Lock()
+			delete(game.players, player.Id)
+			game.Unlock()
+			player.Shutdown()
 			multicast = true
+			pd_filtered <- pd
+		case "is-czar":
+			multicast = true
+			me_to = true
 		default:
+			pd_filtered <- pd
 		}
 
 		//If we should reflect this message to all players
 		if multicast {
+			game.RLock()
 			for _, p := range game.players {
 				if !me_to && p == player {
 					continue
 				}
 				p.outgoingPlayerDeltas <- pd
 			}
+			game.RUnlock()
 		}
-	case dd := <-game.deckDeltas:
-		game.RLock()
-		for _, p := range game.players {
-			p.outgoingDeckDeltas <- dd
-		}
-		game.RUnlock()
-	}
-}
-
-func (game *Game) Play() {
-	for {
-		game.playRound();
 	}
 }
 
 func (game *Game) HandlePlayer(dec *NetDecoder, enc *NetEncoder) {
-	game.Lock()
-	me := NewPlayer(dec, enc, game.playerInc)
-	game.players[game.playerInc] = me
-	game.playerInc++
-	game.Unlock()
-
+	me := NewPlayer(dec, enc)
 	//Decode goroutine, sends messages to dealer
 	go me.DecodeDeltas(game.playerDeltas, game.deckDeltas)
 	//Encode our messages

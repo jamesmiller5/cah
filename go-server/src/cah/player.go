@@ -27,9 +27,9 @@ func (pd *PlayerDelta) isClean() bool {
 }
 
 var playerDeltaMessages = map[string]bool{
-	"join":   true,
-	"leave":  true,
-	"my-id?": true,
+	"join":    true,
+	"leave":   true,
+	"my-id?":  true,
 	"is-czar": true,
 }
 
@@ -68,41 +68,40 @@ type Player struct {
 	outgoingDeckDeltas   chan *DeckDelta
 	dec                  *NetDecoder
 	enc                  *NetEncoder
-	hand				 *Deck
+	hand                 *Deck
 }
 
 const PLAYER_TIMEOUT = 10 * time.Minute
 
-func NewPlayer(dec *NetDecoder, enc *NetEncoder, id int) *Player {
+func NewPlayer(dec *NetDecoder, enc *NetEncoder) *Player {
 	return &Player{
-		Id:                   id,
 		dec:                  dec,
 		enc:                  enc,
 		outgoingPlayerDeltas: make(chan *PlayerDelta),
 		outgoingDeckDeltas:   make(chan *DeckDelta),
 		//We want 2 slots in case both goroutines quit at the same time
 		quit: make(chan bool, 2),
-		hand: 				  NewDeck("hand", nil),
+		hand: NewDeck("hand", nil),
 	}
 }
 
 func (p *Player) Shutdown() {
-	p.quit <- true;
+	p.quit <- true
 }
 
 func (p *Player) Leave() *PlayerDelta {
-	return &PlayerDelta{ Id: p.Id, Message: "leave", Delta:Delta{ fromPlayer: p }}
+	return &PlayerDelta{Id: p.Id, Message: "leave", Delta: Delta{fromPlayer: p}}
 }
 
 //Send decoded messages to arguments
-func (p *Player) DecodeDeltas(incomingPlayerDeltas chan *PlayerDelta, incomingDeckDeltas chan *DeckDelta) {
+func (p *Player) DecodeDeltas(incomingPlayerDeltas chan<- *PlayerDelta, incomingDeckDeltas chan<- *DeckDelta) {
 	defer func() { p.quit <- true }()
 
 	for {
 		select {
 		case <-p.quit:
-			//Should quit
-			goto exit
+			//Should quit silently
+			goto silent_exit
 		default:
 			//Decode a delta
 			var delta struct {
@@ -147,28 +146,34 @@ func (p *Player) DecodeDeltas(incomingPlayerDeltas chan *PlayerDelta, incomingDe
 	}
 exit:
 	incomingPlayerDeltas <- p.Leave()
+silent_exit:
 }
 
-func (p *Player) sendCards() {
+func (p *Player) sendHand() {
 	// Give the new player a new hand of 7 cards
 	cards := []*Card{}
 	for i := 0; i < 7; i++ {
-	    cards = append(cards, nil)
+		cards = append(cards, nil)
 	}
-	p.outgoingDeckDeltas <- &DeckDelta{Player: p.Id, DeckTo: "hand", DeckFrom: "draw", Cards: cards}
+	//p.outgoingDeckDeltas <- &DeckDelta{Player: p.Id, DeckTo: "hand", DeckFrom: "draw", Cards: cards}
 }
 
-func (p *Player) sendPlayers( players map[int]*Player ) {
+func (p *Player) sendPlayers(players map[int]*Player) {
 	log.Println("Sending players")
-	for id,_ := range players {
+	for id, _ := range players {
 		if id != p.Id {
 			p.outgoingPlayerDeltas <- &PlayerDelta{Id: id, Message: "join"}
 		}
 	}
 }
 
-func (p *Player) sendYourId() {
-	p.outgoingPlayerDeltas <- &PlayerDelta{Id: p.Id, Message: "your-id"}
+func (p *Player) sendYourId(id int) {
+	p.Id = id
+	p.outgoingPlayerDeltas <- &PlayerDelta{Id: id, Message: "your-id"}
+}
+
+func (p *Player) czarify() {
+	p.outgoingPlayerDeltas <- &PlayerDelta{Id: p.Id, Message: "is-czar"}
 }
 
 func (p *Player) EncodeDeltas() {
