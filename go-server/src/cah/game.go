@@ -163,11 +163,7 @@ func (game *Game) playRound(pd_filtered <-chan *PlayerDelta) {
 	}
 
 	end:
-
 	log.Println("ROUND OVER")
-	for {
-		time.Sleep(1000)
-	}
 }
 
 func (game *Game) playerCount() (l int) {
@@ -184,6 +180,8 @@ func (game *Game) Play() {
 	go func() {
 		for {
 			game.playRound(pd_filtered)
+			//go to sleep, let them bask in their glory
+			time.Sleep(10*time.Second)
 		}
 	}()
 
