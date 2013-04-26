@@ -61,6 +61,7 @@ var deckDeltaDecks = map[string]bool{
 	"black-draw": true,
 	"hand": true,
 	"play": true,
+	"winner": true,
 }
 
 type Player struct {

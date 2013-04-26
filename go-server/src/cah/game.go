@@ -106,9 +106,9 @@ func (game *Game) playRound(pd_filtered <-chan *PlayerDelta) {
 	}
 	game.RUnlock()
 
-	//wait for either everyone to play a white card or for people to leave
-
-	wait_for := game.playerCount()
+	//wait for either everyone to play a white card except czar or for people to leave
+	log.Println("Waiting for n-1 white cards")
+	wait_for := game.playerCount() - 1
 	have := 0
 	for {
 		select {
@@ -121,17 +121,19 @@ func (game *Game) playRound(pd_filtered <-chan *PlayerDelta) {
 			}
 
 		case dd := <-game.deckDeltas:
-			log.Println("Got a card from player", dd.Player)
 			have++
+			log.Println("Got a card from player", dd.Player, "have is now", have)
 			game.czar.outgoingDeckDeltas <- dd
 
 			if have >= wait_for {
-				break
+				goto czar_pick
 			}
 		}
 	}
 
+	czar_pick:
 	//wait for czar to choose card
+	log.Println("waiting for czar to choose card")
 	for {
 		select {
 		case pd := <-pd_filtered:
@@ -218,9 +220,6 @@ func (game *Game) Play() {
 		if multicast {
 			game.RLock()
 			for _, p := range game.players {
-				if me_to {
-					println("METO: %v",p)
-				}
 				if !me_to && p == player {
 					continue
 				}
