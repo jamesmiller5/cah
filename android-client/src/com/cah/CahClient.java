@@ -26,8 +26,23 @@ import com.google.gson.JsonSyntaxException;
 import com.google.gson.stream.JsonReader;
 import com.google.gson.stream.JsonWriter;
 
+class CardEater implements JsonDeserializer<Card> {
+	public Card deserialize( final JsonElement jsonRaw, final java.lang.reflect.Type type, final JsonDeserializationContext context ) throws JsonParseException {
+		//All messages are objects, get this out of the way
+		JsonObject json = jsonRaw.getAsJsonObject();
+
+			//it's a card
+		if( json.has("Text") ) {
+			Card card =  new Card( json.getAsJsonPrimitive("Text").getAsString() );
+			return card;
+		} else
+
+		throw new JsonParseException("Unknown Message Delta from server");
+	}
+}
+
 public class CahClient extends Thread implements JsonDeserializer<Delta>, JsonSerializer<Delta> {
-	final Gson gson = new GsonBuilder().registerTypeAdapter(Delta.class, this).create();
+	final Gson gson = new GsonBuilder().registerTypeAdapter(Delta.class, this).registerTypeAdapter(Card.class, new CardEater()).create();
 	final AtomicBoolean go = new AtomicBoolean(true);
 	BlockingQueue<Delta> incoming;
 	BlockingQueue<Delta> outgoing;
