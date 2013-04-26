@@ -307,6 +307,8 @@ public class CahPlayer {
 	/**
 	 * This function is called by CahClient when a player joins our table. This
 	 * adds the player to the table UI.
+	 * 
+	 * Added differing player icons
 	 *
 	 * @param player
 	 *            The player that joined
@@ -322,14 +324,28 @@ public class CahPlayer {
 				GameTable table = (GameTable) cahActivity.findViewById(R.id.gameTable);
 				Bitmap playerBitmap;
 
-				//two different players.....
-				if(imageID == 0){
-					playerBitmap = BitmapFactory.decodeResource(cahActivity.getResources(), R.drawable.hulk);
-					imageID =1;
-				}else{
-					playerBitmap = BitmapFactory.decodeResource(cahActivity.getResources(), R.drawable.cartman_tiny_bw);
-					imageID = 0;
+				//gives each player a unique user image
+				switch (imageID) {
+					case 0:  playerBitmap = BitmapFactory.decodeResource(cahActivity.getResources(), R.drawable.kenny_tiny_bw);
+							 imageID++;
+	                		 break;
+		            case 1:  playerBitmap = BitmapFactory.decodeResource(cahActivity.getResources(), R.drawable.butters_tiny_bw);
+		                     imageID++;
+		            		 break;
+		            case 2:  playerBitmap = BitmapFactory.decodeResource(cahActivity.getResources(), R.drawable.superman);
+                    		 imageID++;
+                    		 break;
+		            case 3:  playerBitmap = BitmapFactory.decodeResource(cahActivity.getResources(), R.drawable.cartman_tiny_bw);
+			           		 imageID++;
+			           		 break;
+		            case 4:  playerBitmap = BitmapFactory.decodeResource(cahActivity.getResources(), R.drawable.hulk_bw);
+			           		 imageID++;
+			           		 break;
+		            default:  playerBitmap = BitmapFactory.decodeResource(cahActivity.getResources(), R.drawable.droid_small);
+			           		 imageID=0;
+			           		 break;
 				}
+
 				table.addPlayerToTable(playerBitmap, isCzar);
 
 		//        ImageView image = (ImageView) findViewById(R.id.test_image);
