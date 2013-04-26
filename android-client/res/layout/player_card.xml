@@ -7,7 +7,7 @@
         android:id="@+id/playerBadge"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:src="@drawable/cartman_tiny_bw" />
+        android:src="@drawable/kenny_tiny_bw" />
     
     <ImageView
         android:id="@+id/playerCrown"

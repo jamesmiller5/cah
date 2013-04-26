@@ -24,10 +24,10 @@ public class GameLauncher extends Activity {
 		titleTextView.setTypeface(typeface);
 		
 		final Button createNewTableButton = (Button) findViewById(R.id.buttonCreateNewTable);
-		
 		final Button joinExistingTableButton = (Button) findViewById(R.id.buttonJoinExistingTable);
 		final EditText tableIdEditText = (EditText) findViewById(R.id.editTextTableId);
 		
+		//action event listener for the join exiting table button on the GUI
 		createNewTableButton.setOnClickListener(new OnClickListener() {
 			@Override
 			public void onClick(View button) {
@@ -37,6 +37,7 @@ public class GameLauncher extends Activity {
 			}
 		});
 		
+		//action event listener for the join exiting table button on the GUI
 		joinExistingTableButton.setOnClickListener(new OnClickListener() {
 			@Override
 			public void onClick(View v) {
