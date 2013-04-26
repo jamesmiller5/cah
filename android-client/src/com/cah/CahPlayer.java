@@ -79,13 +79,6 @@ public class CahPlayer {
 	}
 
 	public void handleIncomingMessages(BlockingQueue<Delta> incoming, BlockingQueue<Delta> outgoing) throws InterruptedException {
-		System.out.println("HelloWorld");
-		playerJoined(1, false);
-		playerJoined(2, false);
-		playerJoined(3, false);
-		playerJoined(4, false);
-		playerBecomesCzar(4);
-		playerLeft(3);
 		for (int i = 0; i < currentList.size(); i++){
 			Player player = currentList.get(i);
 			System.out.print("Player ID is" + player.id + ",");
@@ -136,6 +129,7 @@ public class CahPlayer {
 				if(delta.Message.equals("your-id")) {
 					this.playerId = delta.Id;
 					outgoing.put(new PlayerDelta(this.playerId, "join"));
+					playerJoined(this.playerId, false);
 					numberOfPlayers++;
 				} else if (delta.Id != this.playerId && delta.Message.equals("join")){
 					// Another player has joined the table
