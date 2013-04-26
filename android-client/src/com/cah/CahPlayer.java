@@ -50,7 +50,7 @@ public class CahPlayer {
 		this.cahActivity = cahActivity;
 		this.client = client;
 		this.tableID = tableToJoin;
-		
+
 
 	    Cah.performOnBackgroundThread(new Runnable() {
 
@@ -89,7 +89,7 @@ public class CahPlayer {
 			// Print out debug information
 			System.out.println("in handleIncomingMessages(): " + incoming_message.toString());
 			this.showDebugText(incoming_message.toString());
-			
+
 			Class<? extends Delta> c = incoming_message.getClass();
 			if(c == TableDelta.class){
 				//TODO: Implement this type of delta.
@@ -107,7 +107,7 @@ public class CahPlayer {
 					for(String cardText : delta.Cards) {
 						addCardToHand(new Card(Card.Color.WHITE, cardText));
 					}
-				} else if (delta.DeckTo.equals("czar-hand") && delta.DeckFrom.equals("draw") && this.playerIsCzar == true) {
+				} else if (delta.DeckTo.equals("play") && delta.DeckFrom.equals("black-draw") && this.playerIsCzar == true) {
 					// Show AlertDialog showing only the black card.
 					AlertDialog.Builder dialogBuilder = new AlertDialog.Builder(cahActivity);
 					dialogBuilder.setView(CzarActivity.getBlackCardView(delta.Cards[0], cahActivity));
@@ -161,7 +161,7 @@ public class CahPlayer {
 			}
 		}
 	}
-	
+
 	public void showWhiteCardChooser(Collection<Pair<Integer, String>> cards, Context context) {
 		LinearLayout cardContainer = new LinearLayout(context);
 		for(final Pair<Integer, String> card : cards) {
@@ -169,7 +169,7 @@ public class CahPlayer {
 			cv.setCardString(card.second);
 			cv.setTextColor(Color.BLACK);
 			cv.setCardColor(Color.WHITE);
-			
+
 			LayoutParams lp = new LayoutParams((int) (235* (context.getResources().getDisplayMetrics().densityDpi/160.)), (int) (300* (context.getResources().getDisplayMetrics().densityDpi/160.)));
 			cv.setLayoutParams(lp);
 			cv.setOnClickListener(new OnClickListener() {
@@ -185,7 +185,7 @@ public class CahPlayer {
 		builder.setView(cardContainer);
 		czarDialog = builder.show();
 	}
-	
+
 	protected void czarChoseCard(int winnerID, String cardText) {
 		//TODO: Send message to server saying which card won.
 		czarDialog.dismiss();
@@ -206,17 +206,17 @@ public class CahPlayer {
 			}
 		}
 	}
-	
-	public class Player { 
+
+	public class Player {
 		public final int id;
 		public boolean czar;
-		
+
 		public Player(int playerId, boolean isCzar) {
 			this.id = playerId;
 			this.czar = isCzar;
 		}
 	}
-	
+
 	public void shutdown() {
 		go.set(false);
 		messageHandler.interrupt();
@@ -226,7 +226,7 @@ public class CahPlayer {
 	/**
 	 * This function is called by CahClient when the server says that a card
 	 * should be added to our hand in the UI.
-	 * 
+	 *
 	 * @param card
 	 *            Card to be added to hand
 	 */
@@ -257,7 +257,7 @@ public class CahPlayer {
 	/**
 	 * This function is called by CahClient when a player joins our table. This
 	 * adds the player to the table UI.
-	 * 
+	 *
 	 * @param player
 	 *            The player that joined
 	 */
@@ -278,7 +278,7 @@ public class CahPlayer {
 	/**
 	 * This function is called by CahClient when a player leaves our table. This
 	 * removes the player from the table UI.
-	 * 
+	 *
 	 * @param player
 	 *            The player that left
 	 */
@@ -287,7 +287,7 @@ public class CahPlayer {
 		//loop through currentList to find correct id and delete that member from the list
 		for (int i = 0; i < currentList.size(); i++) {
 			Player player = currentList.get(i);
-			if (player.id == id) { 
+			if (player.id == id) {
 				currentList.remove(i);
 				break;
 			}
@@ -298,7 +298,7 @@ public class CahPlayer {
 	/**
 	 * This function is called by CahClient when the current czar changes. This
 	 * changes the table UI so that a crown appears next to whoever is the czar.
-	 * 
+	 *
 	 * @param player
 	 *            The player that is now the czar
 	 */

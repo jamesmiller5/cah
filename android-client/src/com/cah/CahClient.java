@@ -121,9 +121,22 @@ public class CahClient extends Thread implements JsonDeserializer<Delta>, JsonSe
 
 			//Player 2 should see that player 1 is czar
 			System.out.println("player 2 should see czar with id 1");
-			p1_is_czar = (PlayerDelta) player2.incoming.take();
-			assert p1_is_czar.Message.equals("is-czar");
-			assert p1_is_czar.Id == 1;
+			PlayerDelta p2_is_czar = (PlayerDelta) player2.incoming.take();
+			assert p2_is_czar.Message.equals("is-czar");
+			assert p2_is_czar.Id == 1;
+
+			//all should get a deck delta with the black card
+			System.out.println("Player 1 should get deckdelta with black card info");
+			DeckDelta p1_bl_crd = (DeckDelta) player1.incoming.take();
+			assert p1_bl_crd.Cards.length == 1;
+			assert p1_bl_crd.DeckFrom.equals("black-draw");
+			assert p1_bl_crd.DeckTo.equals("play");
+
+			System.out.println("Player 2 should get deckdelta with black card info");
+			DeckDelta p2_bl_crd = (DeckDelta) player2.incoming.take();
+			assert p2_bl_crd.Cards.length == 1;
+			assert p2_bl_crd.DeckFrom.equals("black-draw");
+			assert p2_bl_crd.DeckTo.equals("play");
 
 			//have player 1 leave and see player 2's update
 			System.out.println("Player 1 is disconnecting, should show up on player 2");

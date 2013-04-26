@@ -17,6 +17,7 @@ type Game struct {
 	czar         *Player
 	white_draw, black_draw *Deck
 	white_discard *Deck
+	play *Deck
 }
 
 func NewGame() *Game {
@@ -29,6 +30,7 @@ func NewGame() *Game {
 		white_draw:   NewDeck("white-draw", wcList),
 		black_draw:   NewDeck("black-draw", bcList),
 		white_discard: NewDeck("white-discard", nil),
+		play: NewDeck("play", nil), //in play deck=current black card
 	}
 }
 
@@ -57,8 +59,6 @@ func (game *Game) playRound(pd_filtered <-chan *PlayerDelta) {
 
 	println("WE HAVE ENOUGH", len(game.players))
 
-	//ugly hack to make sure czar is not b4 join on client
-	time.Sleep(1)
 	//next czar
 	czar_id := 0
 	if game.czar != nil {
@@ -86,6 +86,26 @@ func (game *Game) playRound(pd_filtered <-chan *PlayerDelta) {
 	game.playerDeltas <- game.players[next_id].czarify()
 	game.RUnlock()
 
+	log.Println("Picking black card")
+	//pick black
+	black:
+	randblack := game.black_draw.randomCards()[0:1]
+	blackdelta, err := TransferSome(game.black_draw,game.play,randblack)
+	//ugly hack to make sure czar is not b4 join on client
+	time.Sleep(1)
+
+	if err {
+		log.Println("OH NOES! Error for black delta")
+		return
+	}
+
+	//tell everyone this black card is in play
+	game.RLock()
+	for _, p := range game.players {
+		p.outgoingDeckDeltas <- blackdelta
+	}
+	game.RUnlock()
+
 	for {
 		pd, ok := <-pd_filtered
 		if !ok {
@@ -99,9 +119,6 @@ func (game *Game) playRound(pd_filtered <-chan *PlayerDelta) {
 			goto black
 		}
 	}
-
-	black:
-	//pick bla
 }
 
 func (game *Game) playerCount() (l int) {
