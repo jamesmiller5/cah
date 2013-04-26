@@ -84,11 +84,11 @@ func (game *Game) playRound(pd_filtered <-chan *PlayerDelta) {
 	}
 
 	game.playerDeltas <- game.players[next_id].czarify()
+	game.czar = game.players[next_id]
 	game.RUnlock()
 
 	log.Println("Picking black card")
 	//pick black
-	black:
 	randblack := game.black_draw.randomCards()[0:1]
 	blackdelta, err := TransferSome(game.black_draw,game.play,randblack)
 	//ugly hack to make sure czar is not b4 join on client
@@ -106,17 +106,48 @@ func (game *Game) playRound(pd_filtered <-chan *PlayerDelta) {
 	}
 	game.RUnlock()
 
+	//wait for either everyone to play a white card or for people to leave
+
+	wait_for := game.playerCount()
+	have := 0
 	for {
-		pd, ok := <-pd_filtered
-		if !ok {
-			return
-		}
-		if pd.Message == "leave" {
-			if game.playerCount() < MIN_PLAYERS {
-				goto start
+		select {
+		case pd := <-pd_filtered:
+			if pd.Message == "leave" {
+				wait_for := game.playerCount()
+				if wait_for < MIN_PLAYERS {
+					goto start
+				}
 			}
-		} else {
-			goto black
+
+		case dd := <-game.deckDeltas:
+			log.Println("Got a card from player", dd.Player)
+			have++
+			game.czar.outgoingDeckDeltas <- dd
+
+			if have >= wait_for {
+				break
+			}
+		}
+	}
+
+	//wait for czar to choose card
+	for {
+		select {
+		case pd := <-pd_filtered:
+			if pd.Message == "leave" {
+				wait_for := game.playerCount()
+				if wait_for < MIN_PLAYERS {
+					goto start
+				}
+
+				if pd.fromPlayer == game.czar {
+					goto start
+				}
+			}
+
+		case dd := <-game.deckDeltas:
+			log.Printf("CZAR MADE CHOICE: %V\n", dd)
 		}
 	}
 }

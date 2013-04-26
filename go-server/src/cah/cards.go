@@ -32,17 +32,17 @@ var bcList = []string{"_____________. Awesome in theory, kind of a mess in pract
 //for now a "Card" is just a string, maybe later we'll mark them differently
 //type Card string
 type Card struct {
-	string
+	Text string "json:text"
 }
 
 func (c *Card) String() string {
-	return c.string
+	return c.Text
 }
 
 func string_it(cards []*Card) []string {
 	list := make([]string,0)
 	for _, value := range cards {
-		list = append(list, value.string)
+		list = append(list, value.Text)
 	}
 
 	return list

@@ -1,5 +1,7 @@
 package com.cah;
 
+import com.cah.datastructures.Card;
+
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -138,9 +140,14 @@ public class CahClient extends Thread implements JsonDeserializer<Delta>, JsonSe
 			assert p2_bl_crd.DeckFrom.equals("black-draw");
 			assert p2_bl_crd.DeckTo.equals("play");
 
+			System.out.println("Sending cards to server!");
+			//our turn! send a white card we pick
+			player1.outgoing.put(new DeckDelta(1, "hand", "play", new Card[] {new Card("RANDOM PLAYER 1")}));
+			player2.outgoing.put(new DeckDelta(2, "hand", "play", new Card[] {new Card("RANDOM PLAYER 2")}));
+
 			//have player 1 leave and see player 2's update
 			System.out.println("Player 1 is disconnecting, should show up on player 2");
-			Thread.sleep(1000);
+			Thread.sleep(1000*1);
 
 			//Assert that player2 saw that player1 left the game
 			player1.shutdown();
@@ -349,9 +356,9 @@ class DeckDelta extends Delta {
 	int Player;
 	String DeckTo;
 	String DeckFrom;
-	String[] Cards;
+	Card[] Cards;
 
-	public DeckDelta( int Player, String DeckTo, String DeckFrom, String[] Cards ) {
+	public DeckDelta( int Player, String DeckTo, String DeckFrom, Card[] Cards ) {
 		this.Player = Player;
 		this.DeckTo = DeckTo;
 		this.DeckFrom = DeckFrom;

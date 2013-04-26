@@ -207,19 +207,7 @@ func (p *Player) EncodeDeltas() {
 		case pd := <-p.outgoingPlayerDeltas:
 			p.enc.Encode(pd)
 		case dd := <-p.outgoingDeckDeltas:
-			//hack
-			rdd := struct {
-				Player int
-				DeckTo string
-				DeckFrom string
-				Cards 	[]string
-			}{
-				dd.Player,
-				dd.DeckTo,
-				dd.DeckFrom,
-				string_it(dd.Cards),
-			}
-			p.enc.Encode(rdd)
+			p.enc.Encode(dd)
 		case <-p.quit:
 			goto exit
 		}
