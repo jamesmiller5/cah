@@ -172,8 +172,8 @@ func (p *Player) sendYourId(id int) {
 	p.outgoingPlayerDeltas <- &PlayerDelta{Id: id, Message: "your-id"}
 }
 
-func (p *Player) czarify() {
-	p.outgoingPlayerDeltas <- &PlayerDelta{Id: p.Id, Message: "is-czar"}
+func (p *Player) czarify() *PlayerDelta {
+	return &PlayerDelta{Id: p.Id, Message: "is-czar"}
 }
 
 func (p *Player) EncodeDeltas() {

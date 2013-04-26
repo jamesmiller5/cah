@@ -78,7 +78,7 @@ func (game *Game) playRound(pd_filtered <-chan *PlayerDelta) {
 		next_id = min_id
 	}
 
-	game.players[next_id].czarify()
+	game.playerDeltas <- game.players[next_id].czarify()
 	game.RUnlock()
 
 	for {
@@ -118,6 +118,7 @@ func (game *Game) Play() {
 	//filter PlayerDeltas
 	for pd := range game.playerDeltas {
 		multicast, me_to := false, false
+		to_filter := false
 		player := pd.fromPlayer
 		switch pd.Message {
 		case "my-id?":
@@ -133,6 +134,9 @@ func (game *Game) Play() {
 			player.sendYourId(id)
 			log.Println("Assigned a new id", id)
 		case "join":
+			multicast = true
+			to_filter = true
+
 			//add to game board
 			log.Println("Join start")
 			game.Lock()
@@ -141,32 +145,38 @@ func (game *Game) Play() {
 
 			player.sendHand()
 			player.sendPlayers(game.players)
-			multicast = true
-			pd_filtered <- pd
 		case "leave":
+			to_filter = true
+			multicast = true
+
 			game.Lock()
 			delete(game.players, player.Id)
 			game.Unlock()
 			player.Shutdown()
-			multicast = true
-			pd_filtered <- pd
 		case "is-czar":
 			multicast = true
 			me_to = true
 		default:
-			pd_filtered <- pd
+			to_filter = true
 		}
 
 		//If we should reflect this message to all players
 		if multicast {
 			game.RLock()
 			for _, p := range game.players {
+				if me_to {
+					println("METO: %v",p)
+				}
 				if !me_to && p == player {
 					continue
 				}
 				p.outgoingPlayerDeltas <- pd
 			}
 			game.RUnlock()
+		}
+
+		if to_filter {
+			pd_filtered <- pd
 		}
 	}
 }

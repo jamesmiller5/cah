@@ -69,12 +69,14 @@ public class CahClient extends Thread implements JsonDeserializer<Delta>, JsonSe
 
 			//join the game
 			player1.outgoing.put(new PlayerDelta(1, "join"));
-			
+
+			/*
 			//get cards from server
 			DeckDelta player1Deck = (DeckDelta) player1.incoming.take();
 			assert player1Deck.Cards.length == 7;
 			assert player1Deck.DeckFrom.equals("draw");
 			assert player1Deck.DeckTo.equals("hand");
+			*/
 
 			//start player 2
 			player2.start();
@@ -92,33 +94,37 @@ public class CahClient extends Thread implements JsonDeserializer<Delta>, JsonSe
 			assert p2_id_reply.Message.equals("your-id");
 
 			player2.outgoing.put(new PlayerDelta(2, "join"));
-			
+
+			/*
 			//get cards
 			DeckDelta player2Deck = (DeckDelta) player2.incoming.take();
 			assert player2Deck.Cards.length == 7;
 			assert player2Deck.DeckFrom.equals("draw");
 			assert player2Deck.DeckTo.equals("hand");
+			*/
 
-			System.out.println(" after we join, we should get information about all players at the table");
+			System.out.println("*** after we join, we should get information about all players at the table");
 			// after we join, we should get information about all players at the table
 			PlayerDelta playersAtTableReply2 = (PlayerDelta) player2.incoming.take();
 			assert playersAtTableReply2.Id == 1;
 
-			System.out.println("player1 should now see player 2 join");
 			// player1 should now see player 2 join
+			System.out.println("player1 should now see player 2 join");
 			PlayerDelta p1_joining_of_p2 = (PlayerDelta) player1.incoming.take();
 			assert p1_joining_of_p2.Id == 2;
 			assert p1_joining_of_p2.Message.equals("join");
 
-			/* player1 should now be the czar
+			// player1 should now be the czar
+			System.out.println("player 1 should see czar with id 1");
 			PlayerDelta p1_is_czar = (PlayerDelta) player1.incoming.take();
 			assert p1_is_czar.Message.equals("is-czar");
 			assert p1_is_czar.Id == 1;
 
+			//Player 2 should see that player 1 is czar
+			System.out.println("player 2 should see czar with id 1");
 			p1_is_czar = (PlayerDelta) player2.incoming.take();
 			assert p1_is_czar.Message.equals("is-czar");
 			assert p1_is_czar.Id == 1;
-			*/
 
 			//have player 1 leave and see player 2's update
 			System.out.println("Player 1 is disconnecting, should show up on player 2");
