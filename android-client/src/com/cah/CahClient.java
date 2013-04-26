@@ -130,35 +130,114 @@ public class CahClient extends Thread implements JsonDeserializer<Delta>, JsonSe
 			assert p1_joining_of_p2.Id == 2;
 			assert p1_joining_of_p2.Message.equals("join");
 
-			// player1 should now be the czar
-			System.out.println("player 1 should see czar with id 1");
-			PlayerDelta p1_is_czar = (PlayerDelta) player1.incoming.take();
-			assert p1_is_czar.Message.equals("is-czar");
-			assert p1_is_czar.Id == 1;
+			//play 10 rounds
+			for( int i = 0; i<10; i++ ) {
+				// player1 should now be the czar
+				System.out.println("player 1 should see czar with id 1");
+				PlayerDelta p1_is_czar = (PlayerDelta) player1.incoming.take();
+				assert p1_is_czar.Message.equals("is-czar");
+				assert p1_is_czar.Id == 1;
 
-			//Player 2 should see that player 1 is czar
-			System.out.println("player 2 should see czar with id 1");
-			PlayerDelta p2_is_czar = (PlayerDelta) player2.incoming.take();
-			assert p2_is_czar.Message.equals("is-czar");
-			assert p2_is_czar.Id == 1;
+				//Player 2 should see that player 1 is czar
+				System.out.println("player 2 should see czar with id 1");
+				PlayerDelta p2_is_czar = (PlayerDelta) player2.incoming.take();
+				assert p2_is_czar.Message.equals("is-czar");
+				assert p2_is_czar.Id == 1;
 
-			//all should get a deck delta with the black card
-			System.out.println("Player 1 should get deckdelta with black card info");
-			DeckDelta p1_bl_crd = (DeckDelta) player1.incoming.take();
-			assert p1_bl_crd.Cards.length == 1;
-			assert p1_bl_crd.DeckFrom.equals("black-draw");
-			assert p1_bl_crd.DeckTo.equals("play");
+				//all should get a deck delta with the black card
+				System.out.println("Player 1 should get deckdelta with black card info");
+				DeckDelta p1_bl_crd = (DeckDelta) player1.incoming.take();
+				assert p1_bl_crd.Cards.length == 1;
+				assert p1_bl_crd.DeckFrom.equals("black-draw");
+				assert p1_bl_crd.DeckTo.equals("play");
 
-			System.out.println("Player 2 should get deckdelta with black card info");
-			DeckDelta p2_bl_crd = (DeckDelta) player2.incoming.take();
-			assert p2_bl_crd.Cards.length == 1;
-			assert p2_bl_crd.DeckFrom.equals("black-draw");
-			assert p2_bl_crd.DeckTo.equals("play");
+				System.out.println("Player 2 should get deckdelta with black card info");
+				DeckDelta p2_bl_crd = (DeckDelta) player2.incoming.take();
+				assert p2_bl_crd.Cards.length == 1;
+				assert p2_bl_crd.DeckFrom.equals("black-draw");
+				assert p2_bl_crd.DeckTo.equals("play");
 
-			System.out.println("Sending cards to server!");
-			//our turn! send a white card we pick
-			player1.outgoing.put(new DeckDelta(1, "hand", "play", new Card[] {new Card("RANDOM PLAYER 1")}));
-			player2.outgoing.put(new DeckDelta(2, "hand", "play", new Card[] {new Card("RANDOM PLAYER 2")}));
+				System.out.println("Sending cards to server!");
+				//our turn! send a white card we pick
+				player2.outgoing.put(new DeckDelta(2, "play", "hand", new Card[] {new Card("RANDOM")}));
+
+				//player 1 should get card from player 2
+				System.out.println("player 1 should get card from player 2");
+				DeckDelta p1_win_crd = (DeckDelta) player1.incoming.take();
+				assert p1_win_crd.Player == 2;
+				assert p1_win_crd.Cards.length == 1;
+				assert p1_win_crd.DeckFrom.equals("hand");
+				assert p1_win_crd.DeckTo.equals("play");
+
+				player1.outgoing.put(new DeckDelta(2, "winner", "hand", new Card[] {new Card("RANDOM")}));
+
+				System.out.println("Player 1 should get deckdelta with winning card info");
+				p1_win_crd = (DeckDelta) player1.incoming.take();
+				assert p1_win_crd.Player == 2;
+				assert p1_win_crd.Cards.length == 1;
+				assert p1_win_crd.DeckFrom.equals("hand");
+				assert p1_win_crd.DeckTo.equals("winner");
+
+				System.out.println("Player 2 should get deckdelta with winning card info");
+				DeckDelta p2_win_crd = (DeckDelta) player2.incoming.take();
+				assert p2_win_crd.Player == 2;
+				assert p2_win_crd.Cards.length == 1;
+				assert p2_win_crd.DeckFrom.equals("hand");
+				assert p2_win_crd.DeckTo.equals("winner");
+
+
+				System.out.println("\nROUNDOVER\n");
+				Thread.sleep(1000);
+
+				// player1 should now be the czar
+				System.out.println("player 1 should see czar with id 2");
+				p1_is_czar = (PlayerDelta) player1.incoming.take();
+				assert p1_is_czar.Message.equals("is-czar");
+				assert p1_is_czar.Id == 2;
+
+				//Player 2 should see that player 1 is czar
+				System.out.println("player 2 should see czar with id 2");
+				p2_is_czar = (PlayerDelta) player2.incoming.take();
+				assert p2_is_czar.Message.equals("is-czar");
+				assert p2_is_czar.Id == 2;
+
+				//all should get a deck delta with the black card
+				System.out.println("Player 1 should get deckdelta with black card info");
+				p1_bl_crd = (DeckDelta) player1.incoming.take();
+				assert p1_bl_crd.Cards.length == 1;
+				assert p1_bl_crd.DeckFrom.equals("black-draw");
+				assert p1_bl_crd.DeckTo.equals("play");
+
+				System.out.println("Player 2 should get deckdelta with black card info");
+				p2_bl_crd = (DeckDelta) player2.incoming.take();
+				assert p2_bl_crd.Cards.length == 1;
+				assert p2_bl_crd.DeckFrom.equals("black-draw");
+				assert p2_bl_crd.DeckTo.equals("play");
+
+				System.out.println("Sending cards to server!");
+				//our turn! send a white card we pick
+				player1.outgoing.put(new DeckDelta(1, "play", "hand", new Card[] {new Card("RANDOM")}));
+
+				//player 1 should get card from player 2
+				System.out.println("player2 should get card from player 1");
+				p1_win_crd = (DeckDelta) player2.incoming.take();
+				assert p1_win_crd.Player == 1;
+				assert p1_win_crd.Cards.length == 1;
+				assert p1_win_crd.DeckFrom.equals("hand");
+				assert p1_win_crd.DeckTo.equals("play");
+
+				player1.outgoing.put(new DeckDelta(1, "winner", "hand", new Card[] {new Card("RANDOM")}));
+
+				System.out.println("Player 1 should get deckdelta with winning card info");
+				p2_win_crd = (DeckDelta) player1.incoming.take();
+				assert p2_win_crd.Player == 1;
+				assert p2_win_crd.Cards.length == 1;
+				assert p2_win_crd.DeckFrom.equals("hand");
+				assert p2_win_crd.DeckTo.equals("winner");
+
+				System.out.println("\nROUNDOVER\n");
+				Thread.sleep(2000);
+			}
 
 			//have player 1 leave and see player 2's update
 			System.out.println("Player 1 is disconnecting, should show up on player 2");
@@ -341,6 +420,13 @@ abstract class Delta {
 				//requires access to private field:
 				if(field.get(this).getClass() == String[].class) {
 					result.append(Arrays.toString((String[]) field.get(this)));
+				} else if(field.get(this).getClass() == Card[].class) {
+					result.append("[");
+					for( Card card : (Card[])field.get(this) ) {
+						result.append(card);
+						result.append(",");
+					}
+					result.append("]");
 				} else {
 					result.append( field.get(this) );
 				}

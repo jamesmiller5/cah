@@ -58,6 +58,8 @@ func (game *Game) playRound(pd_filtered <-chan *PlayerDelta) {
 	game.RLock()
 
 	println("WE HAVE ENOUGH", len(game.players))
+	log.Println("Pick a czar")
+	time.Sleep(3*time.Second)
 
 	//next czar
 	czar_id := 0
@@ -85,6 +87,7 @@ func (game *Game) playRound(pd_filtered <-chan *PlayerDelta) {
 
 	game.playerDeltas <- game.players[next_id].czarify()
 	game.czar = game.players[next_id]
+	log.Println("Next czar is", next_id)
 	game.RUnlock()
 
 	log.Println("Picking black card")
@@ -92,7 +95,7 @@ func (game *Game) playRound(pd_filtered <-chan *PlayerDelta) {
 	randblack := game.black_draw.randomCards()[0:1]
 	blackdelta, err := TransferSome(game.black_draw,game.play,randblack)
 	//ugly hack to make sure czar is not b4 join on client
-	time.Sleep(1)
+	time.Sleep(3*time.Second)
 
 	if err {
 		log.Println("OH NOES! Error for black delta")
@@ -150,8 +153,18 @@ func (game *Game) playRound(pd_filtered <-chan *PlayerDelta) {
 
 		case dd := <-game.deckDeltas:
 			log.Printf("CZAR MADE CHOICE: %V\n", dd)
+
+			game.RLock()
+			for _, p := range game.players {
+				p.outgoingDeckDeltas <- dd
+			}
+			game.RUnlock()
+			goto end
 		}
 	}
+
+	end:
+	log.Println("ROUND OVER")
 }
 
 func (game *Game) playerCount() (l int) {
@@ -167,7 +180,14 @@ func (game *Game) Play() {
 
 	go func() {
 		for {
+			game.RLock()
+			for _, player := range game.players {
+				player.sendHand(game.white_draw)
+			}
+			game.RUnlock()
 			game.playRound(pd_filtered)
+			//go to sleep, let them bask in their glory
+			time.Sleep(2*time.Second)
 		}
 	}()
 
