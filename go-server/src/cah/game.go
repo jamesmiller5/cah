@@ -59,6 +59,7 @@ func (game *Game) playRound(pd_filtered <-chan *PlayerDelta) {
 
 	println("WE HAVE ENOUGH", len(game.players))
 	log.Println("Pick a czar")
+	time.Sleep(3*time.Second)
 
 	//next czar
 	czar_id := 0
@@ -94,7 +95,7 @@ func (game *Game) playRound(pd_filtered <-chan *PlayerDelta) {
 	randblack := game.black_draw.randomCards()[0:1]
 	blackdelta, err := TransferSome(game.black_draw,game.play,randblack)
 	//ugly hack to make sure czar is not b4 join on client
-	time.Sleep(1)
+	time.Sleep(3*time.Second)
 
 	if err {
 		log.Println("OH NOES! Error for black delta")
