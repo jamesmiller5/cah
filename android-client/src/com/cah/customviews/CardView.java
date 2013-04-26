@@ -113,10 +113,8 @@ public class CardView extends View {
 		
 		if(mCardWidth < 0) {
 			mCardWidth = getWidth();
-			//invalidateSizeOfEverything();
+			invalidateSizeOfEverything();
 		}
-		
-		invalidateSizeOfEverything();
 
 		// TODO: consider storing these as member variables to reduce
 		// allocations per draw cycle.
