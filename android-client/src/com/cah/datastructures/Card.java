@@ -1,14 +1,16 @@
 package com.cah.datastructures;
 
+/* Used by CahClient.java to encode and decode cards! */
 public class Card {
 	public enum Color {BLACK, WHITE};
 	public final Color color;
 	public final String text;
 	public final int numberOfBlanks;
-	
+
+
 	/**
 	 * Main constructor for Card class.
-	 * 
+	 *
 	 * @param color The color of the card.
 	 * @param text Text that appears on the card.
 	 * @param numberOfBlanks For black cards, the number of white cards that must be picked. Set to 0 if the card is white.
@@ -18,15 +20,15 @@ public class Card {
 		if(color == Color.WHITE && numberOfBlanks > 0) {
 			throw new IllegalArgumentException("Invalid numberOfBlanks");
 		}
-		
+
 		this.color = color;
 		this.text = text;
 		this.numberOfBlanks = numberOfBlanks;
 	}
-	
+
 	/**
 	 * Constructor for Card class
-	 * 
+	 *
 	 * @param color The color of the card. Sets numberOfBlanks to 1 if the card color isn't WHITE.
 	 * @param text Text that appears on the card.
 	 */
@@ -36,8 +38,43 @@ public class Card {
 		} else {
 			this.numberOfBlanks = 1;
 		}
-		
+
 		this.color = color;
 		this.text = text;
+	}
+
+	/**
+	 * Constructor that guesses card type, used for decoding
+	 *
+	 * @param text Text that appears on the card.
+	 */
+	public Card(String text) {
+		this.text = text;
+
+		//all chards under 6 characters are white
+		if( this.text.length() > 6 ) {
+			if( this.text.contains("_____________") ) {
+				this.color = Color.BLACK;
+				//calc number of __'s
+				int count = 0;
+				for( int i = 0; i < text.length(); i++ ) {
+					if( text.charAt(i) == '_' ) {
+						count++;
+					}
+				}
+
+				this.numberOfBlanks = Math.min(count/13,1);
+
+				return;
+			} else if( this.text.lastIndexOf('?') == this.text.length()-1 ) {
+				this.color = Color.BLACK;
+				this.numberOfBlanks = 1;
+
+				return;
+			}
+		}
+
+		this.color = Color.WHITE;
+		this.numberOfBlanks = 0;
 	}
 }

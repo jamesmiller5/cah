@@ -22,6 +22,7 @@ import android.widget.TextView;
 import com.cah.customviews.CardView;
 import com.cah.customviews.GameTable;
 import com.cah.datastructures.Card;
+import com.cah.CahClient;
 
 /**
  * Class that handles all gameplay interactions with the UI
@@ -104,8 +105,8 @@ public class CahPlayer {
 				DeckDelta delta = (DeckDelta) incoming_message;
 				if(delta.DeckTo.equals("hand") && delta.DeckFrom.equals("white-draw")) {
 					// Add the card to our hand
-					for(String cardText : delta.Cards) {
-						addCardToHand(new Card(Card.Color.WHITE, cardText));
+					for(Card card : delta.Cards) {
+						addCardToHand(new Card(Card.Color.WHITE, card.text));
 					}
 				} else if (delta.DeckTo.equals("play") && delta.DeckFrom.equals("black-draw") && this.playerIsCzar == true) {
 					// Show AlertDialog showing only the black card.
@@ -115,8 +116,8 @@ public class CahPlayer {
 					czarDialog = dialogBuilder.show();
 					//TODO: Dismiss the dialog when we recieve all player's white cards.
 				} else if (delta.DeckTo.equals("play") && this.playerIsCzar == true) {
-					for(String card : delta.Cards){
-						czarWhiteCards.add(new Pair<Integer, String>(delta.Player, card));
+					for(Card card : delta.Cards){
+						czarWhiteCards.add(new Pair<Integer, String>(delta.Player, card.text));
 					}
 					if(czarWhiteCards.size() == numberOfPlayers-1) {
 						// All players have played a card. Czar should now choose best card.
@@ -245,7 +246,7 @@ public class CahPlayer {
 			public void run() {
 				try {
 					client.outgoing.put(new DeckDelta(playerId, "play", "hand",
-							new String[] { card.text }));
+							new Card[] { card }));
 				} catch (InterruptedException e) {
 					// TODO Auto-generated catch block
 					e.printStackTrace();
