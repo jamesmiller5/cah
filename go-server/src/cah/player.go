@@ -155,8 +155,6 @@ silent_exit:
 func (p *Player) sendHand(white_card *Deck) {
 	log.Println("Sending player hand for", p.Id)
 	// Give the new player a new hand of 7 cards
-	cards := []*Card{}
-
 	have := len(p.hand.cards)
 	println("----HV:",have)
 	if have < 7 {
@@ -170,15 +168,17 @@ func (p *Player) sendHand(white_card *Deck) {
 		if err {
 			println("Oh noes! Error")
 		}
-	}
 
+		p.outgoingDeckDeltas <- delta //&DeckDelta{Player: p.Id, DeckTo: "hand", DeckFrom: "white-draw", Cards: cards}
+	}
+/*
 	for key, _ := range p.hand.cards {
 		cards = append(cards, key)
 	}
 
 	log.Printf("----CARDS:%v\n",cards)
+	*/
 
-	p.outgoingDeckDeltas <- &DeckDelta{Player: p.Id, DeckTo: "hand", DeckFrom: "white-draw", Cards: cards}
 }
 
 func (p *Player) sendPlayers(players map[int]*Player) {
