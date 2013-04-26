@@ -92,7 +92,7 @@ public class CardView extends View {
 
 	}
 	
-	public void invalidateSizeOfEverything() {
+	private void invalidateSizeOfEverything() {
 		// mCahLogo should be 60% of the card's width
 		int goalLogoWidth = (mCardWidth / 10) * 5;
 		int goalLogoHeight = (int) (goalLogoWidth/5.8);

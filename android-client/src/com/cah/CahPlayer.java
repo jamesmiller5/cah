@@ -15,6 +15,7 @@ import android.graphics.Color;
 import android.util.Pair;
 import android.view.View;
 import android.view.View.OnClickListener;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.LinearLayout.LayoutParams;
 import android.widget.TextView;
@@ -39,6 +40,13 @@ public class CahPlayer {
 	ArrayList<Pair<Integer, String>> czarWhiteCards = new ArrayList<Pair<Integer, String>>();
 	Thread messageHandler;
 	public final static List<Player> currentList = new ArrayList<Player>();
+	
+	//mehbe?
+	public final static List<String> imageList = new ArrayList<String>();
+	int imageID;
+	
+	
+	
 
 	/**
 	 * @param cahActivity
@@ -50,7 +58,11 @@ public class CahPlayer {
 		this.cahActivity = cahActivity;
 		this.client = client;
 		this.tableID = tableToJoin;
-
+		
+		imageID = 0;
+		imageList.add("butters_tiny_bw.png");
+		imageList.add("cartman_tiny_bw.png");
+		//imageList.add("droid_small.png");
 
 	    Cah.performOnBackgroundThread(new Runnable() {
 
@@ -210,6 +222,7 @@ public class CahPlayer {
 	public class Player {
 		public final int id;
 		public boolean czar;
+		
 
 		public Player(int playerId, boolean isCzar) {
 			this.id = playerId;
@@ -268,9 +281,23 @@ public class CahPlayer {
 
 			@Override
 			public void run() {
+				
 				GameTable table = (GameTable) cahActivity.findViewById(R.id.gameTable);
-				Bitmap playerBitmap = BitmapFactory.decodeResource(cahActivity.getResources(), R.drawable.cartman_tiny_bw);
+				Bitmap playerBitmap;
+				
+				//two different players.....
+				if(imageID == 0){
+					playerBitmap = BitmapFactory.decodeResource(cahActivity.getResources(), R.drawable.hulk);
+					imageID =1;
+				}else{
+					playerBitmap = BitmapFactory.decodeResource(cahActivity.getResources(), R.drawable.cartman_tiny_bw);
+					imageID = 0;
+				}
 				table.addPlayerToTable(playerBitmap, isCzar);
+				
+		//        ImageView image = (ImageView) findViewById(R.id.test_image);
+		//        image.setImageResource(R.drawable.test2);
+
 			}
 		});
 	}
