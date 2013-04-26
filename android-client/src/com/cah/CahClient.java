@@ -69,7 +69,12 @@ public class CahClient extends Thread implements JsonDeserializer<Delta>, JsonSe
 
 			//join the game
 			player1.outgoing.put(new PlayerDelta(1, "join"));
-			//TODO: get cards from server
+			
+			//get cards from server
+			DeckDelta player1Deck = (DeckDelta) player1.incoming.take();
+			assert player1Deck.Cards.length == 7;
+			assert player1Deck.DeckFrom.equals("draw");
+			assert player1Deck.DeckTo.equals("hand");
 
 			//start player 2
 			player2.start();
@@ -87,7 +92,12 @@ public class CahClient extends Thread implements JsonDeserializer<Delta>, JsonSe
 			assert p2_id_reply.Message.equals("your-id");
 
 			player2.outgoing.put(new PlayerDelta(2, "join"));
-			//TODO: get cards
+			
+			//get cards
+			DeckDelta player2Deck = (DeckDelta) player2.incoming.take();
+			assert player2Deck.Cards.length == 7;
+			assert player2Deck.DeckFrom.equals("draw");
+			assert player2Deck.DeckTo.equals("hand");
 
 			System.out.println(" after we join, we should get information about all players at the table");
 			// after we join, we should get information about all players at the table
