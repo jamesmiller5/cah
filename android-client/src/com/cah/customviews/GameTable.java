@@ -29,8 +29,6 @@ public class GameTable extends ViewGroup {
 		paint = new Paint();
 		paint.setColor(Color.LTGRAY);
 		paint.setStrokeWidth(1);
-		
-	//	paint.setShader(new RadialGradient(10f,100f,100f,Color.LTGRAY,Color.GRAY, Shader.TileMode.MIRROR));
 	}
 	
 	public void addPlayerToTable(Bitmap playerBitmap, boolean isCzar) {
