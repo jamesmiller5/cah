@@ -8,6 +8,7 @@ import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import android.app.AlertDialog;
+import android.app.AlertDialog.Builder;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -38,6 +39,7 @@ public class CahPlayer {
 	int numberOfPlayers = 0;
 	boolean playerIsCzar = false;
 	AlertDialog czarDialog;
+	int numberOfRoundsWon = 0;
 	ArrayList<Pair<Integer, String>> czarWhiteCards = new ArrayList<Pair<Integer, String>>();
 	Thread messageHandler;
 	public final static List<Player> currentList = new ArrayList<Player>();
@@ -141,6 +143,19 @@ public class CahPlayer {
 						// All players have played a card. Czar should now choose best card.
 						showWhiteCardChooser(czarWhiteCards, cahActivity);
 					}
+				} else if (delta.DeckTo.equals("winner") && delta.Player == playerId){
+					cahActivity.runOnUiThread(new Runnable() {
+
+						@Override
+						public void run() {
+							numberOfRoundsWon++;
+							AlertDialog.Builder dialogBuilder = new AlertDialog.Builder(cahActivity);
+							dialogBuilder.setMessage("Congratulations! You won that round! You have won a total of " + numberOfRoundsWon + " rounds.");
+							dialogBuilder.setPositiveButton("Ok", null);
+							dialogBuilder.show();
+						}
+						
+					});
 				}
 			} else if (c == PlayerDelta.class) {
 				//TODO: Implement this type of delta.
@@ -181,32 +196,48 @@ public class CahPlayer {
 		}
 	}
 
-	public void showWhiteCardChooser(Collection<Pair<Integer, String>> cards, Context context) {
-		LinearLayout cardContainer = new LinearLayout(context);
-		for(final Pair<Integer, String> card : cards) {
-			CardView cv = new CardView(context);
-			cv.setCardString(card.second);
-			cv.setTextColor(Color.BLACK);
-			cv.setCardColor(Color.WHITE);
+	public void showWhiteCardChooser(final Collection<Pair<Integer, String>> cards, final Context context) {
+		cahActivity.runOnUiThread(new Runnable() {
 
-			LayoutParams lp = new LayoutParams((int) (235* (context.getResources().getDisplayMetrics().densityDpi/160.)), (int) (300* (context.getResources().getDisplayMetrics().densityDpi/160.)));
-			cv.setLayoutParams(lp);
-			cv.setOnClickListener(new OnClickListener() {
-				@Override
-				public void onClick(View arg0) {
-					czarChoseCard(card.first, card.second);
+			@Override
+			public void run() {
+				if(czarDialog != null) 
+					czarDialog.dismiss();
+				LinearLayout cardContainer = new LinearLayout(context);
+				for(final Pair<Integer, String> card : cards) {
+					CardView cv = new CardView(context);
+					cv.setCardString(card.second);
+					cv.setTextColor(Color.BLACK);
+					cv.setCardColor(Color.WHITE);
+
+					LayoutParams lp = new LayoutParams((int) (235* (context.getResources().getDisplayMetrics().densityDpi/160.)), (int) (300* (context.getResources().getDisplayMetrics().densityDpi/160.)));
+					cv.setLayoutParams(lp);
+					cv.setOnClickListener(new OnClickListener() {
+						@Override
+						public void onClick(View arg0) {
+							czarChoseCard(card.first, card.second);
+						}
+					});
+					cardContainer.addView(cv);
 				}
-			});
-			cardContainer.addView(cv);
-		}
-		AlertDialog.Builder builder = new AlertDialog.Builder(context);
-		builder.setTitle("Choose wining card");
-		builder.setView(cardContainer);
-		czarDialog = builder.show();
+				AlertDialog.Builder builder = new AlertDialog.Builder(context);
+				builder.setTitle("Choose wining card");
+				builder.setView(cardContainer);
+				czarDialog = builder.show();
+			}
+			
+		});
+		
 	}
 
 	protected void czarChoseCard(int winnerID, String cardText) {
 		//TODO: Send message to server saying which card won.
+		try {
+			client.outgoing.put(new DeckDelta(winnerID, "winner", "hand", new Card[] {new Card(Card.Color.WHITE, cardText )}));
+		} catch (InterruptedException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 		czarDialog.dismiss();
 	}
 
