@@ -109,7 +109,7 @@ public class CahPlayer {
 			} else if (c == DeckDelta.class){
 				//TODO: Implement this type of delta.
 				DeckDelta delta = (DeckDelta) incoming_message;
-				if(delta.DeckTo.equals("hand") && delta.DeckFrom.equals("draw")) {
+				if(delta.DeckTo.equals("hand") && delta.DeckFrom.equals("white-draw")) {
 					// Add the card to our hand
 					for(String cardText : delta.Cards) {
 						addCardToHand(new Card(Card.Color.WHITE, cardText));
