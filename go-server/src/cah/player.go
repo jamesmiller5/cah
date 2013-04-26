@@ -56,7 +56,9 @@ func (dd *DeckDelta) isClean() bool {
 
 //table of available
 var deckDeltaDecks = map[string]bool{
-	"draw": true,
+	"white-draw": true,
+	"white-discard": true,
+	"black-draw": true,
 	"hand": true,
 	"play": true,
 }
@@ -149,13 +151,33 @@ exit:
 silent_exit:
 }
 
-func (p *Player) sendHand() {
+func (p *Player) sendHand(white_card *Deck) {
+	log.Println("Sending player hand for", p.Id)
 	// Give the new player a new hand of 7 cards
 	cards := []*Card{}
-	for i := 0; i < 7; i++ {
-		cards = append(cards, nil)
+
+	have := len(p.hand.cards)
+	println("----HV:",have)
+	if have < 7 {
+		//random white cards
+		randomList := white_card.randomCards()[0:7-have]
+
+
+		delta, err := TransferSome(white_card, p.hand, randomList)
+
+		log.Printf("----DELAT:%v\n",delta)
+		if err {
+			println("Oh noes! Error")
+		}
 	}
-	//p.outgoingDeckDeltas <- &DeckDelta{Player: p.Id, DeckTo: "hand", DeckFrom: "draw", Cards: cards}
+
+	for key, _ := range p.hand.cards {
+		cards = append(cards, key)
+	}
+
+	log.Printf("----CARDS:%v\n",cards)
+
+	p.outgoingDeckDeltas <- &DeckDelta{Player: p.Id, DeckTo: "hand", DeckFrom: "white-draw", Cards: cards}
 }
 
 func (p *Player) sendPlayers(players map[int]*Player) {
@@ -185,7 +207,19 @@ func (p *Player) EncodeDeltas() {
 		case pd := <-p.outgoingPlayerDeltas:
 			p.enc.Encode(pd)
 		case dd := <-p.outgoingDeckDeltas:
-			p.enc.Encode(dd)
+			//hack
+			rdd := struct {
+				Player int
+				DeckTo string
+				DeckFrom string
+				Cards 	[]string
+			}{
+				dd.Player,
+				dd.DeckTo,
+				dd.DeckFrom,
+				string_it(dd.Cards),
+			}
+			p.enc.Encode(rdd)
 		case <-p.quit:
 			goto exit
 		}

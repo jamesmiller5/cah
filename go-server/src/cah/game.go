@@ -15,6 +15,8 @@ type Game struct {
 	playerDeltas chan *PlayerDelta
 	deckDeltas   chan *DeckDelta
 	czar         *Player
+	white_draw, black_draw *Deck
+	white_discard *Deck
 }
 
 func NewGame() *Game {
@@ -24,6 +26,9 @@ func NewGame() *Game {
 		playerInc:    1,
 		playerDeltas: make(chan *PlayerDelta),
 		deckDeltas:   make(chan *DeckDelta),
+		white_draw:   NewDeck("white-draw", wcList),
+		black_draw:   NewDeck("black-draw", bcList),
+		white_discard: NewDeck("white-discard", nil),
 	}
 }
 
@@ -96,6 +101,7 @@ func (game *Game) playRound(pd_filtered <-chan *PlayerDelta) {
 	}
 
 	black:
+	//pick bla
 }
 
 func (game *Game) playerCount() (l int) {
@@ -143,7 +149,7 @@ func (game *Game) Play() {
 			game.players[player.Id] = player
 			game.Unlock()
 
-			player.sendHand()
+			player.sendHand(game.white_draw)
 			player.sendPlayers(game.players)
 		case "leave":
 			to_filter = true

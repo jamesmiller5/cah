@@ -35,16 +35,30 @@ type Card struct {
 	string
 }
 
+func (c *Card) String() string {
+	return c.string
+}
+
+func string_it(cards []*Card) []string {
+	list := make([]string,0)
+	for _, value := range cards {
+		list = append(list, value.string)
+	}
+
+	return list
+}
+
 type Deck struct {
 	cards map[*Card]bool
 	name  string
 }
 
-func NewDeck(name string, init []*Card) *Deck {
+func NewDeck(name string, init []string) *Deck {
 	deck := &Deck{cards: make(map[*Card]bool), name: name}
 	if init != nil {
 		for _, item := range init {
-			deck.cards[item] = true
+			card := &Card{ item }
+			deck.cards[card] = true
 		}
 	}
 
@@ -123,7 +137,7 @@ func (deck *Deck) randomCards() (randomList []*Card) {
 }
 
 func testdeck() {
-	list_one, list_two := []*Card{{"Hi"}, {"there"}}, []*Card{{"I'm"}, {"James"}}
+	list_one, list_two := []string{"Hi", "there"}, []string{"I'm", "James"}
 	deck_left := NewDeck("list-one", list_one)
 	deck_right := NewDeck("list-two", list_two)
 
