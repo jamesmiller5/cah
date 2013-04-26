@@ -264,8 +264,7 @@ public class CahPlayer {
 			@Override
 			public void run() {
 				try {
-					client.outgoing.put(new DeckDelta(playerId, "play", "hand",
-							new Card[] { card }));
+					client.outgoing.put(new DeckDelta(playerId, "play", "hand", new Card[] { card }));
 				} catch (InterruptedException e) {
 					// TODO Auto-generated catch block
 					e.printStackTrace();
