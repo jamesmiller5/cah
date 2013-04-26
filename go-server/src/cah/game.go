@@ -180,6 +180,11 @@ func (game *Game) Play() {
 
 	go func() {
 		for {
+			game.RLock()
+			for _, player := range game.players {
+				player.sendHand(game.white_draw)
+			}
+			game.RUnlock()
 			game.playRound(pd_filtered)
 			//go to sleep, let them bask in their glory
 			time.Sleep(10*time.Second)
