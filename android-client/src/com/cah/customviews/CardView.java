@@ -92,7 +92,7 @@ public class CardView extends View {
 
 	}
 	
-	public void invalidateSizeOfEverything() {
+	private void invalidateSizeOfEverything() {
 		// mCahLogo should be 60% of the card's width
 		int goalLogoWidth = (mCardWidth / 10) * 5;
 		int goalLogoHeight = (int) (goalLogoWidth/5.8);
@@ -113,10 +113,8 @@ public class CardView extends View {
 		
 		if(mCardWidth < 0) {
 			mCardWidth = getWidth();
-			//invalidateSizeOfEverything();
+			invalidateSizeOfEverything();
 		}
-		
-		invalidateSizeOfEverything();
 
 		// TODO: consider storing these as member variables to reduce
 		// allocations per draw cycle.
