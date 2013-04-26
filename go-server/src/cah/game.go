@@ -58,6 +58,7 @@ func (game *Game) playRound(pd_filtered <-chan *PlayerDelta) {
 	game.RLock()
 
 	println("WE HAVE ENOUGH", len(game.players))
+	log.Println("Pick a czar")
 
 	//next czar
 	czar_id := 0
@@ -85,6 +86,7 @@ func (game *Game) playRound(pd_filtered <-chan *PlayerDelta) {
 
 	game.playerDeltas <- game.players[next_id].czarify()
 	game.czar = game.players[next_id]
+	log.Println("Next czar is", next_id)
 	game.RUnlock()
 
 	log.Println("Picking black card")
@@ -150,7 +152,21 @@ func (game *Game) playRound(pd_filtered <-chan *PlayerDelta) {
 
 		case dd := <-game.deckDeltas:
 			log.Printf("CZAR MADE CHOICE: %V\n", dd)
+
+			game.RLock()
+			for _, p := range game.players {
+				p.outgoingDeckDeltas <- dd
+			}
+			game.RUnlock()
+			goto end
 		}
+	}
+
+	end:
+
+	log.Println("ROUND OVER")
+	for {
+		time.Sleep(1000)
 	}
 }
 

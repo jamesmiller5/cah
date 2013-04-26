@@ -157,8 +157,24 @@ public class CahClient extends Thread implements JsonDeserializer<Delta>, JsonSe
 
 			System.out.println("Sending cards to server!");
 			//our turn! send a white card we pick
-			player1.outgoing.put(new DeckDelta(1, "hand", "play", new Card[] {new Card("RANDOM PLAYER 1")}));
-			player2.outgoing.put(new DeckDelta(2, "hand", "play", new Card[] {new Card("RANDOM PLAYER 2")}));
+			player2.outgoing.put(new DeckDelta(2, "play", "hand", new Card[] {new Card("RANDOM")}));
+
+			//player 1 should get card from player 2
+			System.out.println("player 1 should get card from player 2");
+			DeckDelta p1_win_crd = (DeckDelta) player1.incoming.take();
+			assert p1_win_crd.Player == 2;
+			assert p1_win_crd.Cards.length == 1;
+			assert p1_win_crd.DeckFrom.equals("hand");
+			assert p1_win_crd.DeckTo.equals("play");
+
+			player1.outgoing.put(new DeckDelta(2, "winner", "hand", new Card[] {new Card("RANDOM")}));
+
+			System.out.println("Player 2 should get deckdelta with winning card info");
+			DeckDelta p2_win_crd = (DeckDelta) player2.incoming.take();
+			assert p2_win_crd.Player == 2;
+			assert p2_win_crd.Cards.length == 1;
+			assert p2_win_crd.DeckFrom.equals("hand");
+			assert p2_win_crd.DeckTo.equals("winner");
 
 			//have player 1 leave and see player 2's update
 			System.out.println("Player 1 is disconnecting, should show up on player 2");
