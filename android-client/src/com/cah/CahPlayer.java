@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
+import java.util.Random;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.atomic.AtomicBoolean;
 
@@ -45,11 +46,8 @@ public class CahPlayer {
 	public final static List<Player> currentList = new ArrayList<Player>();
 
 	//mehbe?
-	public final static List<String> imageList = new ArrayList<String>();
+	//public final static List<String> imageList = new ArrayList<String>();
 	int imageID;
-
-
-
 
 	/**
 	 * @param cahActivity
@@ -61,10 +59,14 @@ public class CahPlayer {
 		this.cahActivity = cahActivity;
 		this.client = client;
 		this.tableID = tableToJoin;
-
-		imageID = 0;
-		imageList.add("butters_tiny_bw.png");
-		imageList.add("cartman_tiny_bw.png");
+		
+		
+		Random rand = new Random();
+		imageID = rand.nextInt(6);
+		
+		imageID = playerId;
+		//imageList.add("butters_tiny_bw.png");
+		//imageList.add("cartman_tiny_bw.png");
 		//imageList.add("droid_small.png");
 
 	    Cah.performOnBackgroundThread(new Runnable() {
@@ -259,10 +261,12 @@ public class CahPlayer {
 
 	public class Player {
 		public final int id;
+		public final int imageID;
 		public boolean czar;
 
 
-		public Player(int playerId, boolean isCzar) {
+		public Player(int playerId, int imageID, boolean isCzar) {
+			this.imageID = imageID;
 			this.id = playerId;
 			this.czar = isCzar;
 		}
@@ -315,7 +319,7 @@ public class CahPlayer {
 	 */
 	public void playerJoined(int id, final boolean isCzar) {
 		// TODO: Implement this function.
-		currentList.add(new Player(id, isCzar));
+		currentList.add(new Player(id, imageID, isCzar));
 		cahActivity.runOnUiThread(new Runnable() {
 
 			@Override
@@ -326,19 +330,19 @@ public class CahPlayer {
 
 				//gives each player a unique user image
 				switch (imageID) {
-					case 0:  playerBitmap = BitmapFactory.decodeResource(cahActivity.getResources(), R.drawable.kenny_tiny_bw);
+					case 0:  playerBitmap = BitmapFactory.decodeResource(cahActivity.getResources(), R.drawable.cartman_tiny);
 							 imageID++;
 	                		 break;
-		            case 1:  playerBitmap = BitmapFactory.decodeResource(cahActivity.getResources(), R.drawable.butters_tiny_bw);
+		            case 1:  playerBitmap = BitmapFactory.decodeResource(cahActivity.getResources(), R.drawable.hulk);
 		                     imageID++;
 		            		 break;
-		            case 2:  playerBitmap = BitmapFactory.decodeResource(cahActivity.getResources(), R.drawable.superman);
+		            case 2:  playerBitmap = BitmapFactory.decodeResource(cahActivity.getResources(), R.drawable.superman_color);
                     		 imageID++;
                     		 break;
-		            case 3:  playerBitmap = BitmapFactory.decodeResource(cahActivity.getResources(), R.drawable.cartman_tiny_bw);
+		            case 3:  playerBitmap = BitmapFactory.decodeResource(cahActivity.getResources(), R.drawable.kenny_tiny);
 			           		 imageID++;
 			           		 break;
-		            case 4:  playerBitmap = BitmapFactory.decodeResource(cahActivity.getResources(), R.drawable.hulk_bw);
+		            case 4:  playerBitmap = BitmapFactory.decodeResource(cahActivity.getResources(), R.drawable.butters_tiny);
 			           		 imageID++;
 			           		 break;
 		            default:  playerBitmap = BitmapFactory.decodeResource(cahActivity.getResources(), R.drawable.droid_small);
