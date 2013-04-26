@@ -102,7 +102,7 @@ public class CahPlayer {
 				}
 			} else if (c == DeckDelta.class){
 				//TODO: Implement this type of delta.
-				DeckDelta delta = (DeckDelta) incoming_message;
+				final DeckDelta delta = (DeckDelta) incoming_message;
 				if(delta.DeckTo.equals("hand") && delta.DeckFrom.equals("white-draw")) {
 					// Add the card to our hand
 					for(Card card : delta.Cards) {
@@ -110,10 +110,16 @@ public class CahPlayer {
 					}
 				} else if (delta.DeckTo.equals("play") && delta.DeckFrom.equals("black-draw") && this.playerIsCzar == true) {
 					// Show AlertDialog showing only the black card.
-					AlertDialog.Builder dialogBuilder = new AlertDialog.Builder(cahActivity);
-					dialogBuilder.setView(CzarActivity.getBlackCardView(delta.Cards[0], cahActivity));
-					dialogBuilder.setCancelable(false);
-					czarDialog = dialogBuilder.show();
+					cahActivity.runOnUiThread(new Runnable() {
+						@Override
+						public void run() {
+							AlertDialog.Builder dialogBuilder = new AlertDialog.Builder(cahActivity);
+							dialogBuilder.setView(CzarActivity.getBlackCardView(delta.Cards[0], cahActivity));
+							dialogBuilder.setCancelable(false);
+							czarDialog = dialogBuilder.show();
+						}	
+					});
+					
 					//TODO: Dismiss the dialog when we recieve all player's white cards.
 				} else if (delta.DeckTo.equals("play") && this.playerIsCzar == true) {
 					for(Card card : delta.Cards){

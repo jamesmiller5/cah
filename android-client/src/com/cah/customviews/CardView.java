@@ -115,7 +115,7 @@ public class CardView extends View {
 			mCardWidth = getWidth();
 			invalidateSizeOfEverything();
 		}
-
+		this.invalidateSizeOfEverything();
 		// TODO: consider storing these as member variables to reduce
 		// allocations per draw cycle.
 		int paddingLeft = (int) (10. * DPI_MULTIPLIER);
