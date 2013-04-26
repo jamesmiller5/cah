@@ -1,11 +1,13 @@
 package com.cah.datastructures;
 
+import com.cah.Delta;
+
 /* Used by CahClient.java to encode and decode cards! */
-public class Card {
+public class Card extends Delta {
 	public enum Color {BLACK, WHITE};
-	public final Color color;
-	public final String text;
-	public final int numberOfBlanks;
+	public Color color;
+	public String text;
+	public int numberOfBlanks;
 
 
 	/**

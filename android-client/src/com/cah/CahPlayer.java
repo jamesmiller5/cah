@@ -118,7 +118,7 @@ public class CahPlayer {
 				if(delta.DeckTo.equals("hand") && delta.DeckFrom.equals("white-draw")) {
 					// Add the card to our hand
 					for(Card card : delta.Cards) {
-						addCardToHand(new Card(Card.Color.WHITE, card.text));
+						addCardToHand(card);
 					}
 				} else if (delta.DeckTo.equals("play") && delta.DeckFrom.equals("black-draw") && this.playerIsCzar == true) {
 					// Show AlertDialog showing only the black card.
