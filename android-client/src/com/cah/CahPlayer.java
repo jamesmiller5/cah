@@ -41,13 +41,13 @@ public class CahPlayer {
 	ArrayList<Pair<Integer, String>> czarWhiteCards = new ArrayList<Pair<Integer, String>>();
 	Thread messageHandler;
 	public final static List<Player> currentList = new ArrayList<Player>();
-	
+
 	//mehbe?
 	public final static List<String> imageList = new ArrayList<String>();
 	int imageID;
-	
-	
-	
+
+
+
 
 	/**
 	 * @param cahActivity
@@ -59,7 +59,7 @@ public class CahPlayer {
 		this.cahActivity = cahActivity;
 		this.client = client;
 		this.tableID = tableToJoin;
-		
+
 		imageID = 0;
 		imageList.add("butters_tiny_bw.png");
 		imageList.add("cartman_tiny_bw.png");
@@ -129,9 +129,9 @@ public class CahPlayer {
 							dialogBuilder.setView(CzarActivity.getBlackCardView(delta.Cards[0], cahActivity));
 							dialogBuilder.setCancelable(false);
 							czarDialog = dialogBuilder.show();
-						}	
+						}
 					});
-					
+
 					//TODO: Dismiss the dialog when we recieve all player's white cards.
 				} else if (delta.DeckTo.equals("play") && this.playerIsCzar == true) {
 					for(Card card : delta.Cards){
@@ -229,7 +229,7 @@ public class CahPlayer {
 	public class Player {
 		public final int id;
 		public boolean czar;
-		
+
 
 		public Player(int playerId, boolean isCzar) {
 			this.id = playerId;
@@ -287,10 +287,10 @@ public class CahPlayer {
 
 			@Override
 			public void run() {
-				
+
 				GameTable table = (GameTable) cahActivity.findViewById(R.id.gameTable);
 				Bitmap playerBitmap;
-				
+
 				//two different players.....
 				if(imageID == 0){
 					playerBitmap = BitmapFactory.decodeResource(cahActivity.getResources(), R.drawable.hulk);
@@ -300,7 +300,7 @@ public class CahPlayer {
 					imageID = 0;
 				}
 				table.addPlayerToTable(playerBitmap, isCzar);
-				
+
 		//        ImageView image = (ImageView) findViewById(R.id.test_image);
 		//        image.setImageResource(R.drawable.test2);
 
