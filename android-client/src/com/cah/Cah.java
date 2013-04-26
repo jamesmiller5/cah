@@ -91,7 +91,7 @@ public class Cah extends Activity
 			this.addCardToHand(new Card(i%2 == 0 ? Card.Color.WHITE : Card.Color.BLACK, dummyCards[i]));
 		}
 
-		// Dynamically add 10 players to the game table.
+		// Dynamically add 7 players to the game table.
 		for(int i = 0; i<10; i++) {
 			GameTable table = (GameTable)this.findViewById(R.id.gameTable);
 			LayoutInflater inflater = (LayoutInflater)this.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
