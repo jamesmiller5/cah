@@ -106,9 +106,8 @@ func (game *Game) playRound(pd_filtered <-chan *PlayerDelta) {
 	}
 	game.RUnlock()
 
-	//wait for either everyone to play a white card or for people to leave
-
-	wait_for := game.playerCount()
+	//wait for either everyone to play a white card except czar or for people to leave
+	wait_for := game.playerCount() - 1
 	have := 0
 	for {
 		select {
