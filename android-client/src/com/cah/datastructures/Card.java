@@ -77,4 +77,8 @@ public class Card {
 		this.color = Color.WHITE;
 		this.numberOfBlanks = 0;
 	}
+
+	public String toString() {
+		return this.text;
+	}
 }
