@@ -7,7 +7,6 @@ public class Card {
 	public final String text;
 	public final int numberOfBlanks;
 
-
 	/**
 	 * Main constructor for Card class.
 	 *
@@ -29,7 +28,8 @@ public class Card {
 	/**
 	 * Constructor for Card class
 	 *
-	 * @param color The color of the card. Sets numberOfBlanks to 1 if the card color isn't WHITE.
+	 * @param color The color of the card. 
+	 * 		  Sets numberOfBlanks to 1 if the card color isn't WHITE.
 	 * @param text Text that appears on the card.
 	 */
 	public Card(Color color, String text) {

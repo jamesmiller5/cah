@@ -1,20 +1,20 @@
 package com.cah;
 
-import java.util.ArrayList;
-import java.util.Collection;
+//import java.util.ArrayList;
+//import java.util.Collection;
 
 import android.app.Activity;
 import android.content.Context;
-import android.content.Intent;
+//import android.content.Intent;
 import android.graphics.Color;
-import android.os.Bundle;
-import android.text.SpannableString;
-import android.util.Pair;
+//import android.os.Bundle;
+//import android.text.SpannableString;
+//import android.util.Pair;
 import android.view.Gravity;
 import android.view.Menu;
 import android.view.View;
-import android.view.View.OnClickListener;
-import android.widget.FrameLayout;
+//import android.view.View.OnClickListener;
+//import android.widget.FrameLayout;
 import android.widget.LinearLayout;
 import android.widget.LinearLayout.LayoutParams;
 
@@ -23,14 +23,14 @@ import com.cah.datastructures.Card;
 
 public class CzarActivity extends Activity {
 
-	@Override
+/*	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 
 		if(this.getIntent().hasExtra("WHITE_CARDS")) {
 			setContentView(R.layout.sample_scrollview);
 			ArrayList<String> whiteCards = this.getIntent().getExtras().getStringArrayList("WHITE_CARDS");
-			int index = 0;
+//			int index = 0;
 			for(String cardText : whiteCards) {
 				Card card = new Card(Card.Color.WHITE, cardText);
 				//this.addChoosableCardToHand(card, index++);
@@ -49,7 +49,10 @@ public class CzarActivity extends Activity {
 			cardContainer.addView(card);
 		}
 	}
-
+*/
+	
+	//grabs the black card view to display on czar's screen
+	//adds it to the card container
 	public static View getBlackCardView(Card black_card, Context context) {
 		LinearLayout cardContainer = new LinearLayout(context);
 		cardContainer.setGravity(Gravity.CENTER);

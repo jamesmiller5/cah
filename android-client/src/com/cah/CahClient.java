@@ -27,11 +27,13 @@ import com.google.gson.stream.JsonReader;
 import com.google.gson.stream.JsonWriter;
 
 class CardEater implements JsonDeserializer<Card> {
+	
 	public Card deserialize( final JsonElement jsonRaw, final java.lang.reflect.Type type, final JsonDeserializationContext context ) throws JsonParseException {
+		
 		//All messages are objects, get this out of the way
 		JsonObject json = jsonRaw.getAsJsonObject();
 
-			//it's a card
+		//it's a card
 		if( json.has("Text") ) {
 			Card card =  new Card( json.getAsJsonPrimitive("Text").getAsString() );
 			return card;
@@ -132,6 +134,7 @@ public class CahClient extends Thread implements JsonDeserializer<Delta>, JsonSe
 
 			//play 10 rounds
 			for( int i = 0; i<10; i++ ) {
+				
 				// player1 should now be the czar
 				System.out.println("player 1 should see czar with id 1");
 				PlayerDelta p1_is_czar = (PlayerDelta) player1.incoming.take();
@@ -264,9 +267,15 @@ public class CahClient extends Thread implements JsonDeserializer<Delta>, JsonSe
 		Thread decoder = new Thread(new DecodeThread());
 
 		String hosts[] = {
-			"localhost", // Look for localhost connection first.
-			"10.0.2.2",   // If that fails attempt to connect to the emulator host's loopback.
-			"erictempl.in"};
+			
+				// Look for localhost connection first.
+			"localhost", 
+			
+			// If that fails attempt to connect to the emulator host's loopback.
+			"10.0.2.2",
+			
+			"erictempl.in"
+		};
 
 		try {
 			boolean connectedToServer = false;
@@ -306,11 +315,14 @@ public class CahClient extends Thread implements JsonDeserializer<Delta>, JsonSe
 			try {
 				decode();
 			} catch( JsonSyntaxException e ) {
+				
 				//Json library throws this when connection is closed
 				System.out.println("SOCKET CLOSED!");
+			
 			} catch( Exception e ) {
 				System.out.println("Unexpected Decode Thread Exception: " + e + "\n" + Arrays.toString(e.getStackTrace()) );
 			} finally {
+				
 				//Shutdown thread pair in case this thread encountered an error
 				shutdown();
 			}
@@ -318,6 +330,7 @@ public class CahClient extends Thread implements JsonDeserializer<Delta>, JsonSe
 	}
 
 	public void shutdown() {
+		
 		//Shutdown only once
 		if( go.get() ) {
 			go.set(false);
@@ -384,12 +397,14 @@ public class CahClient extends Thread implements JsonDeserializer<Delta>, JsonSe
 	}
 
 	public JsonElement serialize(final Delta src, final java.lang.reflect.Type type, final JsonSerializationContext context ) {
+		
 		//wrap some classes in an action delta if need be
 		if( src.getClass() == PlayerDelta.class ) {
 			return context.serialize(new ActionDelta((PlayerDelta)src), ActionDelta.class);
 		} else if( src.getClass() == DeckDelta.class ) {
 			return context.serialize(new ActionDelta((DeckDelta)src), ActionDelta.class);
 		} else if( src.getClass() == ActionDelta.class ) {
+			
 			//makes no sense, action delta's are a wrapper and shouldn't be used manually
 			throw new IllegalStateException("Unable to encode ActionDelta, should be done automatically");
 		} else {
@@ -417,6 +432,7 @@ abstract class Delta {
 			try {
 				result.append( field.getName() );
 				result.append(": ");
+				
 				//requires access to private field:
 				if(field.get(this).getClass() == String[].class) {
 					result.append(Arrays.toString((String[]) field.get(this)));

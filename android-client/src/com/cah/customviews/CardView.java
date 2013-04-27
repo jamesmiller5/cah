@@ -6,8 +6,6 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
 import android.graphics.Color;
-import android.graphics.ColorMatrix;
-import android.graphics.ColorMatrixColorFilter;
 import android.graphics.Paint;
 import android.graphics.Typeface;
 import android.text.Layout.Alignment;
@@ -15,8 +13,9 @@ import android.text.StaticLayout;
 import android.text.TextPaint;
 import android.util.AttributeSet;
 import android.view.View;
-
-import com.cah.Cah;
+//import android.graphics.ColorMatrix;
+//import android.graphics.ColorMatrixColorFilter;
+//import com.cah.Cah;
 import com.cah.R;
 
 /**
@@ -36,7 +35,7 @@ public class CardView extends View {
 	private final float TEXT_SIZE = this.getResources().getDimensionPixelSize(R.dimen.card_font_size);
 	private final float DPI_MULTIPLIER = (float) (this.getResources().getDisplayMetrics().densityDpi/160.);
 	
-	private Cah gameActivity;
+//	private Cah gameActivity;
 
 	public CardView(Context context) {
 		super(context);
@@ -104,7 +103,7 @@ public class CardView extends View {
 		mTextPaint.setTextSize(this.TEXT_SIZE);
 		mTextPaint.setColor(mTextColor);
 
-		Paint.FontMetrics fontMetrics = mTextPaint.getFontMetrics();
+//		Paint.FontMetrics fontMetrics = mTextPaint.getFontMetrics();
 	}
 	
 	@Override
@@ -119,12 +118,12 @@ public class CardView extends View {
 		// TODO: consider storing these as member variables to reduce
 		// allocations per draw cycle.
 		int paddingLeft = (int) (10. * DPI_MULTIPLIER);
-		int paddingTop = getPaddingTop();
+//		int paddingTop = getPaddingTop();
 		int paddingRight = getPaddingRight();
-		int paddingBottom = (int) (20. * DPI_MULTIPLIER);
+//		int paddingBottom = (int) (20. * DPI_MULTIPLIER);
 
 		int contentWidth = getWidth() - paddingLeft - paddingRight;
-		int contentHeight = getHeight() - paddingTop - paddingBottom;
+//		int contentHeight = getHeight() - paddingTop - paddingBottom;
 
 		canvas.translate((float)25. * DPI_MULTIPLIER, (float)17.5 * DPI_MULTIPLIER);
 		if(mTextLayout == null)
@@ -213,5 +212,4 @@ public class CardView extends View {
 		this.setBackgroundColor(Color.argb(255, (255-redValue)+redValue, 255-redValue, 255-redValue));
 
 	}
-
 }

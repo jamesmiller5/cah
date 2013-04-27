@@ -9,14 +9,17 @@ import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.RadialGradient;
 import android.graphics.Shader;
-import android.graphics.SweepGradient;
 import android.util.AttributeSet;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.QuickContactBadge;
+//import android.graphics.SweepGradient;
 
+//this class is primarily responsible for the table view 
+//however the player images controlled with CahPlayer 
+//except below which is just used for testing
 public class GameTable extends ViewGroup {
 
 	Paint paint;
@@ -31,6 +34,7 @@ public class GameTable extends ViewGroup {
 		paint.setStrokeWidth(1);
 	}
 	
+	//not currently used
 	public void addPlayerToTable(Bitmap playerBitmap, boolean isCzar) {
 		LayoutInflater inflater = (LayoutInflater)context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
 
@@ -88,6 +92,8 @@ public class GameTable extends ViewGroup {
 	protected void onDraw(Canvas canvas) {
 		
 		//Set shading for table
+		//radial gradient that is dynamically redrawn 
+		//to fit every size screen correctly
 		paint.setShader(new RadialGradient(this.getLeft()+(this.getWidth()/2), this.getTop()+(this.getHeight()/2), (this.getWidth()<this.getHeight()) ? this.getWidth()/3 : this.getHeight()/3, Color.LTGRAY,Color.GRAY, Shader.TileMode.MIRROR));
 
 		canvas.drawCircle(this.getLeft()+(this.getWidth()/2), this.getTop()+(this.getHeight()/2), (this.getWidth()<this.getHeight()) ? this.getWidth()/3 : this.getHeight()/3, paint);

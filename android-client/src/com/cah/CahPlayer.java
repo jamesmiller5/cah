@@ -4,7 +4,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
-import java.util.Random;
+//import java.util.Random;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.atomic.AtomicBoolean;
 
@@ -27,6 +27,7 @@ import com.cah.datastructures.Card;
 
 /**
  * Class that handles all gameplay interactions with the UI
+ * The user mainly directly interacts with this class.
  */
 public class CahPlayer {
 
@@ -57,15 +58,11 @@ public class CahPlayer {
 		this.cahActivity = cahActivity;
 		this.client = client;
 		this.tableID = tableToJoin;
-		
-		
-		Random rand = new Random();
-		imageID = rand.nextInt(6);
+
+		//Random rand = new Random();
+		//imageID = rand.nextInt(6);
 		
 		imageID = playerId;
-		//imageList.add("butters_tiny_bw.png");
-		//imageList.add("cartman_tiny_bw.png");
-		//imageList.add("droid_small.png");
 
 	    Cah.performOnBackgroundThread(new Runnable() {
 
@@ -93,14 +90,19 @@ public class CahPlayer {
 		}); // End performOnBackgroundThread
 	}
 
+	//handles incoming messages from server
 	public void handleIncomingMessages(BlockingQueue<Delta> incoming, BlockingQueue<Delta> outgoing) throws InterruptedException {
+		
 		for (int i = 0; i < currentList.size(); i++){
 			Player player = currentList.get(i);
 			System.out.print("Player ID is" + player.id + ",");
 			System.out.println("Player czar status is" + player.czar);
 		}
+		
 		while( go.get() ) {
-			Delta incoming_message = incoming.take(); // This will block until something comes in.
+			// This will block until something comes in.
+			Delta incoming_message = incoming.take(); 
+			
 			// Print out debug information
 			System.out.println("in handleIncomingMessages(): " + incoming_message.toString());
 			this.showDebugText(incoming_message.toString());
@@ -137,14 +139,17 @@ public class CahPlayer {
 
 					//TODO: Dismiss the dialog when we recieve all player's white cards.
 				} else if (delta.DeckTo.equals("play") && this.playerIsCzar.get() == true) {
+					
 					for(Card card : delta.Cards){
 						czarWhiteCards.add(new Pair<Integer, String>(delta.Player, card.text));
 					}
+					
 					if(czarWhiteCards.size() == numberOfPlayers-1) {
 						// All players have played a card. Czar should now choose best card.
 						System.out.println("SHOWING WHITE CARD CHOOSER");
 						showWhiteCardChooser(czarWhiteCards, cahActivity);
 					}
+					
 				} else if (delta.DeckTo.equals("winner") && delta.Player == playerId){
 					cahActivity.runOnUiThread(new Runnable() {
 
@@ -370,12 +375,9 @@ public class CahPlayer {
 			           		 imageID=0;
 			           		 break;
 				}
-
 				table.addPlayerToTable(playerBitmap, isCzar);
-
 		//        ImageView image = (ImageView) findViewById(R.id.test_image);
 		//        image.setImageResource(R.drawable.test2);
-
 			}
 		});
 	}
