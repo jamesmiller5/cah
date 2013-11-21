@@ -40,7 +40,7 @@ func (c *Card) String() string {
 }
 
 func string_it(cards []*Card) []string {
-	list := make([]string,0)
+	list := make([]string, 0)
 	for _, value := range cards {
 		list = append(list, value.Text)
 	}
@@ -57,7 +57,7 @@ func NewDeck(name string, init []string) *Deck {
 	deck := &Deck{cards: make(map[*Card]bool), name: name}
 	if init != nil {
 		for _, item := range init {
-			card := &Card{ item }
+			card := &Card{item}
 			deck.cards[card] = true
 		}
 	}

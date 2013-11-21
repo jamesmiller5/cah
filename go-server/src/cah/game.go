@@ -10,27 +10,27 @@ const MIN_PLAYERS = 2
 
 type Game struct {
 	sync.RWMutex
-	players      map[int]*Player
-	playerInc    int
-	playerDeltas chan *PlayerDelta
-	deckDeltas   chan *DeckDelta
-	czar         *Player
+	players                map[int]*Player
+	playerInc              int
+	playerDeltas           chan *PlayerDelta
+	deckDeltas             chan *DeckDelta
+	czar                   *Player
 	white_draw, black_draw *Deck
-	white_discard *Deck
-	play *Deck
+	white_discard          *Deck
+	play                   *Deck
 }
 
 func NewGame() *Game {
 	//dealer has an id of 0
 	return &Game{
-		players:      make(map[int]*Player),
-		playerInc:    1,
-		playerDeltas: make(chan *PlayerDelta),
-		deckDeltas:   make(chan *DeckDelta),
-		white_draw:   NewDeck("white-draw", wcList),
-		black_draw:   NewDeck("black-draw", bcList),
+		players:       make(map[int]*Player),
+		playerInc:     1,
+		playerDeltas:  make(chan *PlayerDelta),
+		deckDeltas:    make(chan *DeckDelta),
+		white_draw:    NewDeck("white-draw", wcList),
+		black_draw:    NewDeck("black-draw", bcList),
 		white_discard: NewDeck("white-discard", nil),
-		play: NewDeck("play", nil), //in play deck=current black card
+		play:          NewDeck("play", nil), //in play deck=current black card
 	}
 }
 
@@ -44,7 +44,7 @@ func (game *Game) playRound(pd_filtered <-chan *PlayerDelta) {
 	//win?
 
 	//wait for MIN_PLAYERS
-	start:
+start:
 	for {
 		l := game.playerCount()
 		if l < MIN_PLAYERS {
@@ -59,14 +59,14 @@ func (game *Game) playRound(pd_filtered <-chan *PlayerDelta) {
 
 	println("WE HAVE ENOUGH", len(game.players))
 	log.Println("Pick a czar")
-	time.Sleep(3*time.Second)
+	time.Sleep(3 * time.Second)
 
 	//next czar
 	czar_id := 0
 	if game.czar != nil {
 		czar_id = game.czar.Id
 	}
-	next_id := int( ^uint(0) >> 1 )
+	next_id := int(^uint(0) >> 1)
 	max_id := next_id
 	min_id := next_id
 
@@ -93,9 +93,9 @@ func (game *Game) playRound(pd_filtered <-chan *PlayerDelta) {
 	log.Println("Picking black card")
 	//pick black
 	randblack := game.black_draw.randomCards()[0:1]
-	blackdelta, err := TransferSome(game.black_draw,game.play,randblack)
+	blackdelta, err := TransferSome(game.black_draw, game.play, randblack)
 	//ugly hack to make sure czar is not b4 join on client
-	time.Sleep(3*time.Second)
+	time.Sleep(3 * time.Second)
 
 	if err {
 		log.Println("OH NOES! Error for black delta")
@@ -134,7 +134,7 @@ func (game *Game) playRound(pd_filtered <-chan *PlayerDelta) {
 		}
 	}
 
-	czar_pick:
+czar_pick:
 	//wait for czar to choose card
 	log.Println("waiting for czar to choose card")
 	for {
@@ -163,14 +163,14 @@ func (game *Game) playRound(pd_filtered <-chan *PlayerDelta) {
 		}
 	}
 
-	end:
+end:
 	log.Println("ROUND OVER")
 }
 
 func (game *Game) playerCount() (l int) {
 	game.RLock()
 	l = len(game.players)
-	game.RUnlock();
+	game.RUnlock()
 
 	return
 }
@@ -187,7 +187,7 @@ func (game *Game) Play() {
 			game.RUnlock()
 			game.playRound(pd_filtered)
 			//go to sleep, let them bask in their glory
-			time.Sleep(2*time.Second)
+			time.Sleep(2 * time.Second)
 		}
 	}()
 
