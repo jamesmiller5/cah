@@ -44,8 +44,8 @@ func HandleNewClient(conn net.Conn) {
 		}
 	}()
 
-	dec := &NetDecoder{json.Decoder: json.NewDecoder(conn), net.Conn: conn}
-	enc := &NetEncoder{json.Encoder: json.NewEncoder(conn), net.Conn: conn}
+	dec := &NetDecoder{json.NewDecoder(conn), conn}
+	enc := &NetEncoder{json.NewEncoder(conn), conn}
 	for {
 		var msg TableDelta
 
